@@ -26,6 +26,8 @@ concurrency:
 
 jobs:
   qualidade-mobile:
+    # Só roda quando existir código do app; sem ele (projeto recomeçando), o job é ignorado.
+    if: ${{ hashFiles('base(tempval)/package.json') != '' }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
