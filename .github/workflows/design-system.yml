@@ -1,19 +1,13 @@
-name: Qualidade MVP e mobile
+name: CI front-end
 
 on:
   push:
-    branches: [main, feat/integracao-mvp-main, feat/issue-74-design-system-mobile]
+    branches: [main]
   pull_request:
     branches: [main]
     paths:
-      - README.md
-      - docs/**
-      - controle-base-main/**
-      - design-em-react/**
-      - base(tempval)/**
-      - package-lock.json
-      - package.json
-      - vitest.config.ts
+      - DEV/**
+      - UI-UX/**
       - .github/workflows/design-system.yml
   workflow_dispatch:
 
@@ -21,35 +15,32 @@ permissions:
   contents: read
 
 concurrency:
-  group: design-system-${{ github.ref }}
+  group: ci-front-end-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  qualidade-mobile:
-    # Só roda quando existir código do app; sem ele (projeto recomeçando), o job é ignorado.
-    if: ${{ hashFiles('base(tempval)/package.json') != '' }}
+  front-end:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: DEV/front-end
     env:
       NEXT_TELEMETRY_DISABLED: "1"
-      NEXT_PUBLIC_SUPABASE_URL: "https://supabase.example.com"
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: "sb_publishable_ci_ficticia"
-      PDF_MAX_BYTES: "4000000"
     steps:
       - uses: actions/checkout@v4
+      - name: Verifica se o app existe
+        id: app
+        working-directory: .
+        run: |
+          if [ -f DEV/front-end/package.json ]; then echo "existe=true" >> "$GITHUB_OUTPUT"; else echo "existe=false" >> "$GITHUB_OUTPUT"; fi
       - uses: actions/setup-node@v4
+        if: steps.app.outputs.existe == 'true'
         with:
-          node-version: 24
+          node-version: 22
+          cache: npm
+          cache-dependency-path: DEV/front-end/package-lock.json
       - run: npm ci --no-audit --no-fund
-      - run: npm run typecheck --workspace 'base(tempval)'
-      - run: npm run lint --workspace 'base(tempval)'
-      - run: npm test --workspace 'base(tempval)' -- --maxWorkers=2
-      - run: npm run build --workspace 'base(tempval)'
-      - run: npx playwright install --with-deps chromium webkit
-      - run: npm run test:mobile --workspace 'base(tempval)'
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: design-system-mobile
-          path: test-results/
-          if-no-files-found: ignore
+        if: steps.app.outputs.existe == 'true'
+      - run: npm run build
+        if: steps.app.outputs.existe == 'true'
