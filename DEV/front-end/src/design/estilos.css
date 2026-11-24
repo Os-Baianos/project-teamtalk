@@ -193,3 +193,7 @@ button:disabled { opacity: .65; cursor: wait; }
 /* A marca já aparece na barra superior */
 .painel .marca { display: none; }
 .painel .rodape-auth { margin: var(--espaco-8) 0 0; }
+
+/* Campo com erro: borda vermelha (a lista de condições abaixo explica o motivo) */
+input[aria-invalid="true"] { border-color: var(--cor-erro); }
+input[aria-invalid="true"]:focus-visible { outline-color: rgba(217, 21, 21, .25); border-color: var(--cor-erro); }

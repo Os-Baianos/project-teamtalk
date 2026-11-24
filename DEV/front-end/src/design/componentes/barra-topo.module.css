@@ -10,7 +10,7 @@
 .marca {
   display: inline-flex;
   align-items: center;
-  gap: var(--espaco-3);
+  gap: var(--espaco-1);
   color: var(--cor-topo-texto);
   font-size: var(--fonte-lg);
   font-weight: var(--peso-forte);

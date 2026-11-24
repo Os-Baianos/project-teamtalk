@@ -1,0 +1,6 @@
+.lista { list-style: none; margin: var(--espaco-2) 0 0; padding: 0; display: grid; gap: var(--espaco-1); }
+.regra { display: flex; align-items: baseline; gap: var(--espaco-2); font-size: var(--fonte-sm); color: var(--cor-secundaria); }
+.marca { flex: none; width: 1em; text-align: center; font-weight: var(--peso-forte); }
+.regra[data-estado="ok"] { color: var(--cor-sucesso); }
+.regra[data-estado="erro"] { color: var(--cor-erro); }
+.leitor { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }

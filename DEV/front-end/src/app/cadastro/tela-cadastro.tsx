@@ -1,8 +1,64 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
+import type { FormEvent } from "react";
+import { ListaRegras } from "@design/componentes";
+import {
+  regrasArroba, regrasConfirmacao, regrasEmail, regrasNome, regrasSenha, todasOk,
+} from "@design/validacoes";
 
 type Props = { cadastrar: (dados: FormData) => Promise<void>; mensagem: string };
+type Campo = "nome" | "arroba" | "email" | "senha" | "confirmacao";
 
 export function TelaCadastro({ cadastrar, mensagem }: Props) {
+  const [valores, setValores] = useState({ nome: "", arroba: "", email: "", senha: "", confirmacao: "" });
+  const [tocados, setTocados] = useState<Record<Campo, boolean>>({
+    nome: false, arroba: false, email: false, senha: false, confirmacao: false,
+  });
+
+  const regras = {
+    nome: regrasNome(valores.nome),
+    arroba: regrasArroba(valores.arroba),
+    email: regrasEmail(valores.email),
+    senha: regrasSenha(valores.senha),
+    confirmacao: regrasConfirmacao(valores.senha, valores.confirmacao),
+  };
+  const invalido = (campo: Campo) => tocados[campo] && !todasOk(regras[campo]);
+
+  const alterar = (campo: Campo, valor: string) => {
+    setValores((atual) => ({ ...atual, [campo]: valor }));
+    setTocados((atual) => ({ ...atual, [campo]: true }));
+  };
+  const aoSair = (campo: Campo) => setTocados((atual) => ({ ...atual, [campo]: true }));
+
+  function aoEnviar(evento: FormEvent<HTMLFormElement>) {
+    if (!todasOk(...Object.values(regras))) {
+      evento.preventDefault();
+      setTocados({ nome: true, arroba: true, email: true, senha: true, confirmacao: true });
+    }
+  }
+
+  const campo = (
+    id: Campo, rotulo: string, props: React.InputHTMLAttributes<HTMLInputElement>,
+  ) => (
+    <>
+      <label htmlFor={id}>{rotulo}</label>
+      <input
+        id={id}
+        name={id}
+        value={valores[id]}
+        onChange={(e) => alterar(id, e.target.value)}
+        onBlur={() => aoSair(id)}
+        aria-invalid={invalido(id)}
+        aria-describedby={`regras-${id}`}
+        required
+        {...props}
+      />
+      <ListaRegras id={`regras-${id}`} regras={regras[id]} ativa={tocados[id]} />
+    </>
+  );
+
   return (
     <main className="pagina">
       <section className="painel" aria-labelledby="titulo-cadastro">
@@ -12,59 +68,22 @@ export function TelaCadastro({ cadastrar, mensagem }: Props) {
         </div>
         <h1 id="titulo-cadastro">Crie sua conta</h1>
         <p>Preencha os dados para começar a conversar com sua equipe.</p>
-        <form action={cadastrar} className="formulario">
-          <label htmlFor="nome">Nome completo</label>
-          <input id="nome" name="nome" type="text" autoComplete="name" enterKeyHint="next" required />
-          <label htmlFor="arroba">Usuário (@)</label>
-          <input
-            id="arroba"
-            name="arroba"
-            type="text"
-            autoComplete="username"
-            autoCapitalize="none"
-            spellCheck={false}
-            pattern="[a-z0-9_.]{3,20}"
-            enterKeyHint="next"
-            required
-            aria-describedby="regra-arroba"
-          />
-          <p id="regra-arroba">De 3 a 20 caracteres: letras minúsculas, números, ponto ou _.</p>
-          <label htmlFor="email">E-mail corporativo</label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            autoCapitalize="none"
-            spellCheck={false}
-            inputMode="email"
-            enterKeyHint="next"
-            required
-          />
-          <label htmlFor="senha">Senha</label>
-          <input
-            id="senha"
-            name="senha"
-            type="password"
-            autoComplete="new-password"
-            minLength={10}
-            maxLength={72}
-            enterKeyHint="next"
-            required
-            aria-describedby="regra-senha"
-          />
-          <p id="regra-senha">Use pelo menos 10 caracteres.</p>
-          <label htmlFor="confirmacao">Confirmar senha</label>
-          <input
-            id="confirmacao"
-            name="confirmacao"
-            type="password"
-            autoComplete="new-password"
-            minLength={10}
-            maxLength={72}
-            enterKeyHint="done"
-            required
-          />
+        <form action={cadastrar} onSubmit={aoEnviar} className="formulario" noValidate>
+          {campo("nome", "Nome completo", { type: "text", autoComplete: "name", enterKeyHint: "next" })}
+          {campo("arroba", "Usuário (@)", {
+            type: "text", autoComplete: "username", autoCapitalize: "none", spellCheck: false,
+            maxLength: 30, enterKeyHint: "next",
+          })}
+          {campo("email", "E-mail corporativo", {
+            type: "email", autoComplete: "email", autoCapitalize: "none", spellCheck: false,
+            inputMode: "email", enterKeyHint: "next",
+          })}
+          {campo("senha", "Senha", {
+            type: "password", autoComplete: "new-password", maxLength: 100, enterKeyHint: "next",
+          })}
+          {campo("confirmacao", "Confirmar senha", {
+            type: "password", autoComplete: "new-password", maxLength: 100, enterKeyHint: "done",
+          })}
           {mensagem && <p className="erro" role="alert">{mensagem}</p>}
           <button type="submit">Criar conta</button>
         </form>

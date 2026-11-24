@@ -11,3 +11,5 @@ export type { PropsNavegacaoMobile, ItemNavegacaoMobile } from "./navegacao-mobi
 export { LayoutMobile } from "./layout-mobile";
 export type { PropsLayoutMobile } from "./layout-mobile";
 export { BarraTopo, RodapeTopo } from "./barra-topo";
+export { ListaRegras } from "./lista-regras";
+export type { Regra } from "./lista-regras";
