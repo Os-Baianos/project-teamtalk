@@ -197,3 +197,27 @@ button:disabled { opacity: .65; cursor: wait; }
 /* Campo com erro: borda vermelha (a lista de condições abaixo explica o motivo) */
 input[aria-invalid="true"] { border-color: var(--cor-erro); }
 input[aria-invalid="true"]:focus-visible { outline-color: rgba(217, 21, 21, .25); border-color: var(--cor-erro); }
+
+/* Animações discretas; desligadas para quem prefere menos movimento */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes entrar-subindo { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @keyframes entrar-suave { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes tremer { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-6px); } 40% { transform: translateX(5px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
+
+  .painel { animation: entrar-subindo .45s cubic-bezier(.2, .7, .2, 1) both; }
+  .painel > * { animation: entrar-suave .5s ease both; }
+  .painel > *:nth-child(2) { animation-delay: .05s; }
+  .painel > *:nth-child(3) { animation-delay: .1s; }
+  .painel > *:nth-child(4) { animation-delay: .15s; }
+
+  input { transition: border-color .15s ease, box-shadow .2s ease, background-color .15s ease; }
+  input:focus-visible { box-shadow: 0 0 0 4px rgba(0, 108, 224, .12); }
+  input[aria-invalid="true"] { animation: tremer .35s ease; }
+
+  button { transition: background .15s ease, transform .15s ease, box-shadow .2s ease; }
+  button:not(:disabled):hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(15, 20, 26, .18); }
+  button:not(:disabled):active { transform: translateY(1px); box-shadow: none; }
+
+  .rodape-auth a { transition: color .15s ease; }
+  .rodape-auth a:hover { color: #0049a3; }
+}
