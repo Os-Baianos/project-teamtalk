@@ -1,3 +1,6 @@
+.recipiente { display: grid; grid-template-rows: 1fr; }
+.recipiente[data-aberta="false"] { grid-template-rows: 0fr; opacity: 0; visibility: hidden; }
+.interno { min-height: 0; overflow: hidden; }
 .lista { list-style: none; margin: var(--espaco-2) 0 0; padding: 0; display: grid; gap: var(--espaco-1); }
 .regra { display: flex; align-items: baseline; gap: var(--espaco-2); font-size: var(--fonte-sm); color: var(--cor-secundaria); }
 .marca { flex: none; width: 1em; text-align: center; font-weight: var(--peso-forte); }
@@ -7,7 +10,9 @@
 @media (prefers-reduced-motion: no-preference) {
   @keyframes aparecer { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
   @keyframes pulo { 0% { transform: scale(.4); } 60% { transform: scale(1.3); } 100% { transform: scale(1); } }
-  .lista { animation: aparecer .22s ease both; }
+  .recipiente { transition: grid-template-rows .25s ease, opacity .2s ease, visibility 0s; }
+  .recipiente[data-aberta="false"] { transition: grid-template-rows .25s ease, opacity .2s ease, visibility 0s linear .25s; }
   .regra { transition: color .2s ease; }
+  .marca { animation: pulo .28s ease both; }
 }
 .regra[data-estado="ok"] { color: var(--cor-sucesso); }
