@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { ListaRegras } from "@design/componentes";
+import { modoLista } from "@design/modo-lista";
 import {
   regrasArroba, regrasConfirmacao, regrasEmail, regrasNome, regrasSenha, todasOk,
 } from "@design/validacoes";
@@ -13,7 +14,8 @@ type Campo = "nome" | "arroba" | "email" | "senha" | "confirmacao";
 
 export function TelaCadastro({ cadastrar, mensagem }: Props) {
   const [valores, setValores] = useState({ nome: "", arroba: "", email: "", senha: "", confirmacao: "" });
-  const [tocados, setTocados] = useState<Record<Campo, boolean>>({
+  const [focado, setFocado] = useState<Campo | null>(null);
+  const [validados, setValidados] = useState<Record<Campo, boolean>>({
     nome: false, arroba: false, email: false, senha: false, confirmacao: false,
   });
 
@@ -24,18 +26,19 @@ export function TelaCadastro({ cadastrar, mensagem }: Props) {
     senha: regrasSenha(valores.senha),
     confirmacao: regrasConfirmacao(valores.senha, valores.confirmacao),
   };
-  const invalido = (campo: Campo) => tocados[campo] && !todasOk(regras[campo]);
+  const modo = (campo: Campo) => modoLista(valores[campo], regras[campo], focado === campo, validados[campo]);
+  const invalido = (campo: Campo) => validados[campo] && !todasOk(regras[campo]);
 
-  const alterar = (campo: Campo, valor: string) => {
-    setValores((atual) => ({ ...atual, [campo]: valor }));
-    setTocados((atual) => ({ ...atual, [campo]: true }));
+  const alterar = (campo: Campo, valor: string) => setValores((atual) => ({ ...atual, [campo]: valor }));
+  const aoSair = (campo: Campo) => {
+    setFocado(null);
+    if (valores[campo] !== "") setValidados((atual) => ({ ...atual, [campo]: true }));
   };
-  const aoSair = (campo: Campo) => setTocados((atual) => ({ ...atual, [campo]: true }));
 
   function aoEnviar(evento: FormEvent<HTMLFormElement>) {
     if (!todasOk(...Object.values(regras))) {
       evento.preventDefault();
-      setTocados({ nome: true, arroba: true, email: true, senha: true, confirmacao: true });
+      setValidados({ nome: true, arroba: true, email: true, senha: true, confirmacao: true });
     }
   }
 
@@ -49,13 +52,14 @@ export function TelaCadastro({ cadastrar, mensagem }: Props) {
         name={id}
         value={valores[id]}
         onChange={(e) => alterar(id, e.target.value)}
+        onFocus={() => setFocado(id)}
         onBlur={() => aoSair(id)}
         aria-invalid={invalido(id)}
         aria-describedby={`regras-${id}`}
         required
         {...props}
       />
-      <ListaRegras id={`regras-${id}`} regras={regras[id]} ativa={tocados[id]} />
+      <ListaRegras id={`regras-${id}`} regras={regras[id]} modo={modo(id)} />
     </>
   );
 

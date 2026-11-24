@@ -1,3 +1,4 @@
+import type { ModoLista } from "@design/modo-lista";
 import estilos from "@design/componentes/lista-regras.module.css";
 
 export type Regra = { texto: string; ok: boolean };
@@ -5,16 +6,17 @@ export type Regra = { texto: string; ok: boolean };
 type Props = {
   id: string;
   regras: Regra[];
-  /** Só mostra a lista depois que o usuário mexeu no campo. */
-  ativa: boolean;
+  /** Define se a lista fica oculta, mostra só o que está certo, ou mostra tudo. */
+  modo: ModoLista;
 };
 
 /** Lista de condições que muda para ✓ (atendida) ou ✕ (pendente) conforme o usuário digita. */
-export function ListaRegras({ id, regras, ativa }: Props) {
-  if (!ativa) return null;
+export function ListaRegras({ id, regras, modo }: Props) {
+  const visiveis = modo === "somenteOk" ? regras.filter((r) => r.ok) : regras;
+  if (modo === "oculta" || visiveis.length === 0) return null;
   return (
     <ul className={estilos.lista} id={id} aria-label="Condições">
-      {regras.map((regra) => {
+      {visiveis.map((regra) => {
         const estado = regra.ok ? "ok" : "erro";
         const marca = estado === "ok" ? "✓" : "✕";
         const leitor = estado === "ok" ? "Atendida: " : "Pendente: ";
