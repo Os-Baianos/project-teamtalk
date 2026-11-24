@@ -11,7 +11,7 @@ export const regrasArroba = (arroba: string): Regra[] => [
 ];
 
 export const regrasEmail = (email: string): Regra[] => [
-  { texto: "E-mail válido (ex.: nome@empresa.com)", ok: /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim()) },
+  { texto: "Digite um e-mail válido", ok: /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim()) },
 ];
 
 export const regrasSenha = (senha: string): Regra[] => [
