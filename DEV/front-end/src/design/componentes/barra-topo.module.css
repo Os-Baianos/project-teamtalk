@@ -16,18 +16,9 @@
   font-weight: var(--peso-forte);
   text-decoration: none;
 }
-.nome { position: relative; padding-bottom: 3px; }
-.nome::after { content: ""; position: absolute; left: 0; right: 0; bottom: -2px; height: 3px; border-radius: var(--raio-pill); background: var(--cor-primaria); }
-.simbolo {
-  display: grid;
-  place-items: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: var(--raio-sm);
-  background: var(--cor-primaria);
-  color: var(--cor-sobre-primaria);
-  font-size: var(--fonte-base);
-}
+.nome { letter-spacing: -0.01em; }
+.destaque { color: var(--cor-primaria); }
+.simbolo { width: 2.25rem; height: 2.25rem; color: var(--cor-primaria); flex: none; }
 .nav { display: flex; gap: var(--espaco-2); overflow-x: auto; }
 .item {
   display: inline-flex;
