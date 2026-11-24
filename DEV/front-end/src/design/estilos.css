@@ -192,3 +192,4 @@ button:disabled { opacity: .65; cursor: wait; }
 
 /* A marca já aparece na barra superior */
 .painel .marca { display: none; }
+.painel .rodape-auth { margin: var(--espaco-8) 0 0; }
