@@ -1,7 +1,7 @@
 import type { Regra } from "@design/componentes/lista-regras";
 
 export const regrasNome = (nome: string): Regra[] => [
-  { texto: "Nome e sobrenome", ok: nome.trim().split(/\s+/).filter((p) => p.length >= 2).length >= 2 },
+  { texto: "Digite nome e sobrenome", textoOk: "Nome completo", ok: nome.trim().split(/\s+/).filter((p) => p.length >= 2).length >= 2 },
 ];
 
 export const regrasArroba = (arroba: string): Regra[] => [
@@ -11,7 +11,7 @@ export const regrasArroba = (arroba: string): Regra[] => [
 ];
 
 export const regrasEmail = (email: string): Regra[] => [
-  { texto: "Digite um e-mail válido", ok: /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim()) },
+  { texto: "Digite um e-mail válido", textoOk: "E-mail válido", ok: /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim()) },
 ];
 
 export const regrasSenha = (senha: string): Regra[] => [
@@ -24,7 +24,7 @@ export const regrasSenha = (senha: string): Regra[] => [
 ];
 
 export const regrasConfirmacao = (senha: string, confirmacao: string): Regra[] => [
-  { texto: "As senhas são iguais", ok: confirmacao.length > 0 && senha === confirmacao },
+  { texto: "As senhas não coincidem", textoOk: "As senhas coincidem", ok: confirmacao.length > 0 && senha === confirmacao },
 ];
 
 export const todasOk = (...grupos: Regra[][]) => grupos.every((g) => g.every((r) => r.ok));

@@ -4,7 +4,8 @@ import { useRef } from "react";
 import type { ModoLista } from "@design/modo-lista";
 import estilos from "@design/componentes/lista-regras.module.css";
 
-export type Regra = { texto: string; ok: boolean };
+/** `texto` descreve o problema (✕); `textoOk` é como a regra aparece depois de corrigida (✓). */
+export type Regra = { texto: string; ok: boolean; textoOk?: string };
 
 type Props = {
   id: string;
@@ -41,7 +42,7 @@ export function ListaRegras({ id, regras, modo, focado }: Props) {
           <span className={estilos.marca} aria-hidden="true">{regra.ok ? "✓" : "✕"}</span>
           <span>
             <span className={estilos.leitor}>{regra.ok ? "Atendida: " : "Pendente: "}</span>
-            {regra.texto}
+            {regra.ok ? (regra.textoOk ?? regra.texto) : regra.texto}
           </span>
         </li>
       ))}
