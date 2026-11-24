@@ -10,3 +10,4 @@ export { NavegacaoMobile } from "./navegacao-mobile";
 export type { PropsNavegacaoMobile, ItemNavegacaoMobile } from "./navegacao-mobile";
 export { LayoutMobile } from "./layout-mobile";
 export type { PropsLayoutMobile } from "./layout-mobile";
+export { BarraTopo, RodapeTopo } from "./barra-topo";

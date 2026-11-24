@@ -1,25 +1,25 @@
 /* Fonte única dos valores visuais. Mantém os nomes de cor usados nas telas existentes. */
 :root {
   color-scheme: light;
-  --cor-texto: #173a35;
-  --cor-secundaria: #566c65;
-  --cor-primaria: #176b5b;
-  --cor-primaria-hover: #105447;
+  --cor-texto: #0f141a;
+  --cor-secundaria: #545b64;
+  --cor-primaria: #ff9900;
+  --cor-primaria-hover: #ec7211;
   --cor-superficie: #ffffff;
-  --cor-fundo: #f0f5f3;
-  --cor-borda: #a5b8b1;
-  --cor-borda-controle: #71877e;
-  --cor-foco: #245bff;
-  --cor-erro: #a42126;
+  --cor-fundo: #f5f5f5;
+  --cor-borda: #d5dbdb;
+  --cor-borda-controle: #7d8998;
+  --cor-foco: #006ce0;
+  --cor-erro: #d91515;
   --cor-erro-fundo: #fff0ef;
-  --cor-sucesso: #155b45;
+  --cor-sucesso: #037f0c;
   --cor-sucesso-fundo: #f0faf6;
   --cor-atencao: #76520a;
   --cor-atencao-fundo: #fff5d6;
   --cor-informacao: #165b9b;
   --cor-informacao-fundo: #edf5ff;
-  --cor-selecionada: #e8f5ee;
-  --fonte-familia: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --cor-selecionada: #f2f8fd;
+  --fonte-familia: "Amazon Ember", "Helvetica Neue", Roboto, Arial, sans-serif;
   --fonte-xs: 0.75rem;
   --fonte-sm: 0.875rem;
   --fonte-base: 1rem;
@@ -47,6 +47,13 @@
   --toque-minimo: 44px;
   --toque-confortavel: 48px;
   --largura-leitura: 44rem;
-  --sombra-painel: 0 12px 32px rgb(23 58 53 / 10%);
+  --sombra-painel: 0 1px 4px rgb(0 0 0 / 8%);
   --duracao-interacao: 150ms;
+  /* Tema corporativo: barra superior escura, laranja como ação principal, azul em links */
+  --cor-topo: #161d26;
+  --cor-topo-borda: #424650;
+  --cor-topo-texto: #f9f9fa;
+  --cor-topo-texto-suave: #c6c6cd;
+  --cor-sobre-primaria: #0f141a;
+  --cor-link: #006ce0;
 }
