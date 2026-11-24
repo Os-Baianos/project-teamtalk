@@ -55,7 +55,7 @@ export function TelaLogin({ entrar, mensagem, aviso }: Props) {
             aria-invalid={usuarioInvalido || !!mensagem}
             aria-describedby="regras-usuario"
           />
-          <ListaRegras id="regras-usuario" regras={regrasUsuario} modo={modoLista(usuario, regrasUsuario, focado === "usuario", validados.usuario)} />
+          <ListaRegras id="regras-usuario" regras={regrasUsuario} modo={modoLista(usuario, regrasUsuario, validados.usuario)} focado={focado === "usuario"} />
           <label htmlFor="senha">Senha</label>
           <input
             id="senha"
@@ -71,7 +71,7 @@ export function TelaLogin({ entrar, mensagem, aviso }: Props) {
             aria-describedby={mensagem ? "regras-senha erro-login" : "regras-senha"}
             aria-invalid={senhaInvalida || !!mensagem}
           />
-          <ListaRegras id="regras-senha" regras={regrasSenha} modo={senhaInvalida ? "completa" : "oculta"} />
+          <ListaRegras id="regras-senha" regras={regrasSenha} modo={senhaInvalida ? "pendentes" : "oculta"} focado={focado === "senha"} />
           {mensagem && <p className="erro" id="erro-login" role="alert">{mensagem}</p>}
           <button type="submit">Entrar</button>
         </form>

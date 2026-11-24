@@ -1,18 +1,14 @@
 import type { Regra } from "@design/componentes/lista-regras";
 
-export type ModoLista = "oculta" | "somenteOk" | "completa";
+export type ModoLista = "oculta" | "pendentes";
 
 /**
- * Quando e como mostrar as condições de um campo:
- * - digitando pela primeira vez: só confirma (✓) o que já está certo, sem reclamar;
- * - ao sair do campo com algo digitado (ou ao tentar enviar): mostra tudo, com ✕ no que falta;
- * - se estiver tudo certo ao sair do campo, a lista some;
- * - campos com uma única condição (nome, e-mail...) só mostram o aviso quando está errado, nunca o ✓.
+ * A lista mostra somente o que ainda está errado (✕); o que já foi atendido some.
+ * - Campo com várias condições (senha, @): acompanha a digitação, para a pessoa ver o que falta.
+ * - Campo com uma condição (nome, e-mail): só reclama depois de sair do campo com algo digitado
+ *   ou ao tentar enviar, para não avisar enquanto ainda está escrevendo.
  */
-export function modoLista(valor: string, regras: Regra[], focado: boolean, validado: boolean): ModoLista {
-  const tudoOk = regras.every((r) => r.ok);
-  // Condição única (nome, e-mail...): só aparece o aviso de erro, nunca o ✓.
-  if (regras.length === 1) return validado && !tudoOk ? "completa" : "oculta";
-  if (validado) return tudoOk && !focado ? "oculta" : "completa";
-  return focado && valor !== "" ? "somenteOk" : "oculta";
+export function modoLista(valor: string, regras: Regra[], validado: boolean): ModoLista {
+  if (regras.length === 1) return validado ? "pendentes" : "oculta";
+  return valor !== "" || validado ? "pendentes" : "oculta";
 }

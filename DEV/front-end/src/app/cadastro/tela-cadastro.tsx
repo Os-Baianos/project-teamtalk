@@ -26,7 +26,7 @@ export function TelaCadastro({ cadastrar, mensagem }: Props) {
     senha: regrasSenha(valores.senha),
     confirmacao: regrasConfirmacao(valores.senha, valores.confirmacao),
   };
-  const modo = (campo: Campo) => modoLista(valores[campo], regras[campo], focado === campo, validados[campo]);
+  const modo = (campo: Campo) => modoLista(valores[campo], regras[campo], validados[campo]);
   const invalido = (campo: Campo) => validados[campo] && !todasOk(regras[campo]);
 
   const alterar = (campo: Campo, valor: string) => setValores((atual) => ({ ...atual, [campo]: valor }));
@@ -59,7 +59,7 @@ export function TelaCadastro({ cadastrar, mensagem }: Props) {
         required
         {...props}
       />
-      <ListaRegras id={`regras-${id}`} regras={regras[id]} modo={modo(id)} />
+      <ListaRegras id={`regras-${id}`} regras={regras[id]} modo={modo(id)} focado={focado === id} />
     </>
   );
 
