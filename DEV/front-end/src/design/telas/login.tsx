@@ -1,14 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
 import { ListaRegras } from "@design/componentes";
 import { modoLista } from "@design/modo-lista";
 import { regrasEmail, todasOk } from "@design/validacoes";
+import { contaDemo } from "../../mock/conta-demo";
 
-type Props = { entrar: (dados: FormData) => Promise<void>; mensagem: string; aviso: string };
+type Props = { mensagem: string; aviso: string };
 
-export function TelaLogin({ entrar, mensagem, aviso }: Props) {
+export function TelaLogin({ mensagem: mensagemInicial, aviso }: Props) {
+  const roteador = useRouter();
+  const [mensagem, setMensagem] = useState(mensagemInicial);
   const [usuario, setUsuario] = useState("");
   const [senha, setSenha] = useState("");
   const [focado, setFocado] = useState<"usuario" | "senha" | null>(null);
@@ -20,9 +24,17 @@ export function TelaLogin({ entrar, mensagem, aviso }: Props) {
   const senhaInvalida = validados.senha && !todasOk(regrasSenha);
 
   function aoEnviar(evento: FormEvent<HTMLFormElement>) {
+    evento.preventDefault();
     if (!todasOk(regrasUsuario, regrasSenha)) {
-      evento.preventDefault();
       setValidados({ usuario: true, senha: true });
+      return;
+    }
+    // Provisório: confere só a conta de demonstração até o login real do back-end.
+    if (usuario.trim().toLowerCase() === contaDemo.email && senha === contaDemo.senha) {
+      setMensagem("");
+      roteador.push("/contatos");
+    } else {
+      setMensagem("E-mail ou senha incorretos.");
     }
   }
 
@@ -36,7 +48,7 @@ export function TelaLogin({ entrar, mensagem, aviso }: Props) {
         <h1 id="titulo-login">Acesse sua conta</h1>
         <p>Entre com suas credenciais corporativas autorizadas.</p>
         {aviso && <p role="status">{aviso}</p>}
-        <form action={entrar} onSubmit={aoEnviar} className="formulario" noValidate>
+        <form onSubmit={aoEnviar} className="formulario" noValidate>
           <label htmlFor="usuario">E-mail corporativo</label>
           <input
             id="usuario"

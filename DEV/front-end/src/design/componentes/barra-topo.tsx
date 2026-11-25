@@ -39,6 +39,14 @@ export function BarraTopo() {
                 {item.rotulo}
               </Link>
             ))}
+            <details className={estilos.menu}>
+              <summary className={estilos.item}>
+                Conta <span className={estilos.seta} aria-hidden="true" />
+              </summary>
+              <div className={estilos.suspenso}>
+                <Link href="/login" className={estilos.opcao}>Sair</Link>
+              </div>
+            </details>
           </nav>
         </div>
       )}
