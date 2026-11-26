@@ -2,8 +2,8 @@
 ## Aplicativo Web de Comunicação Interna
 
 **Tipo:** Especificação de Requisitos de Software  
-**Versão:** 1.0  
-**Status:** Documento inicial — baseado em entrevista com o cliente  
+**Versão:** 1.1  
+**Status:** Requisitos iniciais com decisões provisórias da equipe — aguardando validação do cliente  
 **Estimativa de usuários:** Aproximadamente 900 funcionários
 
 ---
@@ -226,3 +226,49 @@ Com base nas informações fornecidas pelo cliente, as funcionalidades abaixo n�
 - Utilização da plataforma em computadores e notebooks.
 
 Outras funcionalidades existentes em aplicativos de mensagens, mas não mencionadas expressamente pelo cliente, não deverão ser consideradas automaticamente incluídas no escopo. Sua inclusão dependerá de análise, priorização e aprovação formal.
+
+
+# 10. Decisões provisórias e pendências de validação
+
+Esta seção registra decisões adotadas pela equipe para permitir o planejamento e o avanço do MVP enquanto não é possível obter retorno do cliente. **Estas decisões não representam aprovação do cliente** e deverão ser revistas quando as informações forem confirmadas. Em caso de divergência, prevalecem os requisitos originalmente confirmados pelo cliente até que uma mudança seja formalmente aprovada.
+
+## 10.1 Parâmetros provisórios do MVP
+
+| Tema | Diretriz provisória | Observação |
+|---|---|---|
+| Tamanho máximo de PDF | 10 MB por arquivo | Valor inicial sujeito a validação técnica e do cliente. |
+| Armazenamento por usuário | Sem quota individual no MVP | Aplicar limites globais de infraestrutura, monitoramento e alertas; capacidade deverá ser dimensionada antes da produção. |
+| Recuperação de senha | Solicitação ao TI para redefinição segura; avaliar fluxo por link/token único, de curta validade, enviado ao e-mail corporativo | Não enviar senhas em texto puro por e-mail. O fluxo final depende da infraestrutura de e-mail e da política de identidade da empresa. |
+| Retenção de mensagens e PDFs | Não implementar exclusão automática por prazo no MVP até definição de política | A ausência de expurgo automático não autoriza retenção ilimitada sem avaliação. A política de retenção, descarte, backup e atendimento aos direitos dos titulares deverá ser aprovada antes da operação com dados reais. |
+| Exclusão pelo usuário | Não oferecer exclusão de mensagens ou arquivos no MVP | Reavaliar após definição de política de retenção, privacidade e requisitos legais. |
+| Cadastro em lote | Preparar importação administrativa por CSV, com modelo de planilha, validação e relatório de erros | Decisão provisória de escopo; confirmar disponibilidade e formato dos dados fornecidos pela TI. |
+| Integração com diretório corporativo | Não implementar integração com Active Directory/LDAP ou SSO no MVP | Manter como evolução futura, sujeita a análise de esforço e segurança. |
+| Conversas em grupo | Não incluir no MVP; priorizar conversas individuais | A documentação original não confirma explicitamente grupos. Inclusão dependerá de aprovação. |
+| Serviço de e-mail | Utilizar serviço/SMTP corporativo indicado e autorizado pela empresa | A empresa deverá fornecer configuração, credenciais técnicas e permissões necessárias por canal seguro. |
+| Auditoria administrativa | Registrar criação, edição, bloqueio e desativação de contas, alterações de permissões e redefinições administrativas de senha | Acesso restrito a administradores autorizados; prazo de retenção ainda depende de política da empresa. |
+
+## 10.2 Implantação gradual — plano de trabalho provisório
+
+1. **Fase 1 — TI:** configuração, cadastro inicial, testes técnicos e validação dos controles administrativos.
+2. **Fase 2 — Grupo piloto:** liberação a um grupo pequeno indicado pela empresa, com acompanhamento de incidentes e feedback.
+3. **Fase 3 — Expansão por setores:** liberação progressiva conforme autorização da empresa e resultados do piloto.
+4. **Fase 4 — Disponibilização geral:** expansão ao público estimado de aproximadamente 900 funcionários após avaliação de estabilidade, segurança, capacidade e aceite.
+
+Os grupos, responsáveis, datas, critérios de aceite e quantitativos de cada fase ainda não foram informados e não devem ser considerados definidos.
+
+## 10.3 Pendências que continuam abertas
+
+- Confirmar limite de tamanho dos PDFs e necessidade de quota de armazenamento.
+- Aprovar política de recuperação de senha e canal de suporte do TI.
+- Definir prazos de retenção, descarte, backup e eventual exclusão de mensagens e arquivos.
+- Confirmar se a importação CSV será necessária e obter o modelo/formato de dados.
+- Confirmar se existe necessidade futura de integração com diretório corporativo ou SSO.
+- Confirmar se conversas em grupo serão necessárias em versão posterior.
+- Definir grupos, responsáveis, cronograma e critérios de avanço da implantação gradual.
+- Definir eventos, perfis de consulta e prazo de retenção dos registros de auditoria.
+- Identificar o serviço de e-mail corporativo e obter as configurações necessárias.
+- Definir metas quantitativas de desempenho, disponibilidade e matriz de navegadores suportados.
+
+## 10.4 Condições para revisão
+
+As decisões desta seção deverão ser atualizadas após retorno do cliente e análise da equipe técnica. Qualquer mudança que acrescente ou altere funcionalidades deverá passar por análise de impacto em requisitos, arquitetura, segurança, testes, prazo e Pontos de Função. Não considerar uma hipótese provisória como requisito aprovado ou compromisso comercial.
