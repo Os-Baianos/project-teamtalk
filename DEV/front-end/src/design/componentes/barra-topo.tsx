@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { sairAction } from "../../sessao/acoes";
+import { souDevAction } from "../../dev/acoes";
 import estilos from "@design/componentes/barra-topo.module.css";
 
 const itens = [
@@ -17,6 +18,13 @@ export function BarraTopo() {
   const caminho = usePathname();
   const publica = rotasPublicas.includes(caminho);
   const menu = useRef<HTMLDetailsElement>(null);
+  const [dev, setDev] = useState(false);
+
+  // Só contas dev veem o Painel dev (a permissão de verdade fica no banco).
+  useEffect(() => {
+    if (publica) { setDev(false); return; }
+    souDevAction().then(setDev);
+  }, [publica]);
 
   // Fecha o menu Conta ao clicar fora, apertar Esc ou trocar de página.
   useEffect(() => {
@@ -65,6 +73,7 @@ export function BarraTopo() {
               </summary>
               <div className={estilos.suspenso}>
                 <Link href="/perfil" className={estilos.opcao}>Perfil</Link>
+                {dev && <Link href="/dev" className={estilos.opcao}>Painel dev</Link>}
                 <form action={sairAction}>
                   <button type="submit" className={estilos.opcao}>Sair</button>
                 </form>
