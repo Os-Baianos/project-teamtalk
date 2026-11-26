@@ -83,3 +83,9 @@ export async function aceitarSolicitacaoAction(id: string) { return acao("aceita
 export async function recusarSolicitacaoAction(id: string) { return acao("recusar_solicitacao", { de: id }, "nenhuma"); }
 export async function cancelarSolicitacaoAction(id: string) { return acao("cancelar_solicitacao", { para: id }, "nenhuma"); }
 export async function removerContatoAction(id: string) { return acao("remover_contato", { contato: id }, "nenhuma"); }
+
+/** Solicitações e contatos juntos, numa chamada só (tela Meus contatos e número no menu). */
+export async function carregarContaContatosAction(): Promise<{ solicitacoes: Solicitacoes; contatos: ContatoDado[] }> {
+  const [solicitacoes, contatos] = await Promise.all([listarSolicitacoesAction(), listarContatosAction()]);
+  return { solicitacoes, contatos };
+}

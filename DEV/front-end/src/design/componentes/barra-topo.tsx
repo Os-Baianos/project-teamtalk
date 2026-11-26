@@ -6,7 +6,9 @@ import { usePathname } from "next/navigation";
 import { sairAction } from "../../sessao/acoes";
 import { souDevAction } from "../../dev/acoes";
 import { criarClienteNavegador } from "../../supabase/navegador";
-import { contarSolicitacoesAction } from "../../contatos/acoes";
+import { carregarContaContatosAction } from "../../contatos/acoes";
+import { carregarInicioAction } from "../../mensagens/acoes";
+import { gravarCache, limparCache } from "../../cache/cache-local";
 import { useContatosAoVivo } from "../../contatos/use-contatos-ao-vivo";
 import estilos from "@design/componentes/barra-topo.module.css";
 
@@ -32,11 +34,15 @@ export function BarraTopo() {
     if (publica) { setDev(false); setEmail(""); setMeuId(null); setPendentes(0); return; }
     souDevAction().then(setDev);
     criarClienteNavegador().auth.getUser().then(({ data }) => { setEmail(data.user?.email ?? ""); setMeuId(data.user?.id ?? null); });
-    contarSolicitacoesAction().then(setPendentes);
+    // Já deixa Conversas e Meus contatos prontos: ao abrir essas telas aparecem na hora.
+    carregarContaContatosAction().then((d) => { gravarCache("conta-contatos", d); setPendentes(d.solicitacoes.recebidas.length); });
+    carregarInicioAction().then((d) => gravarCache("inicio", d));
   }, [publica]);
 
   // Número de solicitações de contato novas no menu Conta (atualiza em tempo real).
-  useContatosAoVivo(meuId, () => { contarSolicitacoesAction().then(setPendentes); });
+  useContatosAoVivo(meuId, () => {
+    carregarContaContatosAction().then((d) => { gravarCache("conta-contatos", d); setPendentes(d.solicitacoes.recebidas.length); });
+  });
 
   // Fecha o menu Conta ao clicar fora, apertar Esc ou trocar de página.
   useEffect(() => {
@@ -78,7 +84,7 @@ export function BarraTopo() {
                 Contatos{pendentes > 0 && <span className={estilos.contagem}>{pendentes}</span>}
               </Link>
               {dev && <Link href="/dev" className={estilos.opcao}>Painel Dev</Link>}
-              <form action={sairAction}>
+              <form action={sairAction} onSubmit={limparCache}>
                 <button type="submit" className={estilos.opcao}>Sair</button>
               </form>
             </div>

@@ -3,16 +3,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { TelaConversas } from "./tela-conversas";
 import type { BalaoDado, Pessoa, ResumoConversa, StatusEnvio } from "./tela-conversas";
-import { listarContatosAction } from "../../contatos/acoes";
+import { lerCache, gravarCache } from "../../cache/cache-local";
+import { meuIdLocal } from "../../supabase/meu-id";
 import {
   apagarMensagemAction,
   editarMensagemAction,
   enviarMensagemAction,
-  listarConversasAction,
+  carregarInicioAction,
   listarMensagensAction,
   marcarLidasAction,
   marcarRecebidasAction,
-  meuIdAction,
 } from "../../mensagens/acoes";
 import type { Mensagem } from "../../mensagens/acoes";
 import { useMensagensAoVivo } from "../../mensagens/use-mensagens-ao-vivo";
@@ -30,21 +30,28 @@ export default function PaginaConversas() {
   const ativaRef = useRef<Pessoa | null>(null);
   ativaRef.current = ativa;
 
-  const carregarLista = useCallback(async () => {
-    const [lista, pessoas] = await Promise.all([listarConversasAction(), listarContatosAction()]);
-    setConversas(lista.map((c) => ({
+  const aplicarInicio = useCallback((dados: Awaited<ReturnType<typeof carregarInicioAction>>) => {
+    setConversas(dados.conversas.map((c) => ({
       id: c.contato_id, nome: c.nome, arroba: c.arroba, fotoUrl: c.foto_url,
       ultimaTexto: c.ultima_texto, ultimaEm: c.ultima_em, naoLidas: c.nao_lidas,
       ultimaMinha: c.ultima_minha, ultimaStatus: c.ultima_status,
     })));
-    setContatos(pessoas.map((p) => ({ id: p.id, nome: p.nome, arroba: p.arroba, fotoUrl: p.foto_url })));
+    setContatos(dados.contatos.map((p) => ({ id: p.id, nome: p.nome, arroba: p.arroba, fotoUrl: p.foto_url })));
   }, []);
 
+  const carregarLista = useCallback(async () => {
+    const dados = await carregarInicioAction(); // também marca como recebidas as mensagens que chegaram
+    gravarCache("inicio", dados);
+    aplicarInicio(dados);
+  }, [aplicarInicio]);
+
   useEffect(() => {
-    meuIdAction().then(setMeuId);
-    marcarRecebidasAction(); // tudo o que já chegou conta como recebido assim que abro o app
+    meuIdLocal().then(setMeuId);
+    // Mostra na hora o que já foi carregado antes e atualiza por trás.
+    const guardado = lerCache<Awaited<ReturnType<typeof carregarInicioAction>>>("inicio");
+    if (guardado) { aplicarInicio(guardado); setCarregando(false); }
     carregarLista().finally(() => setCarregando(false));
-  }, [carregarLista]);
+  }, [carregarLista, aplicarInicio]);
 
   // Vindo do perfil de alguém (/conversas?com=@usuario): abre a conversa com essa pessoa.
   const abrirDoLink = useRef(false);

@@ -1,6 +1,8 @@
 "use server";
 
 import { criarClienteServidor } from "../supabase/servidor";
+import { listarContatosAction } from "../contatos/acoes";
+import type { ContatoDado } from "../contatos/acoes";
 
 export type Mensagem = {
   id: string;
@@ -95,4 +97,10 @@ export async function apagarMensagemAction(id: string): Promise<boolean> {
   const supabase = await criarClienteServidor();
   const { data } = await supabase.rpc("apagar_mensagem", { msg: id });
   return data === true;
+}
+
+/** Tudo o que a tela de Conversas precisa para abrir, numa chamada só (as ações rodam em fila). */
+export async function carregarInicioAction(): Promise<{ conversas: Conversa[]; contatos: ContatoDado[] }> {
+  const [conversas, contatos] = await Promise.all([listarConversasAction(), listarContatosAction(), marcarRecebidasAction()]);
+  return { conversas, contatos };
 }
