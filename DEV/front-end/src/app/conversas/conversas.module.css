@@ -43,6 +43,10 @@
 .naoLidas { flex: none; min-width: 1.4rem; padding: 0 var(--espaco-2); border-radius: var(--raio-pill); background: var(--cor-primaria); color: var(--cor-sobre-primaria); font-size: var(--fonte-xs); font-weight: var(--peso-forte); text-align: center; line-height: 1.4rem; }
 .subtitulo { margin: var(--espaco-3) 0 var(--espaco-1); padding: 0 var(--espaco-4); font-size: var(--fonte-sm); color: var(--cor-secundaria); }
 .vazio { margin: var(--espaco-6) var(--espaco-4); color: var(--cor-secundaria); text-align: center; }
+.estadoErro { display: grid; justify-items: center; gap: var(--espaco-2); padding: var(--espaco-6) var(--espaco-4); text-align: center; color: var(--cor-erro); margin: auto; }
+.estadoErro strong { color: var(--cor-texto); }
+.raiz .tentar { padding: var(--espaco-1) var(--espaco-3); border: var(--borda-fina) solid var(--cor-borda-controle); border-radius: var(--raio-pill); color: var(--cor-link); font-size: var(--fonte-sm); font-weight: var(--peso-forte); }
+.raiz .tentar:hover { background: var(--cor-selecionada); }
 .centro { display: grid; place-items: center; padding: var(--espaco-6); }
 
 /* ---------- Conversa ---------- */

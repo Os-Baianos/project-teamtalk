@@ -33,6 +33,11 @@ export type BalaoDado = {
 type Props = {
   carregandoLista: boolean;
   carregandoMensagens: boolean;
+  erroLista: boolean;
+  aoTentarLista: () => void;
+  erroHistorico: boolean;
+  aoTentarHistorico: () => void;
+  aoReenviar: (id: string) => void;
   conversas: ResumoConversa[];
   /** Contatos que ainda não têm conversa (para começar uma). */
   novos: Pessoa[];
@@ -50,6 +55,15 @@ const FUSO = "America/Sao_Paulo";
 const hora = (iso: string) => new Date(iso).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: FUSO });
 const dia = (iso: string) => new Date(iso).toLocaleDateString("pt-BR", { timeZone: FUSO });
 const completo = (iso: string) => `${dia(iso)} às ${hora(iso)}`;
+
+/** Na lista: hora se for hoje, "Ontem" ou o dia da semana. */
+function horarioLista(iso: string) {
+  const d = dia(iso);
+  const agora = Date.now();
+  if (d === dia(new Date(agora).toISOString())) return hora(iso);
+  if (d === dia(new Date(agora - 864e5).toISOString())) return "Ontem";
+  return new Date(iso).toLocaleDateString("pt-BR", { weekday: "short", timeZone: FUSO }).replace(".", "");
+}
 
 function rotuloDia(iso: string) {
   const d = dia(iso);
@@ -71,7 +85,7 @@ function Tiques({ status }: { status: StatusEnvio | "enviada" | "recebida" | "li
 }
 
 export function TelaConversas({
-  carregandoLista, carregandoMensagens, conversas, novos, ativa, mensagens,
+  carregandoLista, carregandoMensagens, erroLista, aoTentarLista, erroHistorico, aoTentarHistorico, aoReenviar, conversas, novos, ativa, mensagens,
   aoAbrir, aoVoltar, aoEnviar, aoEditar, aoApagar,
 }: Props) {
   const [texto, setTexto] = useState("");
@@ -86,7 +100,10 @@ export function TelaConversas({
   const fim = useRef<HTMLDivElement>(null);
   const campo = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => { fim.current?.scrollIntoView({ block: "end" }); }, [mensagens.length, carregandoMensagens, ativa?.id]);
+  // Acompanha as mensagens novas só quando a pessoa está no fim; se subiu para ler, não puxa de volta.
+  const noFim = useRef(true);
+  useEffect(() => { noFim.current = true; }, [ativa?.id]);
+  useEffect(() => { if (noFim.current) fim.current?.scrollIntoView({ block: "end" }); }, [mensagens.length, carregandoMensagens, ativa?.id]);
   useEffect(() => { setTexto(""); setErro(""); setMenu(null); setDados(null); setEditando(null); }, [ativa?.id]);
   useEffect(() => {
     const el = campo.current;
@@ -193,7 +210,13 @@ export function TelaConversas({
           <input type="search" value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Buscar conversa" aria-label="Buscar conversa" autoComplete="off" />
         </div>
         <div className={estilos.rolagem}>
-          {carregandoLista ? (
+          {erroLista && conversas.length === 0 ? (
+            <div className={estilos.estadoErro} role="alert">
+              <Icone nome="erro" width={32} height={32} />
+              <strong>Não foi possível carregar suas conversas.</strong>
+              <button type="button" className={estilos.tentar} onClick={aoTentarLista}>Tentar novamente</button>
+            </div>
+          ) : carregandoLista ? (
             <div className={estilos.centro}><Carregando tamanho="2rem" texto="Carregando conversas" atraso /></div>
           ) : (
             <>
@@ -207,11 +230,11 @@ export function TelaConversas({
                       <span className={estilos.dados}>
                         <span className={estilos.linha}>
                           <strong>{c.nome}</strong>
-                          <time dateTime={c.ultimaEm} className={c.naoLidas > 0 ? estilos.horaNova : ""}>{hora(c.ultimaEm)}</time>
+                          <time dateTime={c.ultimaEm} className={c.naoLidas > 0 ? estilos.horaNova : ""}>{horarioLista(c.ultimaEm)}</time>
                         </span>
                         <span className={estilos.linha}>
                           <span className={estilos.previa}>{statusLista(c)}{c.ultimaTexto}</span>
-                          {c.naoLidas > 0 && <span className={estilos.naoLidas} aria-label={`${c.naoLidas} não lidas`}>{c.naoLidas}</span>}
+                          {c.naoLidas > 0 && <span className={estilos.naoLidas} aria-label={`${c.naoLidas} não lidas`}>{c.naoLidas > 99 ? "99+" : c.naoLidas}</span>}
                         </span>
                       </span>
                     </button>
@@ -272,8 +295,17 @@ export function TelaConversas({
               </Link>
             </header>
 
-            <div className={estilos.historico} aria-live="polite">
-              {carregandoMensagens ? (
+            <div className={estilos.historico} aria-live="polite" onScroll={(e) => {
+              const el = e.currentTarget;
+              noFim.current = el.scrollHeight - el.scrollTop - el.clientHeight < 96;
+            }}>
+              {erroHistorico ? (
+                <div className={estilos.estadoErro} role="alert">
+                  <Icone nome="erro" width={32} height={32} />
+                  <strong>Não foi possível carregar as mensagens.</strong>
+                  <button type="button" className={estilos.tentar} onClick={aoTentarHistorico}>Tentar novamente</button>
+                </div>
+              ) : carregandoMensagens ? (
                 <div className={estilos.centro}><Carregando tamanho="2.25rem" texto="Carregando mensagens" atraso /></div>
               ) : mensagens.length === 0 ? (
                 <p className={estilos.vazioChat}>Nenhuma mensagem ainda. Diga olá!</p>
@@ -300,6 +332,7 @@ export function TelaConversas({
                           </span>
                         )}
                         <p>{it.m.apagada ? (it.m.minha ? "Você apagou esta mensagem" : "Esta mensagem foi apagada") : it.m.texto}</p>
+                        {it.m.status === "falha" && <button type="button" className={estilos.tentar} onClick={() => aoReenviar(it.m.id)}>Falha ao enviar. Tentar novamente</button>}
                         <span className={estilos.rodape}>
                           {it.m.editadaEm && !it.m.apagada && <em>Editada</em>}
                           <time dateTime={it.m.criadoEm}>{hora(it.m.criadoEm)}</time>

@@ -27,6 +27,8 @@ export default function PaginaConversas() {
   const [mensagens, setMensagens] = useState<Local[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [carregandoMensagens, setCarregandoMensagens] = useState(false);
+  const [erroLista, setErroLista] = useState(false);
+  const [erroHistorico, setErroHistorico] = useState(false);
   const ativaRef = useRef<Pessoa | null>(null);
   ativaRef.current = ativa;
 
@@ -40,9 +42,14 @@ export default function PaginaConversas() {
   }, []);
 
   const carregarLista = useCallback(async () => {
-    const dados = await carregarInicioAction(); // também marca como recebidas as mensagens que chegaram
-    gravarCache("inicio", dados);
-    aplicarInicio(dados);
+    try {
+      const dados = await carregarInicioAction(); // também marca como recebidas as mensagens que chegaram
+      gravarCache("inicio", dados);
+      aplicarInicio(dados);
+      setErroLista(false);
+    } catch {
+      setErroLista(true);
+    }
   }, [aplicarInicio]);
 
   useEffect(() => {
@@ -84,13 +91,19 @@ export default function PaginaConversas() {
   async function abrir(pessoa: Pessoa) {
     setAtiva(pessoa);
     setMensagens([]);
+    setErroHistorico(false);
     setCarregandoMensagens(true);
-    const lista = await listarMensagensAction(pessoa.id);
-    if (ativaRef.current?.id !== pessoa.id) return; // trocou de conversa enquanto carregava
-    setMensagens(lista);
-    setCarregandoMensagens(false);
-    await marcarLidasAction(pessoa.id);
-    carregarLista();
+    try {
+      const lista = await listarMensagensAction(pessoa.id);
+      if (ativaRef.current?.id !== pessoa.id) return; // trocou de conversa enquanto carregava
+      setMensagens(lista);
+      await marcarLidasAction(pessoa.id);
+      carregarLista();
+    } catch {
+      if (ativaRef.current?.id === pessoa.id) setErroHistorico(true);
+    } finally {
+      if (ativaRef.current?.id === pessoa.id) setCarregandoMensagens(false);
+    }
   }
 
   function voltar() {
@@ -107,8 +120,9 @@ export default function PaginaConversas() {
     setMensagens((atual) => [...atual, provisoria]);
     const r = await enviarMensagemAction(ativa.id, texto);
     if (!r.ok) {
-      setMensagens((atual) => atual.filter((x) => x.id !== provisoria.id));
-      return r.mensagem;
+      // A mensagem fica na conversa marcada como falha, com "Tentar novamente".
+      setMensagens((atual) => atual.map((x) => (x.id === provisoria.id ? { ...x, falhou: true } : x)));
+      return null;
     }
     setMensagens((atual) => {
       const real = atual.some((x) => x.id === r.mensagem.id);
@@ -116,6 +130,19 @@ export default function PaginaConversas() {
     });
     carregarLista();
     return null;
+  }
+
+  async function reenviar(id: string) {
+    const falha = mensagens.find((m) => m.id === id);
+    if (!falha || !ativa) return;
+    setMensagens((atual) => atual.map((x) => (x.id === id ? { ...x, falhou: false } : x)));
+    const r = await enviarMensagemAction(ativa.id, falha.texto);
+    if (!r.ok) {
+      setMensagens((atual) => atual.map((x) => (x.id === id ? { ...x, falhou: true } : x)));
+      return;
+    }
+    setMensagens((atual) => atual.map((x) => (x.id === id ? r.mensagem : x)));
+    carregarLista();
   }
 
   async function editar(id: string, texto: string) {
@@ -138,7 +165,7 @@ export default function PaginaConversas() {
 
   const baloes: BalaoDado[] = mensagens.map((m) => {
     const minha = m.remetente_id === meuId;
-    const status: StatusEnvio = m.id.startsWith("tmp-") ? "enviando" : m.lida_em ? "lida" : m.recebida_em ? "recebida" : "enviada";
+    const status: StatusEnvio = m.falhou ? "falha" : m.id.startsWith("tmp-") ? "enviando" : m.lida_em ? "lida" : m.recebida_em ? "recebida" : "enviada";
     return {
       id: m.id, minha, texto: m.texto, criadoEm: m.criado_em,
       recebidaEm: m.recebida_em, lidaEm: m.lida_em, editadaEm: m.editada_em,
@@ -152,6 +179,11 @@ export default function PaginaConversas() {
     <TelaConversas
       carregandoLista={carregando}
       carregandoMensagens={carregandoMensagens}
+      erroLista={erroLista}
+      aoTentarLista={() => { setCarregando(true); carregarLista().finally(() => setCarregando(false)); }}
+      erroHistorico={erroHistorico}
+      aoTentarHistorico={() => { if (ativa) void abrir(ativa); }}
+      aoReenviar={reenviar}
       conversas={conversas}
       novos={novos}
       ativa={ativa}
