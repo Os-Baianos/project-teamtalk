@@ -11,3 +11,4 @@ Data: 2026-11-26
 ## Ajuste de tamanho
 - Botão mais compacto (altura mínima de 2rem), como no console AWS.
 - Linha "Nome" do Perfil volta a ter a mesma altura das outras linhas.
+- Borda dos botões de 2px, como no console AWS.
