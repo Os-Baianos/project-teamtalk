@@ -42,6 +42,7 @@ export function BarraTopo() {
   // Número de solicitações de contato novas no menu Conta (atualiza em tempo real).
   useContatosAoVivo(meuId, () => {
     carregarContaContatosAction().then((d) => { gravarCache("conta-contatos", d); setPendentes(d.solicitacoes.recebidas.length); });
+    carregarInicioAction().then((d) => gravarCache("inicio", d)); // remover contato também some a conversa
   });
 
   // Fecha o menu Conta ao clicar fora, apertar Esc ou trocar de página.

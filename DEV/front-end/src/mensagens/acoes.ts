@@ -48,13 +48,8 @@ export async function listarConversasAction(): Promise<Conversa[]> {
 /** Histórico com uma pessoa, do mais antigo para o mais novo. */
 export async function listarMensagensAction(contatoId: string): Promise<Mensagem[]> {
   const supabase = await criarClienteServidor();
-  const { data } = await supabase
-    .from("mensagens")
-    .select("*")
-    .or(`remetente_id.eq.${contatoId},destinatario_id.eq.${contatoId}`)
-    .order("criado_em", { ascending: true })
-    .limit(500);
-  return data ?? [];
+  const { data } = await supabase.rpc("listar_mensagens", { outro: contatoId }); // já sem o que eu excluí
+  return (data ?? []) as Mensagem[];
 }
 
 export async function enviarMensagemAction(
@@ -103,4 +98,11 @@ export async function apagarMensagemAction(id: string): Promise<boolean> {
 export async function carregarInicioAction(): Promise<{ conversas: Conversa[]; contatos: ContatoDado[] }> {
   const [conversas, contatos] = await Promise.all([listarConversasAction(), listarContatosAction(), marcarRecebidasAction()]);
   return { conversas, contatos };
+}
+
+/** Exclui a conversa só do meu lado; a outra pessoa continua vendo. */
+export async function excluirConversaAction(contatoId: string): Promise<boolean> {
+  const supabase = await criarClienteServidor();
+  const { error } = await supabase.rpc("limpar_conversa", { outro: contatoId });
+  return !error;
 }
