@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">Símbolo TeamTalk</title>
+  <desc id="desc">Balão de conversa verde com a letra T branca.</desc>
+  <path d="M13 3h38a10 10 0 0 1 10 10v27a10 10 0 0 1-10 10H31L14 62a2 2 0 0 1-3-1.7V50A10 10 0 0 1 3 40V13A10 10 0 0 1 13 3Z" fill="#176b5b"/>
+  <path d="M15 18h34v7H36v20h-8V25H15Z" fill="#ffffff"/>
+</svg>

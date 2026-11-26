@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 64" role="img" aria-labelledby="title desc">
+  <title id="title">TeamTalk — versão monocromática</title>
+  <desc id="desc">Símbolo e nome TeamTalk em branco, para fundos escuros.</desc>
+  <g transform="translate(2 2)" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M13 3h34a10 10 0 0 1 10 10v25a10 10 0 0 1-10 10H29L14 59a2 2 0 0 1-3-1.7V48A10 10 0 0 1 3 38V13A10 10 0 0 1 13 3Z"/>
+    <path d="M16 19h28M30 19v22"/>
+  </g>
+  <text x="76" y="43" fill="#ffffff" font-family="ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="34" font-weight="700" letter-spacing="-1.2">TeamTalk</text>
+</svg>
