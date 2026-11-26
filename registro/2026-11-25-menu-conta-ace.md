@@ -17,3 +17,6 @@ PR: ver PR "Menu Conta: caixa compacta e fecha ao clicar fora"
 
 ## Pendências e dúvidas
 - Nenhuma.
+
+## Ajuste 2
+- A seleção (hover e foco) do "Sair" estava com cantos arredondados; agora é quadrada, igual à caixa.

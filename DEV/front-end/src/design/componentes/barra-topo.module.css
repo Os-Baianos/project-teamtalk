@@ -71,4 +71,4 @@
 .opcao { display: block; padding: var(--espaco-2) var(--espaco-4); color: var(--cor-topo-texto); text-decoration: none; font-size: var(--fonte-sm); }
 .opcao:hover { background: #232f3e; color: var(--cor-primaria); }
 .nav { overflow: visible; flex-wrap: wrap; }
-button.opcao { display: flex; align-items: center; width: 100%; min-height: 0; height: auto; margin: 0; background: none; border: 0; text-align: left; font: inherit; font-size: var(--fonte-sm); line-height: 1.2; cursor: pointer; }
+button.opcao { border-radius: 0; display: flex; align-items: center; width: 100%; min-height: 0; height: auto; margin: 0; background: none; border: 0; text-align: left; font: inherit; font-size: var(--fonte-sm); line-height: 1.2; cursor: pointer; }
