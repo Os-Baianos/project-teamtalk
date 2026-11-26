@@ -14,6 +14,7 @@
 .aviso { flex: 1 1 100%; font-size: var(--fonte-sm); color: var(--cor-erro); }
 .edicao { display: grid; gap: var(--espaco-3); }
 .erro { margin: var(--espaco-3) 0 0; color: var(--cor-erro); font-size: var(--fonte-sm); }
+.ok { margin: var(--espaco-3) 0 0; color: var(--cor-sucesso); font-size: var(--fonte-sm); }
 .vazio { color: var(--cor-secundaria); }
 
 @media (prefers-reduced-motion: no-preference) {
