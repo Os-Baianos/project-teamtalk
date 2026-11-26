@@ -65,7 +65,7 @@ export function BarraTopo() {
             <div className={estilos.suspenso}>
             {email && <div className={estilos.email}>{email}</div>}
               <Link href="/perfil" className={estilos.opcao}>Perfil</Link>
-              {dev && <Link href="/dev" className={estilos.opcao}>Painel dev</Link>}
+              {dev && <Link href="/dev" className={estilos.opcao}>Painel Dev</Link>}
               <form action={sairAction}>
                 <button type="submit" className={estilos.opcao}>Sair</button>
               </form>

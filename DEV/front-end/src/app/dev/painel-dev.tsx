@@ -68,7 +68,7 @@ export function PainelDev({ inicial, meuId }: { inicial: UsuarioDev[]; meuId: st
   }
 
   return (
-    <LayoutMobile cabecalho={<CabecalhoMobile titulo="Painel dev" subtitulo={`${usuarios.length} usuários cadastrados`} />}>
+    <LayoutMobile cabecalho={<CabecalhoMobile titulo="Painel Dev" subtitulo={`${usuarios.length} usuários cadastrados`} />}>
       <Campo id="filtro-usuarios" rotulo="Filtrar por nome, @ ou e-mail" value={filtro} onChange={(e) => setFiltro(e.target.value)} autoComplete="off" />
       {mensagem && <p className={estilos.erro} role="alert">{mensagem}</p>}
       {feito && <p className={estilos.ok} role="status">{feito}</p>}
