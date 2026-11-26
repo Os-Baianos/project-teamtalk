@@ -21,3 +21,6 @@ PR: ver PR "Conversas: lista e tela de conversa, Conta no canto da barra"
 
 ## Pendências e dúvidas
 - Mostrar foto de perfil nas listas.
+
+## Ajuste (menu Conta)
+- A caixa do menu Conta agora termina alinhada com a seta do "Conta" (antes passava alguns pixels para a direita).
