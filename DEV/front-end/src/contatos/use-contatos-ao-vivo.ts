@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { criarClienteNavegador } from "../supabase/navegador";
 
 const EVENTO = "contatos-mudaram";
+let contador = 0; // cada uso do hook precisa de um canal com nome próprio (o menu e a página usam ao mesmo tempo)
 
 /** Avisa o resto da tela (ex.: o número no menu Conta) que as solicitações ou contatos mudaram. */
 export function avisarMudancaDeContatos() {
@@ -24,7 +25,7 @@ export function useContatosAoVivo(meuId: string | null, aoMudar: () => void) {
     const chamar = () => ref.current();
     const supabase = criarClienteNavegador();
     const canal = supabase
-      .channel(`contatos-${meuId}`)
+      .channel(`contatos-${meuId}-${++contador}`)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "solicitacoes_contato", filter: `para_id=eq.${meuId}` }, chamar)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "contatos", filter: `dono_id=eq.${meuId}` }, chamar)
       .subscribe();

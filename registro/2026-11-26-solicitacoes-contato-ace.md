@@ -22,3 +22,6 @@ Data: 2026-11-26
 
 ## Para a documentação (Eliot)
 - Contatos agora dependem de solicitação aceita; mensagens só entre contatos aceitos.
+
+## Correção
+- A página Conta > Contatos dava erro ("client-side exception"): o menu e a página criavam o canal de tempo real com o mesmo nome. Cada uso agora tem um canal próprio.
