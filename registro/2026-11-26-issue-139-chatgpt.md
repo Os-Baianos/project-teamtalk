@@ -2,7 +2,7 @@
 
 Quem: ChatGPT (OpenAI), em colaboração com Luana
 Data: 2026-11-26
-PR: a ser preenchido após abertura
+PR: https://github.com/Os-Baianos/project-teamtalk/pull/187
 
 ## O que foi feito
 - Criada uma assinatura horizontal colorida e uma versão monocromática para fundos escuros.
