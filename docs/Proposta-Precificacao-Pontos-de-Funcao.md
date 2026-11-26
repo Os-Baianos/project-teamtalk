@@ -5,7 +5,7 @@
 **PROJETO:** TeamTalk  
 **CLIENTE:** Fábio Cerqueira  
 **DATA:** 18 de novembro de 2026  
-**VERSÃO:** 1.1 — Para análise e aprovação  
+**VERSÃO:** 1.2 — Estimativa preliminar com premissas provisórias  
 **VALOR UNITÁRIO:** R$ 488,00 por Ponto de Função
 
 ---
@@ -249,26 +249,61 @@ A estimativa considera:
 - A solução terá foco em dispositivos móveis.
 - A implantação ocorrerá de forma gradual.
 
-Ainda precisam ser detalhadas políticas de recuperação de senha, retenção de mensagens, armazenamento, suporte, auditoria e implantação.
+As decisões provisórias e as pendências estão detalhadas na seção 12. As hipóteses não representam aprovação do cliente e deverão ser revistas antes da homologação funcional e comercial.
 
-# 12. Questões para validação
+# 12. Premissas provisórias e validações pendentes
 
-Antes da homologação da contagem, recomenda-se esclarecer:
+Como o cliente ainda não pôde ser contatado, foram adotadas hipóteses de trabalho para orientar o MVP. **Nenhuma hipótese desta seção deve ser interpretada como aprovação do cliente ou como escopo comercial definitivamente contratado.**
 
-1. Conversas individuais e em grupo serão suportadas?
-2. Cada conversa terá participantes armazenados separadamente?
-3. Mensagens poderão ser editadas ou excluídas?
-4. O status de leitura será armazenado individualmente?
-5. Haverá notificações além do e-mail inicial?
-6. O usuário poderá pesquisar mensagens e arquivos?
-7. Os PDFs terão limite de tamanho?
-8. Haverá recuperação de senha?
-9. A equipe de TI poderá importar usuários em lote?
-10. Existirá integração com diretório corporativo?
-11. Haverá relatórios administrativos?
-12. Como será implementada a liberação gradual?
-13. Por quanto tempo mensagens e arquivos serão armazenados?
-14. O sistema terá logs consultáveis pelos administradores?
+## 12.1 Decisões provisórias consideradas no planejamento
+
+| Tema | Hipótese adotada | Impacto/ressalva |
+|---|---|---|
+| Limite de PDF | Até 10 MB por arquivo | Validar com a empresa e testar limites da infraestrutura. |
+| Quota de armazenamento | Sem quota individual inicial; monitoramento e limites globais de infraestrutura | Capacidade e custos de armazenamento não estão incluídos automaticamente no preço funcional. |
+| Recuperação de senha | Solicitação ao TI; avaliar redefinição por link/token único e temporário enviado ao e-mail corporativo | Não enviar senhas em texto puro. Fluxo depende do serviço de e-mail e da política de identidade. |
+| Retenção | Sem exclusão automática por prazo no MVP até aprovação de política | Retenção, descarte, backup e requisitos LGPD precisam ser definidos antes da produção com dados reais; não significa retenção ilimitada aprovada. |
+| Exclusão pelo usuário | Não oferecer no MVP | Rever após definição da política de retenção e privacidade. |
+| Cadastro em lote | Considerar importação CSV administrativa, com validação e relatório de erros | Hipótese adicional que pode alterar escopo e contagem; depende de confirmação. |
+| Diretório corporativo | Sem integração AD/LDAP/SSO no MVP | Evolução futura sujeita a orçamento e análise. |
+| Conversas em grupo | Fora do MVP; priorizar conversas individuais | Não há confirmação documental suficiente para incluir grupos. |
+| E-mail | Serviço/SMTP corporativo indicado e autorizado pela empresa | Configuração, credenciais e custos do provedor deverão ser fornecidos/definidos pela empresa. |
+| Auditoria | Registrar operações administrativas relevantes: criação, edição, bloqueio/desativação, permissões e redefinições administrativas | Eventos, acesso e retenção dos logs ainda precisam de política formal. |
+
+## 12.2 Plano provisório de implantação
+
+1. TI: configuração, cadastro inicial e testes.
+2. Grupo piloto: liberação limitada e acompanhamento.
+3. Expansão por setores: conforme autorização e resultados do piloto.
+4. Disponibilização geral: após avaliação de estabilidade, segurança, capacidade e aceite.
+
+Os grupos, datas, quantitativos, responsáveis e critérios de passagem entre fases ainda não estão definidos.
+
+## 12.3 Pendências para o cliente
+
+1. Confirmar o limite de PDF e eventual quota de armazenamento.
+2. Aprovar o fluxo de recuperação de senha e o papel do TI nesse processo.
+3. Definir retenção, descarte, backup e exclusão de mensagens e documentos.
+4. Confirmar necessidade de importação CSV e fornecer o formato dos dados.
+5. Informar se existe necessidade de integração com diretório corporativo/SSO.
+6. Confirmar se conversas em grupo serão necessárias em versão futura.
+7. Definir os grupos, responsáveis, cronograma e critérios de implantação gradual.
+8. Definir eventos auditáveis, quem poderá consultar os registros e por quanto tempo serão mantidos.
+9. Indicar o serviço de e-mail corporativo e o processo seguro de disponibilização das configurações.
+10. Validar metas de desempenho, disponibilidade e navegadores suportados.
+
+## 12.4 Efeito sobre a estimativa
+
+A estimativa de 75 PF e 600 horas permanece como **referência preliminar da versão anterior**, não como contagem recalculada ou homologada com base nas hipóteses desta versão. Em especial, importação CSV, recuperação de senha, auditoria detalhada e quaisquer integrações podem alterar funções de dados, processos elementares e esforço.
+
+Antes de fechar preço e prazo, a equipe deverá:
+- confirmar o escopo efetivo com o cliente;
+- distinguir requisitos já aprovados de hipóteses provisórias;
+- revisar a contagem funcional com DETs, RETs e FTRs;
+- avaliar impacto das decisões técnicas e não funcionais;
+- atualizar a estimativa de horas e a proposta comercial.
+
+A ausência de resposta do cliente não deve ser tratada como aceite tácito.
 
 # 13. Riscos e recomendações
 
@@ -310,4 +345,4 @@ A aprovação desta versão representa a concordância com a continuidade da val
 
 **TEAMTALK — PROPOSTA TÉCNICA E COMERCIAL**
 
-*Versão 1.1 — Documento preliminar para análise. A contagem definitiva depende da validação funcional e da aplicação integral dos critérios de mensuração adotados.*
+*Versão 1.2 — Documento preliminar para análise. A contagem definitiva depende da validação funcional e da aplicação integral dos critérios de mensuração adotados.*
