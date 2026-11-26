@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 64" role="img" aria-labelledby="title desc">
+  <title id="title">TeamTalk</title>
+  <desc id="desc">Símbolo verde de balão de conversa com a letra T, acompanhado do nome TeamTalk.</desc>
+  <g transform="translate(2 2)">
+    <path d="M13 3h34a10 10 0 0 1 10 10v25a10 10 0 0 1-10 10H29L14 59a2 2 0 0 1-3-1.7V48A10 10 0 0 1 3 38V13A10 10 0 0 1 13 3Z" fill="#176b5b"/>
+    <path d="M15 17h30v7H34v19h-8V24H15Z" fill="#ffffff"/>
+  </g>
+  <text x="76" y="43" font-family="ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="34" font-weight="700" letter-spacing="-1.2"><tspan fill="#173a35">Team</tspan><tspan fill="#176b5b">Talk</tspan></text>
+</svg>
