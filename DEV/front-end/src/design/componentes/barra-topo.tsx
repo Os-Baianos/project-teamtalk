@@ -10,6 +10,7 @@ import { aquecerMensagens, lerContaContatos, lerInicio } from "../../dados/leitu
 import { gravarCache, limparCache } from "../../cache/cache-local";
 import { useContatosAoVivo } from "../../contatos/use-contatos-ao-vivo";
 import estilos from "@design/componentes/barra-topo.module.css";
+import { Icone } from "../icones/icone";
 
 const itens = [
   { href: "/conversas", rotulo: "Conversas" },
@@ -65,10 +66,7 @@ export function BarraTopo() {
     <header className={estilos.topo}>
       <div className={estilos.linha}>
         <Link href="/" className={estilos.marca} aria-label="TeamTalk, página inicial">
-          <svg className={estilos.simbolo} viewBox="0 0 32 32" aria-hidden="true" focusable="false">
-            <path d="M6 3h20a4 4 0 0 1 4 4v13a4 4 0 0 1-4 4H14l-6.2 5.1a.8.8 0 0 1-1.3-.6V24H6a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4Z" fill="currentColor" />
-            <path d="M10.5 9h11v2.8h-4.1V20h-2.8v-8.2h-4.1Z" fill="var(--cor-topo)" />
-          </svg>
+          <Icone nome="simbolo" className={estilos.simbolo} />
           <span className={estilos.nome}>Team<span className={estilos.destaque}>Talk</span></span>
         </Link>
       {!publica && (
