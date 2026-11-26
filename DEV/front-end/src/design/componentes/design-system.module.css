@@ -8,7 +8,7 @@
   min-height: 2rem;
   margin: 0;
   padding: 0.125rem var(--espaco-5);
-  border: var(--borda-fina) solid transparent;
+  border: 2px solid transparent;
   border-radius: var(--raio-pill);
   background: var(--cor-primaria);
   color: var(--cor-sobre-primaria);
