@@ -19,3 +19,10 @@ PR: ver PR "Aba Perfil na Conta"
 
 ## Pendências e dúvidas
 - Foto de perfil de verdade (envio de imagem) ainda não existe.
+
+## Foto de perfil e visual do menu Conta
+- Na página Perfil: enviar foto, ajustar (arrastar e zoom) e remover. A foto final é um quadrado de 256 px em JPEG, mostrado em círculo.
+- Supabase: bucket público `avatares` (cada pessoa mexe só na própria pasta, máx. 2 MB), coluna `perfis.foto_path` e função `definir_foto`.
+- Menu Conta no estilo das listas da AWS: caixa de cantos arredondados, fundo levemente transparente com desfoque, divisórias entre os itens e seleção que acompanha a borda.
+- Arquivos: `src/app/perfil/foto-perfil.tsx`, `perfil.module.css`, `page.tsx`, `barra-topo.module.css`, `DEV/supabase/migracoes/2026-11-25-foto-perfil.sql`.
+- Pendência: mostrar a foto também nos contatos e conversas (depende das telas de #116 e #117).
