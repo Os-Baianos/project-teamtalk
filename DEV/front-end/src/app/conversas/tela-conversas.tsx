@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent, KeyboardEvent } from "react";
+import { Aviso } from "@design/componentes/aviso";
 import { Carregando } from "@design/componentes/carregando";
 import { Icone } from "@design/icones/icone";
 import { Avatar } from "../../contatos/avatar";
@@ -91,6 +92,7 @@ export function TelaConversas({
     if (!el) return;
     el.style.height = "auto";
     el.style.height = `${Math.min(el.scrollHeight, 140)}px`;
+    el.style.overflowY = el.scrollHeight > 140 ? "auto" : "hidden"; // sem barra de rolagem enquanto cabe
   }, [texto]);
   useEffect(() => {
     if (!menu) return;
@@ -308,15 +310,12 @@ export function TelaConversas({
               <div ref={fim} />
             </div>
 
-            {aviso && <div className={estilos.toast} role="status">{aviso}</div>}
 
             <form className={estilos.envio} onSubmit={enviar}>
-              {editando && (
-                <div className={estilos.editando}>
-                  <span>Editando mensagem</span>
-                  <button type="button" className={estilos.icone} onClick={() => { setEditando(null); setTexto(""); }} aria-label="Cancelar edição">
-                    <Icone nome="fechar" width={16} height={16} />
-                  </button>
+              {(editando || aviso) && (
+                <div className={estilos.avisos}>
+                  {editando && <Aviso key={editando.id} rotuloFechar="Cancelar edição" aoFechar={() => { setEditando(null); setTexto(""); }}>Editando mensagem</Aviso>}
+                  {aviso && <Aviso key={aviso} aoFechar={() => setAviso("")}>{aviso}</Aviso>}
                 </div>
               )}
               <div className={estilos.entrada}>

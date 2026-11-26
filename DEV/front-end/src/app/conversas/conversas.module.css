@@ -15,13 +15,13 @@
 .listaFechada .lista { visibility: hidden; }
 
 /* Os botões e campos globais do site são grandes e laranja: aqui voltam ao neutro. */
-.raiz button {
+.raiz button:not(:where(.avisos *)) {
   width: auto; min-height: 0; margin: 0; padding: 0;
   border: 0; border-radius: 0; background: none; color: inherit;
   font: inherit; font-weight: inherit; text-align: left; cursor: pointer;
 }
-.raiz button:hover { background: none; }
-.raiz button:not(:disabled):hover, .raiz button:not(:disabled):active { transform: none; box-shadow: none; }
+.raiz button:not(:where(.avisos *)):hover { background: none; }
+.raiz button:not(:where(.avisos *)):not(:disabled):hover, .raiz button:not(:where(.avisos *)):not(:disabled):active { transform: none; box-shadow: none; }
 
 /* ---------- Lista ---------- */
 .lista { display: flex; flex-direction: column; min-width: 0; min-height: 0; border-right: var(--borda-fina) solid var(--cor-borda); background: var(--cor-superficie); }
@@ -87,17 +87,16 @@
 .raiz .menu button:hover { background: var(--cor-fundo); }
 .raiz .menu .perigo { color: var(--cor-erro); }
 
-.toast { position: absolute; left: 50%; bottom: 5.5rem; transform: translateX(-50%); padding: var(--espaco-2) var(--espaco-4); border-radius: var(--raio-pill); background: var(--cor-topo); color: var(--cor-topo-texto); font-size: var(--fonte-sm); }
 
 /* ---------- Envio ---------- */
 .envio { padding: var(--espaco-2) var(--espaco-3) var(--espaco-3); background: var(--cor-fundo); border-top: var(--borda-fina) solid var(--cor-borda); }
-.editando { display: flex; align-items: center; justify-content: space-between; padding: var(--espaco-1) var(--espaco-3); margin-bottom: var(--espaco-2); border-left: 3px solid var(--cor-primaria); background: var(--cor-superficie); border-radius: var(--raio-sm); font-size: var(--fonte-sm); color: var(--cor-secundaria); }
 .entrada { display: flex; align-items: flex-end; gap: var(--espaco-2); }
-.entrada textarea { flex: 1; min-height: 2.75rem; max-height: 140px; padding: 0.7rem var(--espaco-4); border: var(--borda-fina) solid var(--cor-borda); border-radius: 1.4rem; background: var(--cor-superficie); font: inherit; line-height: 1.3; resize: none; }
+.entrada textarea { flex: 1; min-height: 2.75rem; max-height: 140px; padding: 0.7rem var(--espaco-4); border: var(--borda-fina) solid var(--cor-borda); border-radius: 1.4rem; background: var(--cor-superficie); font: inherit; line-height: 1.3; resize: none; box-sizing: border-box; overflow-y: hidden; }
 .entrada textarea:focus-visible { outline: 2px solid var(--cor-foco); outline-offset: 0; }
 .raiz .enviar { flex: none; display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border-radius: var(--raio-pill); background: var(--cor-primaria); color: var(--cor-sobre-primaria); }
 .raiz .enviar:hover { background: var(--cor-primaria-hover); }
 .raiz .enviar:disabled { opacity: .5; cursor: default; }
+.avisos { display: grid; gap: var(--espaco-2); margin-bottom: var(--espaco-2); }
 .erro { margin: var(--espaco-1) var(--espaco-3) 0; color: var(--cor-erro); font-size: var(--fonte-sm); }
 
 /* ---------- Dados da mensagem ---------- */
@@ -136,8 +135,7 @@
   .minha { transform-origin: bottom right; }
   .dia, .vazioChat, .semConversa > * { animation: aparecer .3s ease backwards; }
   .menu { animation: entrar .15s ease backwards; transform-origin: top right; }
-  .toast { animation: aparecer .2s ease backwards; }
-  .fundoDialogo { animation: aparecer .18s ease backwards; }
+    .fundoDialogo { animation: aparecer .18s ease backwards; }
   .dialogo { animation: entrar .22s cubic-bezier(.2, .7, .2, 1) backwards; }
   .chat { animation: aparecer .25s ease backwards; }
   .tique { transition: color .25s ease; }
