@@ -25,3 +25,9 @@ PR: ver PR "Contas dev e Painel dev"
 ## Pendências e dúvidas
 - Foto de perfil da pessoa excluída continua guardada no Storage (arquivo órfão).
 - Trocar senha de outra conta ainda não existe.
+
+## Trocar senha e fotos (atualização)
+- Conta dev agora troca a senha de qualquer conta no Painel dev ("Trocar senha"). Segue as mesmas regras de senha do cadastro; a pessoa é desconectada de onde estiver logada.
+- Ao excluir uma conta, a foto dela também é apagada do armazenamento (não fica mais órfã).
+- Supabase: função `dev_trocar_senha` e políticas do Storage para a conta dev listar e apagar fotos (`DEV/supabase/migracoes/2026-11-25-painel-dev-senha-fotos.sql`).
+- Pendência anterior resolvida: "Trocar senha de outra conta" e "foto órfã".

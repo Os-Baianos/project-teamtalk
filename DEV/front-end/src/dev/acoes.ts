@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { criarClienteServidor } from "../supabase/servidor";
+import { regrasSenha, todasOk } from "../design/validacoes";
 
 export type UsuarioDev = { id: string; nome: string; arroba: string; email: string; papel: string; criado_em: string };
 
@@ -20,6 +21,13 @@ export async function listarUsuariosAction(): Promise<UsuarioDev[]> {
 
 export async function excluirUsuarioAction(id: string): Promise<{ ok: boolean; mensagem?: string }> {
   const supabase = await criarClienteServidor();
+  // Primeiro confirma que é dev e que não é a própria conta; só então apaga as fotos e a conta.
+  const { data: dev } = await supabase.rpc("sou_dev");
+  const { data: eu } = await supabase.auth.getUser();
+  if (dev === true && eu.user?.id !== id) {
+    const { data: arquivos } = await supabase.storage.from("avatares").list(id);
+    if (arquivos?.length) await supabase.storage.from("avatares").remove(arquivos.map((a) => `${id}/${a.name}`));
+  }
   const { data, error } = await supabase.rpc("dev_excluir_usuario", { alvo: id });
   if (error) return { ok: false, mensagem: "Não foi possível excluir agora. Tente novamente." };
   if (data === "ok") { revalidatePath("/dev"); return { ok: true }; }
@@ -40,4 +48,18 @@ export async function editarUsuarioAction(
   if (data === "arroba_em_uso") return { ok: false, mensagem: "Este @ já está em uso." };
   if (data === "inexistente") return { ok: false, mensagem: "Esse usuário já não existe." };
   return { ok: false, mensagem: "Sem permissão para editar." };
+}
+
+export async function trocarSenhaAction(id: string, senha: string): Promise<{ ok: boolean; mensagem?: string }> {
+  if (!todasOk(regrasSenha(senha))) {
+    const faltou = regrasSenha(senha).find((r) => !r.ok);
+    return { ok: false, mensagem: `Senha fraca: ${faltou?.texto.toLowerCase() ?? "confira as regras"}.` };
+  }
+  const supabase = await criarClienteServidor();
+  const { data, error } = await supabase.rpc("dev_trocar_senha", { alvo: id, nova: senha });
+  if (error) return { ok: false, mensagem: "Não foi possível trocar a senha agora. Tente novamente." };
+  if (data === "ok") return { ok: true };
+  if (data === "senha_fraca") return { ok: false, mensagem: "Senha fraca. Use maiúscula, minúscula, número e símbolo." };
+  if (data === "inexistente") return { ok: false, mensagem: "Esse usuário já não existe." };
+  return { ok: false, mensagem: "Sem permissão para trocar a senha." };
 }

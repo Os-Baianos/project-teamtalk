@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { Badge, Botao, Campo, CabecalhoMobile, LayoutMobile } from "@design/componentes";
-import { editarUsuarioAction, excluirUsuarioAction, listarUsuariosAction } from "../../dev/acoes";
+import { editarUsuarioAction, excluirUsuarioAction, listarUsuariosAction, trocarSenhaAction } from "../../dev/acoes";
 import type { UsuarioDev } from "../../dev/acoes";
 import estilos from "./dev.module.css";
 
@@ -16,6 +16,9 @@ export function PainelDev({ inicial, meuId }: { inicial: UsuarioDev[]; meuId: st
   const [excluindo, setExcluindo] = useState<string | null>(null);
   const [nome, setNome] = useState("");
   const [arroba, setArroba] = useState("");
+  const [trocandoSenha, setTrocandoSenha] = useState<string | null>(null);
+  const [novaSenha, setNovaSenha] = useState("");
+  const [feito, setFeito] = useState("");
   const [ocupado, setOcupado] = useState(false);
   const [mensagem, setMensagem] = useState("");
 
@@ -28,7 +31,7 @@ export function PainelDev({ inicial, meuId }: { inicial: UsuarioDev[]; meuId: st
   async function recarregar() { setUsuarios(await listarUsuariosAction()); }
 
   function comecarEdicao(u: UsuarioDev) {
-    setEditando(u.id); setExcluindo(null); setNome(u.nome); setArroba(u.arroba); setMensagem("");
+    setEditando(u.id); setExcluindo(null); setTrocandoSenha(null); setNome(u.nome); setArroba(u.arroba); setMensagem(""); setFeito("");
   }
 
   async function salvar(e: FormEvent<HTMLFormElement>, id: string) {
@@ -39,6 +42,16 @@ export function PainelDev({ inicial, meuId }: { inicial: UsuarioDev[]; meuId: st
     if (!r.ok) { setMensagem(r.mensagem ?? "Não foi possível salvar."); return; }
     setEditando(null);
     await recarregar();
+  }
+
+  async function trocarSenha(e: FormEvent<HTMLFormElement>, id: string) {
+    e.preventDefault();
+    setOcupado(true); setMensagem(""); setFeito("");
+    const r = await trocarSenhaAction(id, novaSenha);
+    setOcupado(false);
+    if (!r.ok) { setMensagem(r.mensagem ?? "Não foi possível trocar a senha."); return; }
+    setTrocandoSenha(null); setNovaSenha("");
+    setFeito("Senha trocada. A pessoa foi desconectada e entra com a nova senha.");
   }
 
   async function excluir(id: string) {
@@ -54,6 +67,7 @@ export function PainelDev({ inicial, meuId }: { inicial: UsuarioDev[]; meuId: st
     <LayoutMobile cabecalho={<CabecalhoMobile titulo="Painel dev" subtitulo={`${usuarios.length} usuários cadastrados`} />}>
       <Campo id="filtro-usuarios" rotulo="Filtrar por nome, @ ou e-mail" value={filtro} onChange={(e) => setFiltro(e.target.value)} autoComplete="off" />
       {mensagem && <p className={estilos.erro} role="alert">{mensagem}</p>}
+      {feito && <p className={estilos.ok} role="status">{feito}</p>}
       <ul className={estilos.lista} aria-label="Usuários">
         {visiveis.map((u) => (
           <li className={estilos.cartao} key={u.id}>
@@ -64,6 +78,22 @@ export function PainelDev({ inicial, meuId }: { inicial: UsuarioDev[]; meuId: st
                 <div className={estilos.acoes}>
                   <Botao variante="secundaria" onClick={() => setEditando(null)} disabled={ocupado}>Cancelar</Botao>
                   <Botao type="submit" ocupado={ocupado}>Salvar</Botao>
+                </div>
+              </form>
+            ) : trocandoSenha === u.id ? (
+              <form className={estilos.edicao} onSubmit={(e) => trocarSenha(e, u.id)}>
+                <Campo
+                  id={`senha-${u.id}`}
+                  rotulo={`Nova senha de ${u.nome}`}
+                  type="password"
+                  autoComplete="new-password"
+                  ajuda="Mínimo 6 caracteres, com maiúscula, minúscula, número e símbolo."
+                  value={novaSenha}
+                  onChange={(e) => setNovaSenha(e.target.value)}
+                />
+                <div className={estilos.acoes}>
+                  <Botao variante="secundaria" onClick={() => { setTrocandoSenha(null); setNovaSenha(""); setMensagem(""); }} disabled={ocupado}>Cancelar</Botao>
+                  <Botao type="submit" ocupado={ocupado}>Trocar senha</Botao>
                 </div>
               </form>
             ) : (
@@ -83,6 +113,7 @@ export function PainelDev({ inicial, meuId }: { inicial: UsuarioDev[]; meuId: st
                 ) : (
                   <div className={estilos.acoes}>
                     <Botao variante="secundaria" onClick={() => comecarEdicao(u)}>Editar</Botao>
+                    <Botao variante="secundaria" onClick={() => { setTrocandoSenha(u.id); setNovaSenha(""); setEditando(null); setExcluindo(null); setMensagem(""); setFeito(""); }} aria-label={`Trocar a senha de ${u.nome}`}>Trocar senha</Botao>
                     {u.id !== meuId && (
                       <Botao variante="perigo" onClick={() => { setExcluindo(u.id); setEditando(null); setMensagem(""); }} aria-label={`Excluir ${u.nome}`}>Excluir</Botao>
                     )}
