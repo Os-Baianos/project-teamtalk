@@ -19,3 +19,8 @@ Data: 2026-11-26
 - Corrigido o espaço extra acima da primeira sugestão (vinha da margem padrão dos botões).
 - Linha de divisão entre a busca e "Meus contatos".
 - Contas de teste que começam com "ma": mariasouza, marcoslima, mateusrocha, manuelacosta, marinaalves, matheusribeiro, maiarapereira (e-mail <arroba>@teamtalk.com).
+
+## Correção e otimização
+- Corrigido um erro meu: o Avatar sem foto chamava a si mesmo e a página caía com "Out of Memory" (PR #179).
+- Sugestões mais rápidas: espera de 180 ms ao digitar e respostas já buscadas ficam guardadas (apagar uma letra volta na hora).
+- O círculo de carregamento só aparece depois de 0,3 s (prop `atraso` do componente Carregando), para não piscar em carregamentos rápidos.

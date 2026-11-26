@@ -35,17 +35,21 @@ export function TelaContatos({ carregando = false, contatos, buscar, sugerir, ao
   const [sugestoes, setSugestoes] = useState<Contato[]>([]);
   const [carregandoSug, setCarregandoSug] = useState(false);
   const pedido = useRef(0);
+  const guardadas = useRef(new Map<string, Contato[]>()); // respostas já buscadas (apagar letra volta na hora)
 
   // Sugestões: espera a pessoa parar de digitar um instante e ignora respostas antigas.
   useEffect(() => {
     const q = normalizar(termo);
     const numero = ++pedido.current;
     if (!sugerir || q.length < 2 || resultado) { setSugestoes([]); setCarregandoSug(false); return; }
+    const pronta = guardadas.current.get(q);
+    if (pronta) { setSugestoes(pronta.filter((c) => !contatos.some((x) => x.id === c.id))); setCarregandoSug(false); return; }
     setCarregandoSug(true);
     const espera = setTimeout(async () => {
       const lista = await sugerir(q);
+      guardadas.current.set(q, lista);
       if (numero === pedido.current) { setSugestoes(lista.filter((c) => !contatos.some((x) => x.id === c.id))); setCarregandoSug(false); }
-    }, 250);
+    }, 180);
     return () => clearTimeout(espera);
   }, [termo, resultado]);
 
@@ -88,7 +92,7 @@ export function TelaContatos({ carregando = false, contatos, buscar, sugerir, ao
             enterKeyHint="search"
             erro={mensagem || undefined}
           />
-          {carregandoSug && sugestoes.length === 0 && <div className={estilos.sugCarregando}><Carregando tamanho="1.25rem" texto="Buscando sugestões" /></div>}
+          {carregandoSug && sugestoes.length === 0 && <div className={estilos.sugCarregando}><Carregando tamanho="1.25rem" texto="Buscando sugestões" atraso /></div>}
           {sugestoes.length > 0 && (
             <ul className={estilos.sugestoes} aria-label="Sugestões">
               {sugestoes.map((c) => (
@@ -129,7 +133,7 @@ export function TelaContatos({ carregando = false, contatos, buscar, sugerir, ao
       <section className={estilos.secao} aria-labelledby="titulo-meus-contatos">
         <h2 id="titulo-meus-contatos">Meus contatos</h2>
         {carregando ? (
-          <div className={estilos.carregando}><Carregando /></div>
+          <div className={estilos.carregando}><Carregando atraso /></div>
         ) : contatos.length === 0 ? (
           <p className={estilos.vazio}>Você ainda não adicionou ninguém.</p>
         ) : (

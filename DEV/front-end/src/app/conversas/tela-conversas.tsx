@@ -80,7 +80,7 @@ export function TelaConversas({ carregando = false, conversas, novos, ativa, men
     <LayoutMobile cabecalho={<CabecalhoMobile titulo="Conversas" subtitulo="Suas mensagens" />}>
       <section aria-label="Conversas">
         {carregando ? (
-          <div className={estilos.carregando}><Carregando /></div>
+          <div className={estilos.carregando}><Carregando atraso /></div>
         ) : conversas.length === 0 ? (
           <p className={estilos.vazio}>Nenhuma conversa ainda.</p>
         ) : (
