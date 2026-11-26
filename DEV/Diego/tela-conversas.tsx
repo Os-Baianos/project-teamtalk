@@ -46,7 +46,8 @@ const horarioLista = (iso: string) => {
   const ontem = new Date(hoje);
   ontem.setDate(hoje.getDate() - 1);
   if (data.toDateString() === ontem.toDateString()) return "Ontem";
-  return data.toLocaleDateString("pt-BR", { weekday: "short", timeZone: "America/Bahia" }).replace(".", "");
+  return data.toLocaleDateString("pt-BR", { weekday: "short", timeZone: "America/Bahia" })
+    .replace(".", "").replace(/^./, (letra) => letra.toLocaleUpperCase("pt-BR"));
 };
 
 function avatar(nome: string, foto?: string | null) {
