@@ -108,3 +108,6 @@
   .tile:not(:disabled):hover { transform: scale(1.06); box-shadow: 0 2px 8px rgb(0 0 0 / 18%); }
   .tile:not(:disabled):active { transform: scale(.97); box-shadow: none; }
 }
+.linhaEditar { display: flex; align-items: center; justify-content: space-between; gap: var(--espaco-3); }
+.linhaEditar dd { margin: 0; overflow-wrap: anywhere; }
+.edicaoNome { display: grid; gap: var(--espaco-3); padding-top: var(--espaco-2); }
