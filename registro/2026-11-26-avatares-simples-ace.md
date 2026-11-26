@@ -12,3 +12,6 @@ PR: ver PR "Avatares: Sol, Folha, Hexágonos e Pinguim mais simples"
 
 ## Pendências e dúvidas
 - Provisórios até o UI-UX oficial.
+
+## Ajuste
+- Avatar do Pinguim removido a pedido. Ficam 12 avatares (grade 4x3 completa).
