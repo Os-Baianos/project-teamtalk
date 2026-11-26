@@ -19,6 +19,16 @@
 
 @media (prefers-reduced-motion: no-preference) {
   @keyframes entrar-dev { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
-  .cartao { animation: entrar-dev .3s cubic-bezier(.2, .7, .2, 1) both; transition: box-shadow .2s ease, border-color .2s ease; }
+  @keyframes aparecer-dev { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+  .cartao { animation: entrar-dev .3s cubic-bezier(.2, .7, .2, 1) backwards; transition: box-shadow .2s ease, border-color .2s ease, opacity .25s ease, transform .25s ease; }
   .cartao:hover { border-color: var(--cor-borda-controle); box-shadow: 0 2px 8px rgb(0 0 0 / 8%); }
+  .cartao:nth-child(2) { animation-delay: .04s; }
+  .cartao:nth-child(3) { animation-delay: .08s; }
+  .cartao:nth-child(4) { animation-delay: .12s; }
+  .cartao:nth-child(5) { animation-delay: .16s; }
+  .cartao:nth-child(n+6) { animation-delay: .2s; }
+  .cartao[data-saindo="true"] { opacity: 0; transform: translateX(16px) scale(.98); pointer-events: none; }
+  .painelInterno { animation: aparecer-dev .22s cubic-bezier(.2, .7, .2, 1) both; }
+  .erro, .ok { animation: aparecer-dev .22s cubic-bezier(.2, .7, .2, 1) both; }
+  .vazio { animation: aparecer-dev .3s ease both; }
 }

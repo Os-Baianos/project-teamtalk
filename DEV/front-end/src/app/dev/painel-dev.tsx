@@ -19,6 +19,7 @@ export function PainelDev({ inicial, meuId }: { inicial: UsuarioDev[]; meuId: st
   const [trocandoSenha, setTrocandoSenha] = useState<string | null>(null);
   const [novaSenha, setNovaSenha] = useState("");
   const [feito, setFeito] = useState("");
+  const [saindo, setSaindo] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
   const [mensagem, setMensagem] = useState("");
 
@@ -60,6 +61,9 @@ export function PainelDev({ inicial, meuId }: { inicial: UsuarioDev[]; meuId: st
     setOcupado(false);
     if (!r.ok) { setMensagem(r.mensagem ?? "Não foi possível excluir."); return; }
     setExcluindo(null);
+    setSaindo(id); // o cartão some com animação antes de sair da lista
+    await new Promise((ok) => setTimeout(ok, 280));
+    setSaindo(null);
     await recarregar();
   }
 
@@ -70,9 +74,9 @@ export function PainelDev({ inicial, meuId }: { inicial: UsuarioDev[]; meuId: st
       {feito && <p className={estilos.ok} role="status">{feito}</p>}
       <ul className={estilos.lista} aria-label="Usuários">
         {visiveis.map((u) => (
-          <li className={estilos.cartao} key={u.id}>
+          <li className={estilos.cartao} data-saindo={saindo === u.id} key={u.id}>
             {editando === u.id ? (
-              <form className={estilos.edicao} onSubmit={(e) => salvar(e, u.id)}>
+              <form className={`${estilos.edicao} ${estilos.painelInterno}`} onSubmit={(e) => salvar(e, u.id)}>
                 <Campo id={`nome-${u.id}`} rotulo="Nome" value={nome} onChange={(e) => setNome(e.target.value)} />
                 <Campo id={`arroba-${u.id}`} rotulo="Usuário (@)" value={arroba} onChange={(e) => setArroba(e.target.value)} autoCapitalize="none" spellCheck={false} />
                 <div className={estilos.acoes}>
@@ -81,7 +85,7 @@ export function PainelDev({ inicial, meuId }: { inicial: UsuarioDev[]; meuId: st
                 </div>
               </form>
             ) : trocandoSenha === u.id ? (
-              <form className={estilos.edicao} onSubmit={(e) => trocarSenha(e, u.id)}>
+              <form className={`${estilos.edicao} ${estilos.painelInterno}`} onSubmit={(e) => trocarSenha(e, u.id)}>
                 <Campo
                   id={`senha-${u.id}`}
                   rotulo={`Nova senha de ${u.nome}`}
@@ -105,7 +109,7 @@ export function PainelDev({ inicial, meuId }: { inicial: UsuarioDev[]; meuId: st
                   <span>Criada em {data(u.criado_em)}</span>
                 </div>
                 {excluindo === u.id ? (
-                  <div className={estilos.acoes}>
+                  <div className={`${estilos.acoes} ${estilos.painelInterno}`}>
                     <span className={estilos.aviso}>Excluir {u.nome}? Apaga a conta, os contatos e as mensagens. Não dá para desfazer.</span>
                     <Botao variante="secundaria" onClick={() => setExcluindo(null)} disabled={ocupado}>Cancelar</Botao>
                     <Botao variante="perigo" onClick={() => excluir(u.id)} ocupado={ocupado}>Confirmar exclusão</Botao>
