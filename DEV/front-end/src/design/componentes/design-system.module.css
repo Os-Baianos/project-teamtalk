@@ -7,9 +7,9 @@
   min-width: var(--toque-confortavel);
   min-height: var(--toque-confortavel);
   margin: 0;
-  padding: var(--espaco-3) var(--espaco-4);
+  padding: var(--espaco-2) var(--espaco-5);
   border: var(--borda-fina) solid transparent;
-  border-radius: var(--raio-sm);
+  border-radius: var(--raio-pill);
   background: var(--cor-primaria);
   color: var(--cor-sobre-primaria);
   font: inherit;
@@ -24,16 +24,16 @@
 
 .botao[data-expandido="true"] { width: 100%; }
 .botao[data-variante="primaria"] { background: var(--cor-primaria); }
-.botao[data-variante="secundaria"] { border-color: var(--cor-borda-controle); background: var(--cor-superficie); color: var(--cor-link); }
+.botao[data-variante="secundaria"] { border-color: var(--cor-link); background: transparent; color: var(--cor-link); }
 .botao[data-variante="discreta"] { background: transparent; color: var(--cor-link); }
-.botao[data-variante="perigo"] { background: var(--cor-erro); color: #fff; }
+.botao[data-variante="perigo"] { border-color: var(--cor-erro); background: transparent; color: var(--cor-erro); }
 .botao:disabled, .destino:disabled { opacity: .6; cursor: not-allowed; }
 
 @media (hover: hover) {
   .botao:not(:disabled):hover { background: var(--cor-primaria-hover); }
   .botao[data-variante="secundaria"]:not(:disabled):hover,
   .botao[data-variante="discreta"]:not(:disabled):hover { background: var(--cor-selecionada); }
-  .botao[data-variante="perigo"]:not(:disabled):hover { background: var(--cor-erro); text-decoration: underline; }
+  .botao[data-variante="perigo"]:not(:disabled):hover { background: var(--cor-erro); color: #fff; }
 }
 
 .botao:focus-visible, .entrada:focus-visible, .destino:focus-visible, .pular:focus-visible {
