@@ -9,11 +9,8 @@ import {
   apagarMensagemAction,
   editarMensagemAction,
   enviarMensagemAction,
-  carregarInicioAction,
-  listarMensagensAction,
-  marcarLidasAction,
-  marcarRecebidasAction,
 } from "../../mensagens/acoes";
+import { lerInicio, lerMensagens, marcarLidas, marcarRecebidas } from "../../dados/leituras";
 import type { Mensagem } from "../../mensagens/acoes";
 import { useMensagensAoVivo } from "../../mensagens/use-mensagens-ao-vivo";
 
@@ -32,7 +29,7 @@ export default function PaginaConversas() {
   const ativaRef = useRef<Pessoa | null>(null);
   ativaRef.current = ativa;
 
-  const aplicarInicio = useCallback((dados: Awaited<ReturnType<typeof carregarInicioAction>>) => {
+  const aplicarInicio = useCallback((dados: Awaited<ReturnType<typeof lerInicio>>) => {
     setConversas(dados.conversas.map((c) => ({
       id: c.contato_id, nome: c.nome, arroba: c.arroba, fotoUrl: c.foto_url,
       ultimaTexto: c.ultima_texto, ultimaEm: c.ultima_em, naoLidas: c.nao_lidas,
@@ -43,7 +40,7 @@ export default function PaginaConversas() {
 
   const carregarLista = useCallback(async () => {
     try {
-      const dados = await carregarInicioAction(); // também marca como recebidas as mensagens que chegaram
+      const dados = await lerInicio(); // também marca como recebidas as mensagens que chegaram
       gravarCache("inicio", dados);
       aplicarInicio(dados);
       setErroLista(false);
@@ -55,7 +52,7 @@ export default function PaginaConversas() {
   useEffect(() => {
     meuIdLocal().then(setMeuId);
     // Mostra na hora o que já foi carregado antes e atualiza por trás.
-    const guardado = lerCache<Awaited<ReturnType<typeof carregarInicioAction>>>("inicio");
+    const guardado = lerCache<Awaited<ReturnType<typeof lerInicio>>>("inicio");
     if (guardado) { aplicarInicio(guardado); setCarregando(false); }
     carregarLista().finally(() => setCarregando(false));
   }, [carregarLista, aplicarInicio]);
@@ -73,10 +70,10 @@ export default function PaginaConversas() {
   }, [carregando]);
 
   const aoReceber = useCallback((m: Mensagem) => {
-    marcarRecebidasAction();
+    marcarRecebidas();
     if (ativaRef.current?.id === m.remetente_id) {
       setMensagens((atual) => (atual.some((x) => x.id === m.id) ? atual : [...atual, m]));
-      marcarLidasAction(m.remetente_id);
+      marcarLidas(m.remetente_id);
     }
     carregarLista();
   }, [carregarLista]);
@@ -94,10 +91,10 @@ export default function PaginaConversas() {
     setErroHistorico(false);
     setCarregandoMensagens(true);
     try {
-      const lista = await listarMensagensAction(pessoa.id);
+      const lista = await lerMensagens(pessoa.id);
       if (ativaRef.current?.id !== pessoa.id) return; // trocou de conversa enquanto carregava
       setMensagens(lista);
-      await marcarLidasAction(pessoa.id);
+      await marcarLidas(pessoa.id);
       carregarLista();
     } catch {
       if (ativaRef.current?.id === pessoa.id) setErroHistorico(true);
