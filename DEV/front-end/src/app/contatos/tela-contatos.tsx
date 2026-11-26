@@ -34,6 +34,7 @@ export function TelaContatos({ carregando = false, contatos, buscar, sugerir, ao
   const [mensagem, setMensagem] = useState("");
   const [sugestoes, setSugestoes] = useState<Contato[]>([]);
   const [carregandoSug, setCarregandoSug] = useState(false);
+  const [erroSug, setErroSug] = useState("");
   const pedido = useRef(0);
   const guardadas = useRef(new Map<string, Contato[]>()); // respostas já buscadas (apagar letra volta na hora)
 
@@ -41,14 +42,31 @@ export function TelaContatos({ carregando = false, contatos, buscar, sugerir, ao
   useEffect(() => {
     const q = normalizar(termo);
     const numero = ++pedido.current;
-    if (!sugerir || q.length < 2 || resultado) { setSugestoes([]); setCarregandoSug(false); return; }
+    if (!sugerir || q.length < 2 || resultado) { setSugestoes([]); setErroSug(""); setCarregandoSug(false); return; }
     const pronta = guardadas.current.get(q);
     if (pronta) { setSugestoes(pronta.filter((c) => !contatos.some((x) => x.id === c.id))); setCarregandoSug(false); return; }
     setCarregandoSug(true);
+    setErroSug("");
     const espera = setTimeout(async () => {
-      const lista = await sugerir(q);
-      guardadas.current.set(q, lista);
-      if (numero === pedido.current) { setSugestoes(lista.filter((c) => !contatos.some((x) => x.id === c.id))); setCarregandoSug(false); }
+      try {
+        // Tempo máximo de 8 s: o círculo nunca fica girando para sempre.
+        const lista = await Promise.race([
+          sugerir(q),
+          new Promise<never>((_, rejeitar) => setTimeout(() => rejeitar(new Error("demorou")), 8000)),
+        ]);
+        guardadas.current.set(q, lista);
+        if (numero === pedido.current) setSugestoes(lista.filter((c) => !contatos.some((x) => x.id === c.id)));
+      } catch {
+        if (numero !== pedido.current) return;
+        // Página aberta antes de uma atualização do site: recarrega uma vez para pegar a versão nova.
+        try {
+          const ultima = Number(sessionStorage.getItem("recarregou-em") ?? 0);
+          if (Date.now() - ultima > 60_000) { sessionStorage.setItem("recarregou-em", String(Date.now())); location.reload(); return; }
+        } catch { /* sem sessionStorage: só mostra o aviso */ }
+        setErroSug("Não foi possível buscar agora. Atualize a página.");
+      } finally {
+        if (numero === pedido.current) setCarregandoSug(false);
+      }
     }, 180);
     return () => clearTimeout(espera);
   }, [termo, resultado]);
@@ -93,6 +111,7 @@ export function TelaContatos({ carregando = false, contatos, buscar, sugerir, ao
             erro={mensagem || undefined}
           />
           {carregandoSug && sugestoes.length === 0 && <div className={estilos.sugCarregando}><Carregando tamanho="1.25rem" texto="Buscando sugestões" atraso /></div>}
+          {erroSug && <p className={estilos.erroSug} role="alert">{erroSug}</p>}
           {sugestoes.length > 0 && (
             <ul className={estilos.sugestoes} aria-label="Sugestões">
               {sugestoes.map((c) => (
