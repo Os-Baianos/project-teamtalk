@@ -1,3 +1,5 @@
+import { Aviso } from "@design/componentes";
+
 type Props = { entrar: (dados: FormData) => Promise<void>; mensagem: string; aviso: string };
 
 export function TelaLogin({ entrar, mensagem, aviso }: Props) {
@@ -10,7 +12,7 @@ export function TelaLogin({ entrar, mensagem, aviso }: Props) {
         </div>
         <h1 id="titulo-login">Acesse sua conta</h1>
         <p>Entre com suas credenciais corporativas autorizadas.</p>
-        {aviso && <p role="status">{aviso}</p>}
+        {aviso && <Aviso>{aviso}</Aviso>}
         <form action={entrar} className="formulario">
           <label htmlFor="usuario">E-mail corporativo</label>
           <input

@@ -144,14 +144,6 @@ button:focus-visible {
   color: var(--cor-erro);
   font-size: 14px;
 }
-[role="status"] {
-  padding: 11px 13px;
-  border: 1px solid #b8d9ce;
-  border-radius: 10px;
-  background: #f0faf6;
-  color: #155b45;
-  font-size: 14px;
-}
 
 @media (max-width: 380px) {
   .pagina { padding-right: 14px; padding-left: 14px; }

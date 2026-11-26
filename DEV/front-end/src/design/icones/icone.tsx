@@ -1,6 +1,6 @@
 import type { SVGProps } from "react";
 
-export type NomeIcone = "inbox" | "equipes" | "arquivos" | "menu" | "nova-conversa" | "busca" | "erro" | "lista-vazia" | "voltar" | "anexar-pdf" | "enviar" | "arquivo-pdf" | "enviada" | "lida" | "aguardando" | "falha";
+export type NomeIcone = "inbox" | "equipes" | "arquivos" | "menu" | "nova-conversa" | "busca" | "erro" | "lista-vazia" | "voltar" | "anexar-pdf" | "enviar" | "arquivo-pdf" | "enviada" | "lida" | "aguardando" | "falha" | "informacao" | "fechar";
 
 /** Geometrias de Gilson; a cor vem exclusivamente dos tokens do TeamTalk. */
 export function Icone({ nome, ...props }: SVGProps<SVGSVGElement> & { nome: NomeIcone }) {
@@ -37,6 +37,8 @@ export function Icone({ nome, ...props }: SVGProps<SVGSVGElement> & { nome: Nome
     case "enviada": return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.0" strokeLinecap="round" strokeLinejoin="round" {...comum}><path d="m4.7 12.25 4.05 4.05L19.3 5.8"/></svg>;
     case "lida": return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round" strokeLinejoin="round" {...comum}><path d="m2.7 12.15 4.05 4.05L16.2 6.75"/><path d="m8.5 12.15 4.05 4.05L22.1 6.75"/></svg>;
     case "aguardando": return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...comum}><circle cx="12" cy="12" r="8.6"/><path d="M12 7.1v5l3.2 1.9"/></svg>;
+    case "informacao": return <svg viewBox="0 0 24 24" fill="none" {...comum}><circle cx="12" cy="12" r="9.1" stroke="currentColor" strokeWidth="1.9"/><path d="M12 11v6" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round"/><circle cx="12" cy="7.5" r="1.1" fill="currentColor"/></svg>;
+    case "fechar": return <svg viewBox="0 0 24 24" fill="none" {...comum}><path d="M5.5 5.5l13 13M18.5 5.5l-13 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>;
     case "falha": return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...comum}><circle cx="12" cy="12" r="9"/><path d="M12 7v6.1"/><path d="M12 16.8v.1"/></svg>;
   }
 }

@@ -13,3 +13,5 @@ export type { PropsLayoutMobile } from "./layout-mobile";
 export { BarraTopo, RodapeTopo } from "./barra-topo";
 export { ListaRegras } from "./lista-regras";
 export type { Regra } from "./lista-regras";
+export { Aviso } from "./aviso";
+export type { PropsAviso } from "./aviso";

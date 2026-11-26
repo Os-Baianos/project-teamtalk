@@ -10,3 +10,5 @@ export { NavegacaoMobile } from "./navegacao-mobile";
 export type { PropsNavegacaoMobile, ItemNavegacaoMobile } from "./navegacao-mobile";
 export { LayoutMobile } from "./layout-mobile";
 export type { PropsLayoutMobile } from "./layout-mobile";
+export { Aviso } from "./aviso";
+export type { PropsAviso } from "./aviso";
