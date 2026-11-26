@@ -68,3 +68,11 @@ end $$;
 
 revoke all on function public.limpar_conversa(uuid), public.listar_mensagens(uuid), public.listar_conversas(), public.remover_contato(uuid) from public, anon;
 grant execute on function public.limpar_conversa(uuid), public.listar_mensagens(uuid), public.listar_conversas(), public.remover_contato(uuid) to authenticated;
+
+-- Existe conversa visível com essa pessoa? (o perfil só mostra "Excluir conversa" se existir)
+create or replace function public.tem_conversa(outro uuid)
+returns boolean language sql stable security invoker set search_path = public as $$
+  select exists (select 1 from public.listar_mensagens(outro));
+$$;
+revoke all on function public.tem_conversa(uuid) from public, anon;
+grant execute on function public.tem_conversa(uuid) to authenticated;

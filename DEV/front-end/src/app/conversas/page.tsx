@@ -9,7 +9,6 @@ import {
   apagarMensagemAction,
   editarMensagemAction,
   enviarMensagemAction,
-  excluirConversaAction,
   carregarInicioAction,
   listarMensagensAction,
   marcarLidasAction,
@@ -146,18 +145,6 @@ export default function PaginaConversas() {
     carregarLista();
   }
 
-  async function excluirConversa() {
-    if (!ativa) return false;
-    const ok = await excluirConversaAction(ativa.id);
-    if (ok) {
-      setAtiva(null);
-      setMensagens([]);
-      setConversas((atual) => atual.filter((c) => c.id !== ativa.id));
-      carregarLista();
-    }
-    return ok;
-  }
-
   async function editar(id: string, texto: string) {
     const ok = await editarMensagemAction(id, texto);
     if (ok) {
@@ -197,7 +184,6 @@ export default function PaginaConversas() {
       erroHistorico={erroHistorico}
       aoTentarHistorico={() => { if (ativa) void abrir(ativa); }}
       aoReenviar={reenviar}
-      aoExcluirConversa={excluirConversa}
       conversas={conversas}
       novos={novos}
       ativa={ativa}

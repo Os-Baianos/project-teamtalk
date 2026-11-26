@@ -38,7 +38,6 @@ type Props = {
   erroHistorico: boolean;
   aoTentarHistorico: () => void;
   aoReenviar: (id: string) => void;
-  aoExcluirConversa: () => Promise<boolean>;
   conversas: ResumoConversa[];
   /** Contatos que ainda não têm conversa (para começar uma). */
   novos: Pessoa[];
@@ -86,7 +85,7 @@ function Tiques({ status }: { status: StatusEnvio | "enviada" | "recebida" | "li
 }
 
 export function TelaConversas({
-  carregandoLista, carregandoMensagens, erroLista, aoTentarLista, erroHistorico, aoTentarHistorico, aoReenviar, aoExcluirConversa, conversas, novos, ativa, mensagens,
+  carregandoLista, carregandoMensagens, erroLista, aoTentarLista, erroHistorico, aoTentarHistorico, aoReenviar, conversas, novos, ativa, mensagens,
   aoAbrir, aoVoltar, aoEnviar, aoEditar, aoApagar,
 }: Props) {
   const [texto, setTexto] = useState("");
@@ -171,11 +170,6 @@ export function TelaConversas({
     setTexto(m.texto);
     setErro("");
     setTimeout(() => campo.current?.focus(), 0);
-  }
-
-  async function excluirConversa() {
-    if (!window.confirm("Excluir esta conversa? Ela some só para você; a outra pessoa continua vendo.")) return;
-    if (!(await aoExcluirConversa())) setAviso("Não foi possível excluir a conversa");
   }
 
   async function apagar(m: BalaoDado) {
@@ -299,7 +293,6 @@ export function TelaConversas({
                   <span>@{ativa.arroba}</span>
                 </span>
               </Link>
-              <button type="button" className={estilos.excluir} onClick={excluirConversa}>Excluir conversa</button>
             </header>
 
             <div className={estilos.historico} aria-live="polite" onScroll={(e) => {
