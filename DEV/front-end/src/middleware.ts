@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import { atualizarSessao } from "./supabase/sessao-middleware";
 import { ROTAS_PUBLICAS } from "./sessao/constantes";
 
-/** Protege as páginas internas: sem sessão volta ao login; com sessão, login e cadastro levam aos contatos. */
+/** Protege as páginas internas: sem sessão volta ao login; com sessão, login e cadastro levam às conversas. */
 export async function middleware(requisicao: NextRequest) {
   const { pathname } = requisicao.nextUrl;
   const { resposta, logado } = await atualizarSessao(requisicao);
@@ -21,7 +21,7 @@ export async function middleware(requisicao: NextRequest) {
     return redirecionar(destino);
   }
   if (logado && (publica || pathname === "/")) {
-    return redirecionar(new URL("/contatos", requisicao.url));
+    return redirecionar(new URL("/conversas", requisicao.url));
   }
   return resposta;
 }

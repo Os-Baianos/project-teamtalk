@@ -90,3 +90,8 @@ button.opcao:focus-visible { border-radius: var(--raio-sm); }
   .seta { transition: transform .2s ease; }
   .menu[open] .seta { transform: rotate(180deg); }
 }
+
+/* Conta no canto direito da primeira linha, como no AWS Skill Builder. */
+.conta { margin-left: auto; }
+.conta .suspenso { left: auto; right: 0; transform-origin: top right; }
+.email { padding: var(--espaco-3) var(--espaco-4); color: var(--cor-topo-texto); font-size: var(--fonte-sm); white-space: nowrap; }

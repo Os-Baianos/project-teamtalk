@@ -27,6 +27,9 @@ jobs:
         working-directory: DEV/front-end
     env:
       NEXT_TELEMETRY_DISABLED: "1"
+      # Valores de mentira só para o build compilar; o app de verdade usa as variáveis do Vercel.
+      NEXT_PUBLIC_SUPABASE_URL: https://exemplo.supabase.co
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: chave-de-teste-ci
     steps:
       - uses: actions/checkout@v4
       - name: Verifica se o app existe

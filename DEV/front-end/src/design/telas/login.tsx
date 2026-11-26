@@ -35,7 +35,7 @@ export function TelaLogin({ mensagem: mensagemInicial, aviso }: Props) {
       .then((resultado) => {
         if (resultado.ok) {
           setMensagem("");
-          roteador.push("/contatos");
+          roteador.push("/conversas");
           roteador.refresh();
         } else {
           setMensagem(resultado.mensagem);

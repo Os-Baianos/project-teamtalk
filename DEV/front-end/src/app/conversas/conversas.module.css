@@ -1,0 +1,63 @@
+.lista { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--espaco-3); }
+.secao { margin-top: var(--espaco-6); }
+.secao h2 { font-size: var(--fonte-lg); margin: 0 0 var(--espaco-3); }
+.vazio { color: var(--cor-secundaria); margin: 0; }
+.cartao {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-3);
+  width: 100%;
+  padding: var(--espaco-3) var(--espaco-4);
+  background: var(--cor-superficie);
+  border: var(--borda-fina) solid var(--cor-borda);
+  border-radius: var(--raio-md);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.avatar {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: var(--toque-minimo);
+  height: var(--toque-minimo);
+  border-radius: var(--raio-pill);
+  background: var(--cor-selecionada);
+  color: var(--cor-primaria);
+  font-weight: var(--peso-forte);
+}
+.dados { flex: 1 1 auto; min-width: 0; }
+.dados strong, .dados span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dados span { color: var(--cor-secundaria); font-size: var(--fonte-sm); }
+.lado { display: grid; justify-items: end; gap: var(--espaco-1); font-size: var(--fonte-xs); color: var(--cor-secundaria); }
+.naoLidas {
+  min-width: 1.5rem;
+  padding: 0 var(--espaco-2);
+  border-radius: var(--raio-pill);
+  background: var(--cor-primaria);
+  color: var(--cor-texto);
+  font-weight: var(--peso-forte);
+  text-align: center;
+}
+
+.historico { display: grid; align-content: start; gap: var(--espaco-2); min-height: 40vh; max-height: 60vh; overflow-y: auto; padding: var(--espaco-2) 0; }
+.mensagem {
+  max-width: 80%;
+  padding: var(--espaco-2) var(--espaco-3);
+  background: var(--cor-superficie);
+  border: var(--borda-fina) solid var(--cor-borda);
+  border-radius: var(--raio-md);
+  overflow-wrap: anywhere;
+}
+.minha { justify-self: end; background: var(--cor-selecionada); }
+.mensagem p { margin: 0; }
+.mensagem time { display: block; margin-top: var(--espaco-1); color: var(--cor-secundaria); font-size: var(--fonte-xs); text-align: right; }
+.envio { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: var(--espaco-3); margin-top: var(--espaco-4); }
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes entrar { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+  .cartao, .mensagem { animation: entrar .3s cubic-bezier(.2, .7, .2, 1) backwards; }
+  .cartao { transition: box-shadow .2s ease, border-color .2s ease; }
+  .cartao:hover { border-color: var(--cor-borda-controle); box-shadow: 0 2px 8px rgb(0 0 0 / 8%); }
+}
