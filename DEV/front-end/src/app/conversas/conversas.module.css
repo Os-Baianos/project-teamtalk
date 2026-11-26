@@ -64,7 +64,7 @@
 .raiz .icone:hover { background: var(--cor-fundo); color: var(--cor-texto); }
 
 .historico { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; padding: var(--espaco-4) clamp(var(--espaco-3), 6%, 4rem); }
-.vazioChat { margin: auto; padding: var(--espaco-2) var(--espaco-4); background: var(--cor-superficie); border-radius: var(--raio-md); color: var(--cor-secundaria); box-shadow: var(--sombra-painel); }
+.vazioChat { margin: var(--espaco-2) auto auto; padding: var(--espaco-2) var(--espaco-4); background: var(--cor-superficie); border-radius: var(--raio-md); color: var(--cor-secundaria); box-shadow: var(--sombra-painel); }
 .dia { display: flex; justify-content: center; margin: var(--espaco-3) 0; }
 .dia span { padding: 4px 12px; border-radius: var(--raio-sm); background: var(--cor-superficie); color: var(--cor-secundaria); font-size: var(--fonte-xs); box-shadow: var(--sombra-painel); }
 .linhaMsg { display: flex; }
