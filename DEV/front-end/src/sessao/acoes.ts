@@ -1,29 +1,50 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { contaDemo } from "../mock/conta-demo";
-import { NOME_COOKIE_SESSAO } from "./constantes";
+import { criarClienteServidor } from "../supabase/servidor";
 
-const OITO_HORAS = 60 * 60 * 8;
+export type Resultado = { ok: true } | { ok: false; mensagem: string };
 
-// Provisório: a sessão real vem do Supabase Auth no card [BACK] Cadastro e login (#118).
-// Quando ele entrar, só o corpo destas duas funções muda; as telas continuam iguais.
-export async function entrarAction(email: string, senha: string): Promise<{ ok: boolean }> {
-  if (email.trim().toLowerCase() !== contaDemo.email || senha !== contaDemo.senha) {
-    return { ok: false };
-  }
-  (await cookies()).set(NOME_COOKIE_SESSAO, "demo", {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: OITO_HORAS,
+function traduzirErro(codigo: string | undefined, texto: string): string {
+  const t = texto.toLowerCase();
+  if (codigo === "invalid_credentials" || t.includes("invalid login")) return "E-mail ou senha incorretos.";
+  if (codigo === "email_not_confirmed") return "Confirme seu e-mail para entrar.";
+  if (codigo === "user_already_exists" || t.includes("already registered")) return "Este e-mail já tem conta.";
+  if (codigo === "email_address_invalid") return "Este e-mail não é aceito. Use um e-mail válido.";
+  if (codigo === "weak_password") return "Senha fraca. Use uma senha mais forte.";
+  if (codigo === "over_request_rate_limit" || codigo === "over_email_send_rate_limit") return "Muitas tentativas. Aguarde um pouco e tente de novo.";
+  return "Não foi possível concluir agora. Tente novamente.";
+}
+
+export async function entrarAction(email: string, senha: string): Promise<Resultado> {
+  const supabase = await criarClienteServidor();
+  const { error } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password: senha });
+  if (error) return { ok: false, mensagem: traduzirErro(error.code, error.message) };
+  return { ok: true };
+}
+
+export async function cadastrarAction(dados: {
+  nome: string; arroba: string; email: string; senha: string;
+}): Promise<Resultado> {
+  const supabase = await criarClienteServidor();
+  const arroba = dados.arroba.trim().toLowerCase().replace(/^@/, "");
+
+  const { data: livre, error: erroConsulta } = await supabase.rpc("arroba_disponivel", { candidato: arroba });
+  if (erroConsulta) return { ok: false, mensagem: "Não foi possível conferir o @ agora. Tente novamente." };
+  if (!livre) return { ok: false, mensagem: "Este @ já está em uso. Escolha outro." };
+
+  const { data, error } = await supabase.auth.signUp({
+    email: dados.email.trim().toLowerCase(),
+    password: dados.senha,
+    options: { data: { nome: dados.nome.trim(), arroba } },
   });
+  if (error) return { ok: false, mensagem: traduzirErro(error.code, error.message) };
+  if (!data.session) return { ok: false, mensagem: "Conta criada. Confirme seu e-mail para entrar." };
   return { ok: true };
 }
 
 export async function sairAction(): Promise<void> {
-  (await cookies()).delete(NOME_COOKIE_SESSAO);
+  const supabase = await criarClienteServidor();
+  await supabase.auth.signOut();
   redirect("/login");
 }

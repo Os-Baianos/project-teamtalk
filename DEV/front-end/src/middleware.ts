@@ -1,22 +1,29 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { NOME_COOKIE_SESSAO, ROTAS_PUBLICAS } from "./sessao/constantes";
+import { atualizarSessao } from "./supabase/sessao-middleware";
+import { ROTAS_PUBLICAS } from "./sessao/constantes";
 
 /** Protege as páginas internas: sem sessão volta ao login; com sessão, login e cadastro levam aos contatos. */
-export function middleware(requisicao: NextRequest) {
+export async function middleware(requisicao: NextRequest) {
   const { pathname } = requisicao.nextUrl;
-  const logado = Boolean(requisicao.cookies.get(NOME_COOKIE_SESSAO)?.value);
+  const { resposta, logado } = await atualizarSessao(requisicao);
   const publica = ROTAS_PUBLICAS.includes(pathname);
+
+  const redirecionar = (destino: URL) => {
+    const r = NextResponse.redirect(destino);
+    resposta.cookies.getAll().forEach((c) => r.cookies.set(c));
+    return r;
+  };
 
   if (!logado && !publica) {
     const destino = new URL("/login", requisicao.url);
     if (pathname !== "/") destino.searchParams.set("aviso", "entre");
-    return NextResponse.redirect(destino);
+    return redirecionar(destino);
   }
   if (logado && (publica || pathname === "/")) {
-    return NextResponse.redirect(new URL("/contatos", requisicao.url));
+    return redirecionar(new URL("/contatos", requisicao.url));
   }
-  return NextResponse.next();
+  return resposta;
 }
 
 export const config = {
