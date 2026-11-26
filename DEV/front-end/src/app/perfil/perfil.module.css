@@ -119,3 +119,4 @@
   .erro, .dica { animation: aparecer-nome .22s cubic-bezier(.2, .7, .2, 1) both; }
   .botaoCanto { transition: opacity .15s ease; }
 }
+.acoesPerfil { display: grid; justify-items: center; gap: var(--espaco-3); }

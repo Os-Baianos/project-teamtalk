@@ -3,31 +3,24 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { FormEvent } from "react";
-import { Botao, Campo, CabecalhoMobile, LayoutMobile } from "@design/componentes";
+import { Campo, CabecalhoMobile, LayoutMobile } from "@design/componentes";
+import { Avatar } from "../../contatos/avatar";
+import { BotoesRelacao } from "../../contatos/botoes-relacao";
+import type { Relacao } from "../../contatos/acoes";
 import estilos from "./contatos.module.css";
 
-export type Contato = { id: string; nome: string; arroba: string; foto_url?: string | null };
+export type Contato = { id: string; nome: string; arroba: string; foto_url?: string | null; relacao?: Relacao };
 
 type Props = {
-  contatos: Contato[];
   /** Procura um usuário pelo @; devolve null quando não existe. */
   buscar: (arroba: string) => Promise<Contato | null>;
   /** Sugestões enquanto a pessoa digita (até 5). */
   sugerir?: (termo: string) => Promise<Contato[]>;
-  aoAdicionar: (contato: Contato) => void;
-  aoRemover: (contato: Contato) => void;
 };
 
 const normalizar = (valor: string) => valor.trim().replace(/^@/, "").toLowerCase();
 
-/** Foto de perfil; sem foto, mostra a inicial do nome. */
-function Avatar({ contato }: { contato: Contato }) {
-  return contato.foto_url
-    ? <img className={`${estilos.avatar} ${estilos.avatarFoto}`} src={contato.foto_url} alt="" />
-    : <span className={estilos.avatar} aria-hidden="true">{contato.nome[0]}</span>;
-}
-
-export function TelaContatos({ contatos, buscar, sugerir, aoAdicionar, aoRemover }: Props) {
+export function TelaContatos({ buscar, sugerir }: Props) {
   const [termo, setTermo] = useState("");
   const [resultado, setResultado] = useState<Contato | null>(null);
   const [mensagem, setMensagem] = useState("");
@@ -42,7 +35,7 @@ export function TelaContatos({ contatos, buscar, sugerir, aoAdicionar, aoRemover
     const numero = ++pedido.current;
     if (!sugerir || q.length < 2 || resultado) { setSugestoes([]); setErroSug(""); return; }
     const pronta = guardadas.current.get(q);
-    if (pronta) { setSugestoes(pronta.filter((c) => !contatos.some((x) => x.id === c.id))); return; }
+    if (pronta) { setSugestoes(pronta); return; }
     setErroSug("");
     const espera = setTimeout(async () => {
       try {
@@ -52,7 +45,7 @@ export function TelaContatos({ contatos, buscar, sugerir, aoAdicionar, aoRemover
           new Promise<never>((_, rejeitar) => setTimeout(() => rejeitar(new Error("demorou")), 8000)),
         ]);
         guardadas.current.set(q, lista);
-        if (numero === pedido.current) setSugestoes(lista.filter((c) => !contatos.some((x) => x.id === c.id)));
+        if (numero === pedido.current) setSugestoes(lista);
       } catch {
         if (numero !== pedido.current) return;
         // Página aberta antes de uma atualização do site: recarrega uma vez para pegar a versão nova.
@@ -82,15 +75,13 @@ export function TelaContatos({ contatos, buscar, sugerir, aoAdicionar, aoRemover
     const encontrado = await buscar(arroba);
     if (encontrado) { setResultado(encontrado); return; }
     // Sem @ exatamente igual: mostra as pessoas parecidas em vez de um erro.
-    const parecidos = sugerir ? (await sugerir(arroba)).filter((c) => !contatos.some((x) => x.id === c.id)) : [];
+    const parecidos = sugerir ? await sugerir(arroba) : [];
     if (parecidos.length) setSugestoes(parecidos);
     else setMensagem(`Nenhum usuário encontrado com @${arroba}.`);
   }
 
-  const jaAdicionado = resultado ? contatos.some((c) => c.id === resultado.id) : false;
-
   return (
-    <LayoutMobile cabecalho={<CabecalhoMobile titulo="Contatos" subtitulo="Adicione pessoas à sua lista" />}>
+    <LayoutMobile cabecalho={<CabecalhoMobile titulo="Contatos" subtitulo="Envie uma solicitação para adicionar alguém" />}>
       <div className={estilos.busca}>
         <form onSubmit={procurar} role="search">
           <Campo
@@ -111,7 +102,7 @@ export function TelaContatos({ contatos, buscar, sugerir, aoAdicionar, aoRemover
               {sugestoes.map((c) => (
                 <li key={c.id} className={estilos.sugestaoLinha}>
                   <button type="button" className={estilos.sugestao} onClick={() => escolher(c)}>
-                    <Avatar contato={c} />
+                    <Avatar nome={c.nome} fotoUrl={c.foto_url} />
                     <span className={estilos.dados}>
                       <strong>{c.nome}</strong>
                       <span>@{c.arroba}</span>
@@ -128,51 +119,25 @@ export function TelaContatos({ contatos, buscar, sugerir, aoAdicionar, aoRemover
           <ul className={estilos.lista} aria-label="Resultado da busca">
             <li className={estilos.cartao}>
               <Link className={estilos.perfilLink} href={`/perfil/${resultado.arroba}`} aria-label={`Ver o perfil de ${resultado.nome}`}>
-                <Avatar contato={resultado} />
+                <Avatar nome={resultado.nome} fotoUrl={resultado.foto_url} />
                 <div className={estilos.dados}>
                   <strong>{resultado.nome}</strong>
                   <span>@{resultado.arroba}</span>
                 </div>
               </Link>
-              <Botao
-                variante={jaAdicionado ? "secundaria" : "primaria"}
-                disabled={jaAdicionado}
-                onClick={() => aoAdicionar(resultado)}
-              >
-                {jaAdicionado ? "Adicionado" : "Adicionar"}
-              </Botao>
+              <BotoesRelacao
+                pessoa={resultado}
+                relacao={resultado.relacao ?? "nenhuma"}
+                aoMudar={(nova) => { guardadas.current.clear(); setResultado({ ...resultado, relacao: nova }); }}
+              />
             </li>
           </ul>
         )}
       </div>
 
-      <section className={estilos.secao} aria-labelledby="titulo-meus-contatos">
-        <h2 id="titulo-meus-contatos">Meus contatos</h2>
-        {contatos.length === 0 ? (
-          <p className={estilos.vazio}>Você ainda não adicionou ninguém.</p>
-        ) : (
-          <ul className={estilos.lista}>
-            {contatos.map((contato) => (
-              <li className={estilos.cartao} key={contato.id}>
-                <Link className={estilos.perfilLink} href={`/perfil/${contato.arroba}`} aria-label={`Ver o perfil de ${contato.nome}`}>
-                  <Avatar contato={contato} />
-                  <div className={estilos.dados}>
-                    <strong>{contato.nome}</strong>
-                    <span>@{contato.arroba}</span>
-                  </div>
-                </Link>
-                <Botao
-                  variante="perigo"
-                  onClick={() => aoRemover(contato)}
-                  aria-label={`Remover ${contato.nome} dos contatos`}
-                >
-                  Remover
-                </Botao>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+      <p className={estilos.atalho}>
+        <Link href="/conta/contatos">Ver minhas solicitações e contatos</Link>
+      </p>
     </LayoutMobile>
   );
 }

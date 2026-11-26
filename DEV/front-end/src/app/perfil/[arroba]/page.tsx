@@ -27,7 +27,7 @@ export default async function PaginaPerfilDeOutraPessoa({ params }: { params: Pr
           : <span className={estilos.foto} aria-hidden="true">{perfil.nome[0]?.toUpperCase()}</span>}
         <h2 className={estilos.nome}>{perfil.nome}</h2>
         <p className={estilos.arroba}>@{perfil.arroba}</p>
-        <AcoesPerfil id={perfil.id} arroba={perfil.arroba} contato={perfil.contato} />
+        <AcoesPerfil id={perfil.id} arroba={perfil.arroba} relacao={perfil.relacao} />
       </div>
       <dl className={estilos.lista}>
         <div className={estilos.linha}><dt>Nome</dt><dd>{perfil.nome}</dd></div>
