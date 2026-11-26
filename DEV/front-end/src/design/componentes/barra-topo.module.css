@@ -81,6 +81,8 @@
 button.opcao { border-radius: 0; display: flex; align-items: center; width: 100%; min-height: 0; height: auto; margin: 0; background: none; border: 0; text-align: left; font: inherit; font-size: var(--fonte-sm); line-height: 1.2; cursor: pointer; }
 button.opcao:focus-visible { border-radius: var(--raio-sm); }
 
+.contagem { margin-left: var(--espaco-2); color: var(--cor-primaria); font-weight: var(--peso-forte); }
+
 /* Menu Conta: mesma entrada suave dos outros elementos do site. */
 @media (prefers-reduced-motion: no-preference) {
   @keyframes aparecer-conta { from { opacity: 0; transform: translateY(-4px) scale(.98); } to { opacity: 1; transform: none; } }

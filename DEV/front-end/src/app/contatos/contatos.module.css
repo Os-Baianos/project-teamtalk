@@ -57,3 +57,6 @@
 .sugestaoLinha .sugestao { flex: 1 1 auto; width: auto; min-width: 0; }
 .verPerfil { flex: 0 0 auto; padding: 0 var(--espaco-4); color: var(--cor-link); font-size: var(--fonte-sm); font-weight: var(--peso-forte); text-decoration: none; }
 .verPerfil:hover { text-decoration: underline; }
+.atalho { margin: var(--espaco-6) 0 0; padding-top: var(--espaco-5); border-top: var(--borda-fina) solid var(--cor-borda-controle); }
+.atalho a { color: var(--cor-link); font-weight: var(--peso-forte); text-decoration: none; }
+.atalho a:hover { text-decoration: underline; }

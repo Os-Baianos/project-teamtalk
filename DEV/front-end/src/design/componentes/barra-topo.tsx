@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import { sairAction } from "../../sessao/acoes";
 import { souDevAction } from "../../dev/acoes";
 import { criarClienteNavegador } from "../../supabase/navegador";
+import { contarSolicitacoesAction } from "../../contatos/acoes";
+import { useContatosAoVivo } from "../../contatos/use-contatos-ao-vivo";
 import estilos from "@design/componentes/barra-topo.module.css";
 
 const itens = [
@@ -22,13 +24,19 @@ export function BarraTopo() {
   const menu = useRef<HTMLDetailsElement>(null);
   const [dev, setDev] = useState(false);
   const [email, setEmail] = useState("");
+  const [meuId, setMeuId] = useState<string | null>(null);
+  const [pendentes, setPendentes] = useState(0);
 
   // Só contas dev veem o Painel dev (a permissão de verdade fica no banco).
   useEffect(() => {
-    if (publica) { setDev(false); setEmail(""); return; }
+    if (publica) { setDev(false); setEmail(""); setMeuId(null); setPendentes(0); return; }
     souDevAction().then(setDev);
-    criarClienteNavegador().auth.getUser().then(({ data }) => setEmail(data.user?.email ?? ""));
+    criarClienteNavegador().auth.getUser().then(({ data }) => { setEmail(data.user?.email ?? ""); setMeuId(data.user?.id ?? null); });
+    contarSolicitacoesAction().then(setPendentes);
   }, [publica]);
+
+  // Número de solicitações de contato novas no menu Conta (atualiza em tempo real).
+  useContatosAoVivo(meuId, () => { contarSolicitacoesAction().then(setPendentes); });
 
   // Fecha o menu Conta ao clicar fora, apertar Esc ou trocar de página.
   useEffect(() => {
@@ -60,11 +68,15 @@ export function BarraTopo() {
       {!publica && (
           <details className={`${estilos.menu} ${estilos.conta}`} ref={menu}>
             <summary className={estilos.item}>
-              Conta <span className={estilos.seta} aria-hidden="true" />
+              Conta{pendentes > 0 && <span className={estilos.contagem} aria-label={`${pendentes} solicitações novas`}>{pendentes}</span>}
+              <span className={estilos.seta} aria-hidden="true" />
             </summary>
             <div className={estilos.suspenso}>
             {email && <div className={estilos.email}>{email}</div>}
               <Link href="/perfil" className={estilos.opcao}>Perfil</Link>
+              <Link href="/conta/contatos" className={estilos.opcao}>
+                Contatos{pendentes > 0 && <span className={estilos.contagem}>{pendentes}</span>}
+              </Link>
               {dev && <Link href="/dev" className={estilos.opcao}>Painel Dev</Link>}
               <form action={sairAction}>
                 <button type="submit" className={estilos.opcao}>Sair</button>
