@@ -16,6 +16,8 @@ export default async function PaginaPerfilDeOutraPessoa({ params }: { params: Pr
   if (!perfil) notFound();
   if (perfil.id === auth.user.id) redirect("/perfil");
 
+  const { data: temConversa } = await supabase.rpc("tem_conversa", { outro: perfil.id });
+
   const fotoUrl = perfil.foto_path ? supabase.storage.from("avatares").getPublicUrl(perfil.foto_path).data.publicUrl : null;
   const desde = new Date(perfil.criado_em).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" });
 
@@ -27,7 +29,7 @@ export default async function PaginaPerfilDeOutraPessoa({ params }: { params: Pr
           : <span className={estilos.foto} aria-hidden="true">{perfil.nome[0]?.toUpperCase()}</span>}
         <h2 className={estilos.nome}>{perfil.nome}</h2>
         <p className={estilos.arroba}>@{perfil.arroba}</p>
-        <AcoesPerfil id={perfil.id} arroba={perfil.arroba} relacao={perfil.relacao} />
+        <AcoesPerfil id={perfil.id} arroba={perfil.arroba} relacao={perfil.relacao} temConversa={temConversa === true} />
       </div>
       <dl className={estilos.lista}>
         <div className={estilos.linha}><dt>Nome</dt><dd>{perfil.nome}</dd></div>
