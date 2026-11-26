@@ -1,25 +1,38 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TelaContatos } from "./tela-contatos";
 import type { Contato } from "./tela-contatos";
-
-// Dados provisórios: a busca e os contatos reais vêm do card [BACK] Buscar usuário e gerenciar contatos.
-const usuarios: Contato[] = [
-  { id: "1", nome: "Marina Souza", arroba: "marina" },
-  { id: "2", nome: "Carlos Lima", arroba: "carlos" },
-  { id: "3", nome: "Ana Ribeiro", arroba: "ana.r" },
-];
+import {
+  adicionarContatoAction,
+  buscarPerfilAction,
+  listarContatosAction,
+  removerContatoAction,
+} from "../../contatos/acoes";
 
 export default function PaginaContatos() {
   const [contatos, setContatos] = useState<Contato[]>([]);
 
+  useEffect(() => {
+    listarContatosAction().then(setContatos);
+  }, []);
+
+  async function adicionar(c: Contato) {
+    const r = await adicionarContatoAction(c.arroba);
+    if (r.ok) setContatos(await listarContatosAction());
+  }
+
+  async function remover(c: Contato) {
+    const r = await removerContatoAction(c.id);
+    if (r.ok) setContatos((atual) => atual.filter((x) => x.id !== c.id));
+  }
+
   return (
     <TelaContatos
       contatos={contatos}
-      buscar={async (arroba) => usuarios.find((u) => u.arroba === arroba) ?? null}
-      aoAdicionar={(c) => setContatos((atual) => [...atual, c])}
-      aoRemover={(c) => setContatos((atual) => atual.filter((x) => x.id !== c.id))}
+      buscar={buscarPerfilAction}
+      aoAdicionar={adicionar}
+      aoRemover={remover}
     />
   );
 }
