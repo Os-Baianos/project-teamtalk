@@ -38,7 +38,7 @@ export function TelaLogin({ mensagem: mensagemInicial, aviso }: Props) {
           roteador.push("/contatos");
           roteador.refresh();
         } else {
-          setMensagem("E-mail ou senha incorretos.");
+          setMensagem(resultado.mensagem);
           setEnviando(false);
         }
       })

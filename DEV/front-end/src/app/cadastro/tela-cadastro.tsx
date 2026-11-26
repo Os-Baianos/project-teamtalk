@@ -1,18 +1,22 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { ListaRegras } from "@design/componentes";
 import { modoLista } from "@design/modo-lista";
+import { cadastrarAction } from "../../sessao/acoes";
 import {
   regrasArroba, regrasConfirmacao, regrasEmail, regrasNome, regrasSenha, todasOk,
 } from "@design/validacoes";
 
-type Props = { cadastrar: (dados: FormData) => Promise<void>; mensagem: string };
 type Campo = "nome" | "arroba" | "email" | "senha" | "confirmacao";
 
-export function TelaCadastro({ cadastrar, mensagem }: Props) {
+export function TelaCadastro() {
+  const roteador = useRouter();
+  const [mensagem, setMensagem] = useState("");
+  const [enviando, setEnviando] = useState(false);
   const [valores, setValores] = useState({ nome: "", arroba: "", email: "", senha: "", confirmacao: "" });
   const [focado, setFocado] = useState<Campo | null>(null);
   const [validados, setValidados] = useState<Record<Campo, boolean>>({
@@ -36,10 +40,27 @@ export function TelaCadastro({ cadastrar, mensagem }: Props) {
   };
 
   function aoEnviar(evento: FormEvent<HTMLFormElement>) {
+    evento.preventDefault();
     if (!todasOk(...Object.values(regras))) {
-      evento.preventDefault();
       setValidados({ nome: true, arroba: true, email: true, senha: true, confirmacao: true });
+      return;
     }
+    setEnviando(true);
+    cadastrarAction({ nome: valores.nome, arroba: valores.arroba, email: valores.email, senha: valores.senha })
+      .then((resultado) => {
+        if (resultado.ok) {
+          setMensagem("");
+          roteador.push("/contatos");
+          roteador.refresh();
+        } else {
+          setMensagem(resultado.mensagem);
+          setEnviando(false);
+        }
+      })
+      .catch(() => {
+        setMensagem("Não foi possível criar a conta agora. Tente novamente.");
+        setEnviando(false);
+      });
   }
 
   const campo = (
@@ -72,7 +93,7 @@ export function TelaCadastro({ cadastrar, mensagem }: Props) {
         </div>
         <h1 id="titulo-cadastro">Crie sua conta</h1>
         <p>Preencha os dados para começar a conversar com sua equipe.</p>
-        <form action={cadastrar} onSubmit={aoEnviar} className="formulario" noValidate>
+        <form onSubmit={aoEnviar} className="formulario" noValidate>
           {campo("nome", "Nome completo", { type: "text", autoComplete: "name", enterKeyHint: "next" })}
           {campo("arroba", "Usuário (@)", {
             type: "text", autoComplete: "username", autoCapitalize: "none", spellCheck: false,
@@ -89,7 +110,7 @@ export function TelaCadastro({ cadastrar, mensagem }: Props) {
             type: "password", autoComplete: "new-password", maxLength: 100, enterKeyHint: "done",
           })}
           {mensagem && <p className="erro" role="alert">{mensagem}</p>}
-          <button type="submit">Criar conta</button>
+          <button type="submit" disabled={enviando} aria-busy={enviando}>{enviando ? "Criando conta..." : "Criar conta"}</button>
         </form>
         <p className="rodape-auth">
           Já tem conta? <Link href="/login">Entrar</Link>
