@@ -1,6 +1,8 @@
 "use server";
 
 import { criarClienteServidor } from "../supabase/servidor";
+import { listarContatosAction } from "../contatos/acoes";
+import type { ContatoDado } from "../contatos/acoes";
 
 export type Mensagem = {
   id: string;
@@ -9,6 +11,9 @@ export type Mensagem = {
   texto: string;
   criado_em: string;
   lida_em: string | null;
+  recebida_em: string | null;
+  editada_em: string | null;
+  apagada_em: string | null;
 };
 
 export type Conversa = {
@@ -18,6 +23,9 @@ export type Conversa = {
   ultima_texto: string;
   ultima_em: string;
   nao_lidas: number;
+  ultima_minha: boolean;
+  ultima_status: "enviada" | "recebida" | "lida";
+  foto_url: string | null;
 };
 
 /** Quem está logado (id), para saber quais bolhas são minhas. */
@@ -30,7 +38,11 @@ export async function meuIdAction(): Promise<string | null> {
 export async function listarConversasAction(): Promise<Conversa[]> {
   const supabase = await criarClienteServidor();
   const { data } = await supabase.rpc("listar_conversas");
-  return (data ?? []).map((c: Conversa) => ({ ...c, nao_lidas: Number(c.nao_lidas) }));
+  return ((data ?? []) as (Conversa & { foto_path: string | null })[]).map(({ foto_path, ...c }) => ({
+    ...c,
+    nao_lidas: Number(c.nao_lidas),
+    foto_url: foto_path ? supabase.storage.from("avatares").getPublicUrl(foto_path).data.publicUrl : null,
+  }));
 }
 
 /** Histórico com uma pessoa, do mais antigo para o mais novo. */
@@ -67,4 +79,28 @@ export async function enviarMensagemAction(
 export async function marcarLidasAction(contatoId: string): Promise<void> {
   const supabase = await criarClienteServidor();
   await supabase.rpc("marcar_lidas", { de: contatoId });
+}
+
+/** Avisa que as mensagens que chegaram para mim foram recebidas (segundo tique). */
+export async function marcarRecebidasAction(): Promise<void> {
+  const supabase = await criarClienteServidor();
+  await supabase.rpc("marcar_recebidas");
+}
+
+export async function editarMensagemAction(id: string, texto: string): Promise<boolean> {
+  const supabase = await criarClienteServidor();
+  const { data } = await supabase.rpc("editar_mensagem", { msg: id, novo: texto });
+  return data === true;
+}
+
+export async function apagarMensagemAction(id: string): Promise<boolean> {
+  const supabase = await criarClienteServidor();
+  const { data } = await supabase.rpc("apagar_mensagem", { msg: id });
+  return data === true;
+}
+
+/** Tudo o que a tela de Conversas precisa para abrir, numa chamada só (as ações rodam em fila). */
+export async function carregarInicioAction(): Promise<{ conversas: Conversa[]; contatos: ContatoDado[] }> {
+  const [conversas, contatos] = await Promise.all([listarConversasAction(), listarContatosAction(), marcarRecebidasAction()]);
+  return { conversas, contatos };
 }

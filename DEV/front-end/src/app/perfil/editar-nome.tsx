@@ -27,10 +27,12 @@ export function EditarNome({ nome }: { nome: string }) {
 
   if (!editando) {
     return (
-      <div className={estilos.linhaEditar}>
+      <>
         <dd>{nome}</dd>
-        <Botao variante="secundaria" onClick={() => { setValor(nome); setErro(""); setEditando(true); }}>Editar</Botao>
-      </div>
+        <div className={estilos.botaoCanto}>
+          <Botao variante="secundaria" onClick={() => { setValor(nome); setErro(""); setEditando(true); }}>Editar</Botao>
+        </div>
+      </>
     );
   }
   return (

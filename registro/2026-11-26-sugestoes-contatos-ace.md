@@ -9,3 +9,22 @@ Data: 2026-11-26
 - A foto de perfil aparece nas sugestões, no resultado da busca e em "Meus contatos" (sem foto, continua a inicial).
 - Banco (migração 2026-11-26-sugestoes-contatos.sql): função `sugerir_perfis` (só para quem está logado) e as funções `buscar_perfil` e `listar_contatos` passaram a devolver `foto_path`. Extensão `unaccent`.
 - Front: `src/contatos/acoes.ts` (`sugerirPerfisAction`) e `src/app/contatos/`.
+
+## Ajuste
+- Ao tocar em Buscar com um @ incompleto, a tela mostra as pessoas parecidas (as mesmas sugestões) em vez de "Nenhum usuário encontrado". O erro só aparece quando não há nenhuma parecida.
+- Itens da lista de sugestões com o mesmo espaçamento em cima e embaixo, foto e texto alinhados no centro.
+
+## Busca automática
+- Como a busca já acontece enquanto digita, o botão Buscar saiu (Enter continua funcionando). O campo agora diz "Buscar por nome ou @".
+- Corrigido o espaço extra acima da primeira sugestão (vinha da margem padrão dos botões).
+- Linha de divisão entre a busca e "Meus contatos".
+- Contas de teste que começam com "ma": mariasouza, marcoslima, mateusrocha, manuelacosta, marinaalves, matheusribeiro, maiarapereira (e-mail <arroba>@teamtalk.com).
+
+## Correção e otimização
+- Corrigido um erro meu: o Avatar sem foto chamava a si mesmo e a página caía com "Out of Memory" (PR #179).
+- Sugestões mais rápidas: espera de 180 ms ao digitar e respostas já buscadas ficam guardadas (apagar uma letra volta na hora).
+- O círculo de carregamento só aparece depois de 0,3 s (prop `atraso` do componente Carregando), para não piscar em carregamentos rápidos.
+
+## Página desatualizada (erro "Failed to find Server Action")
+- Causa do círculo girando sem fim: a aba tinha sido aberta antes de uma atualização do site, e a ação de buscar não existia mais na versão nova.
+- Agora a busca tem limite de 8 s. Se falhar, a página recarrega sozinha uma vez (para pegar a versão nova) e, se ainda falhar, mostra "Não foi possível buscar agora. Atualize a página."

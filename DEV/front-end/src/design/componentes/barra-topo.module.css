@@ -1,4 +1,4 @@
-.topo { background: var(--cor-topo); color: var(--cor-topo-texto); }
+.topo { position: relative; z-index: 30; background: var(--cor-topo); color: var(--cor-topo-texto); }
 .linha {
   display: flex;
   align-items: center;
@@ -80,6 +80,8 @@
 .nav { overflow: visible; flex-wrap: wrap; }
 button.opcao { border-radius: 0; display: flex; align-items: center; width: 100%; min-height: 0; height: auto; margin: 0; background: none; border: 0; text-align: left; font: inherit; font-size: var(--fonte-sm); line-height: 1.2; cursor: pointer; }
 button.opcao:focus-visible { border-radius: var(--raio-sm); }
+
+.contagem { margin-left: var(--espaco-2); color: var(--cor-primaria); font-weight: var(--peso-forte); }
 
 /* Menu Conta: mesma entrada suave dos outros elementos do site. */
 @media (prefers-reduced-motion: no-preference) {

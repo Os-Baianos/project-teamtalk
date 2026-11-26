@@ -1,0 +1,12 @@
+.avatar {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: var(--toque-minimo);
+  height: var(--toque-minimo);
+  border-radius: var(--raio-pill);
+  background: var(--cor-selecionada);
+  color: var(--cor-primaria);
+  font-weight: var(--peso-forte);
+}
+.foto { object-fit: cover; }
