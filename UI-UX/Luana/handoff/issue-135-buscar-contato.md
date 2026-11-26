@@ -30,6 +30,7 @@
 
 - Barra superior: `DEV/front-end/src/design/componentes/barra-topo.tsx` e CSS existente.
 - Campo: `Campo` de `DEV/front-end/src/design/componentes/campo.tsx`.
+- Busca, caso o front-end exiba o símbolo: reutilizar `UI-UX/Gil/icons/lista-de-conversas/prancha-1/search.svg`; não criar outro SVG.
 - Ações: `Botao` de `DEV/front-end/src/design/componentes/botao.tsx`.
 - Carregamento: `Carregando` existente.
 - Avatar: `DEV/front-end/src/contatos/avatar.tsx`.
