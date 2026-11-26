@@ -20,7 +20,7 @@
   border: var(--borda-fina) solid var(--cor-borda);
   border-radius: var(--raio-md);
 }
-.linha { display: grid; gap: 2px; padding: var(--espaco-3) var(--espaco-4); }
+.linha { position: relative; display: grid; gap: 2px; padding: var(--espaco-3) var(--espaco-4); }
 .linha + .linha { border-top: var(--borda-fina) solid var(--cor-borda); }
 .linha dt { color: var(--cor-secundaria); font-size: var(--fonte-sm); }
 .linha dd { margin: 0; overflow-wrap: anywhere; }
@@ -108,6 +108,5 @@
   .tile:not(:disabled):hover { transform: scale(1.06); box-shadow: 0 2px 8px rgb(0 0 0 / 18%); }
   .tile:not(:disabled):active { transform: scale(.97); box-shadow: none; }
 }
-.linhaEditar { display: flex; align-items: center; justify-content: space-between; gap: var(--espaco-3); margin-block: -0.25rem; }
-.linhaEditar dd { margin: 0; overflow-wrap: anywhere; }
+.botaoCanto { position: absolute; right: var(--espaco-4); top: 50%; transform: translateY(-50%); }
 .edicaoNome { display: grid; gap: var(--espaco-3); padding-top: var(--espaco-2); }
