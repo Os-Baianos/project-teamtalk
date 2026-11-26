@@ -26,8 +26,7 @@ drop policy if exists solicitacoes_ver_minhas on public.solicitacoes_contato;
 create policy solicitacoes_ver_minhas on public.solicitacoes_contato for select to authenticated
   using (de_id = (select auth.uid()) or para_id = (select auth.uid()));
 
-create index if not exists mensagens_remetente_destinatario_criado on public.mensagens (remetente_id, destinatario_id, criado_em desc);
-create index if not exists mensagens_destinatario_criado on public.mensagens (destinatario_id, criado_em desc);
+-- mensagens já tinha índices equivalentes (mensagens_par_idx e mensagens_dest_idx), então não cria outros.
 create index if not exists contatos_contato_id_idx on public.contatos (contato_id);
 create index if not exists solicitacoes_para_id_idx on public.solicitacoes_contato (para_id);
 create index if not exists conversas_limpas_outro_id_idx on public.conversas_limpas (outro_id);
