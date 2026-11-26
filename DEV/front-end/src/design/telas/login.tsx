@@ -13,6 +13,7 @@ type Props = { mensagem: string; aviso: string };
 export function TelaLogin({ mensagem: mensagemInicial, aviso }: Props) {
   const roteador = useRouter();
   const [mensagem, setMensagem] = useState(mensagemInicial);
+  const [avisoAberto, setAvisoAberto] = useState(true);
   const [enviando, setEnviando] = useState(false);
   const [usuario, setUsuario] = useState("");
   const [senha, setSenha] = useState("");
@@ -57,7 +58,21 @@ export function TelaLogin({ mensagem: mensagemInicial, aviso }: Props) {
         </div>
         <h1 id="titulo-login">Acesse sua conta</h1>
         <p>Entre com suas credenciais corporativas autorizadas.</p>
-        {aviso && <p role="status">{aviso}</p>}
+        {aviso && avisoAberto && (
+          <p role="status">
+            <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false">
+              <circle cx="10" cy="10" r="8.25" fill="none" stroke="currentColor" strokeWidth="1.5" />
+              <rect x="9.1" y="8.5" width="1.8" height="5.5" rx=".9" fill="currentColor" />
+              <circle cx="10" cy="6" r="1.1" fill="currentColor" />
+            </svg>
+            <span>{aviso}</span>
+            <button type="button" className="aviso-fechar" aria-label="Fechar aviso" onClick={() => setAvisoAberto(false)}>
+              <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true" focusable="false">
+                <path d="M4.5 4.5l11 11M15.5 4.5l-11 11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" fill="none" />
+              </svg>
+            </button>
+          </p>
+        )}
         <form onSubmit={aoEnviar} className="formulario" noValidate>
           <label htmlFor="usuario">E-mail corporativo</label>
           <input
