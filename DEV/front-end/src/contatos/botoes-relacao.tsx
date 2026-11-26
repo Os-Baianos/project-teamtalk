@@ -68,7 +68,7 @@ export function BotoesRelacao({ pessoa, relacao, aoMudar, centralizado = false }
         {relacao === "contato" && confirmando && (
           <>
             <Botao variante="perigo" ocupado={ocupado === "remover"} onClick={() => executar("remover", () => removerContatoAction(pessoa.id))}>
-              Confirmar remoção
+              Remover e excluir conversa
             </Botao>
             <Botao variante="secundaria" disabled={ocupado === "remover"} onClick={() => setConfirmando(false)}>Cancelar</Botao>
           </>
