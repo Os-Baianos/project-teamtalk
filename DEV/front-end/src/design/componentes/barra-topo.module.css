@@ -94,4 +94,11 @@ button.opcao:focus-visible { border-radius: var(--raio-sm); }
 /* Conta no canto direito da primeira linha, como no AWS Skill Builder. */
 .conta { margin-left: auto; }
 .conta .suspenso { left: auto; right: var(--espaco-3); transform-origin: top right; }
-.email { padding: var(--espaco-3) var(--espaco-4); color: var(--cor-topo-texto); font-size: var(--fonte-sm); white-space: nowrap; }
+/* Caixa opaca: a transparência mostrava cores diferentes onde ela cruza a barra e a página. */
+.conta .suspenso { min-width: 14rem; max-width: 18rem; background: #161e2a; }
+.email {
+  padding: var(--espaco-2) var(--espaco-4);
+  color: var(--cor-topo-texto-suave);
+  font-size: var(--fonte-sm);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
