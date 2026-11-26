@@ -70,7 +70,7 @@
 <rect x="1030" y="660" width="124" height="46" rx="23" class="outline"/><text x="1092" y="688" text-anchor="middle" class="outlinetext">Remover</text>
 <rect x="672" y="746" width="502" height="94" rx="8" class="card"/>
 <circle cx="715" cy="793" r="25" fill="#D8C4E5"/><text x="715" y="800" text-anchor="middle" class="h3">J</text>
-<text x="755" y="786" class="h3">Joana Santos</text><text x="755" y="811" class="small muted">@joan santos</text>
+<text x="755" y="786" class="h3">Joana Santos</text><text x="755" y="811" class="small muted">@joanasantos</text>
 <rect x="1030" y="768" width="124" height="46" rx="23" class="outline"/><text x="1092" y="796" text-anchor="middle" class="outlinetext">Remover</text>
 </g>
 <line x1="672" y1="872" x2="1174" y2="872" stroke="#D5DBDB"/>
@@ -123,41 +123,47 @@
 <!-- states strip -->
 <text x="70" y="1300" class="h2">03 · Estados obrigatórios e mensagens</text>
 <text x="70" y="1328" class="small muted">Variações para busca e lista; usar os componentes e as cores de estado existentes.</text>
-<!-- state cards -->
 <g>
-<rect x="70" y="1350" width="350" height="230" rx="12" class="surface border"/>
-<text x="94" y="1388" class="h3">Lista vazia</text>
-<text x="94" y="1430" class="body">Você ainda não tem contatos.</text>
-<text x="94" y="1455" class="small muted">Busque alguém por @ para começar.</text>
-<text x="94" y="1525" class="tiny muted">Sem ilustração nova; texto e CTA.</text>
+<rect x="70" y="1350" width="300" height="230" rx="12" class="surface border"/>
+<text x="90" y="1388" class="h3">Lista vazia</text>
+<text x="90" y="1430" class="body">Você ainda não tem contatos.</text>
+<text x="90" y="1455" class="small muted">Busque alguém por @ para começar.</text>
+<text x="90" y="1525" class="tiny muted">Texto simples + acesso à busca.</text>
 
-<rect x="440" y="1350" width="350" height="230" rx="12" class="surface border"/>
-<text x="464" y="1388" class="h3">Carregando</text>
-<circle cx="495" cy="1450" r="15" fill="none" stroke="#006CE0" stroke-width="3" stroke-dasharray="48 18"/>
-<text x="525" y="1456" class="body">Carregando contatos…</text>
-<text x="464" y="1525" class="tiny muted">Usar Carregando existente; sem piscar.</text>
+<rect x="390" y="1350" width="300" height="230" rx="12" class="surface border"/>
+<text x="410" y="1388" class="h3">Carregando</text>
+<circle cx="438" cy="1450" r="15" fill="none" stroke="#006CE0" stroke-width="3" stroke-dasharray="48 18"/>
+<text x="468" y="1456" class="body">Carregando…</text>
+<text x="410" y="1525" class="tiny muted">Usar Carregando existente; sem piscar.</text>
 
-<rect x="810" y="1350" width="350" height="230" rx="12" class="surface border"/>
-<text x="834" y="1388" class="h3">Erro ao carregar</text>
-<text x="834" y="1430" class="body red">Não foi possível carregar seus contatos.</text>
-<rect x="834" y="1450" width="170" height="44" rx="22" fill="#FFFFFF" stroke="#006CE0"/>
-<text x="919" y="1478" text-anchor="middle" class="small link" font-weight="700">Tentar novamente</text>
-<text x="834" y="1540" class="tiny muted">Mensagem textual + ação de recuperação.</text>
+<rect x="710" y="1350" width="300" height="230" rx="12" class="surface border"/>
+<text x="730" y="1388" class="h3">Erro ao carregar</text>
+<text x="730" y="1430" class="small red">Não foi possível carregar</text>
+<text x="730" y="1452" class="small red">seus contatos.</text>
+<rect x="730" y="1470" width="170" height="44" rx="22" fill="#FFFFFF" stroke="#006CE0"/>
+<text x="815" y="1498" text-anchor="middle" class="small link" font-weight="700">Tentar novamente</text>
 
-<rect x="1180" y="1350" width="350" height="230" rx="12" class="surface border"/>
-<text x="1204" y="1388" class="h3">@ inexistente</text>
-<rect x="1204" y="1405" width="302" height="46" rx="7" fill="#FFFFFF" stroke="#D91515"/>
-<text x="1220" y="1434" class="small">@usuarioxyz</text>
-<text x="1204" y="1482" class="small red">Nenhum usuário encontrado com</text>
-<text x="1204" y="1502" class="small red">@usuarioxyz.</text>
+<rect x="1030" y="1350" width="300" height="230" rx="12" class="surface border"/>
+<text x="1050" y="1388" class="h3">Falha na busca</text>
+<text x="1050" y="1430" class="small red">Não foi possível buscar agora.</text>
+<text x="1050" y="1452" class="small muted">Tente novamente em instantes.</text>
+<rect x="1050" y="1470" width="160" height="44" rx="22" fill="#FFFFFF" stroke="#006CE0"/>
+<text x="1130" y="1498" text-anchor="middle" class="small link" font-weight="700">Tentar novamente</text>
 
-<rect x="1550" y="1350" width="380" height="230" rx="12" class="surface border"/>
-<text x="1574" y="1388" class="h3">Contato repetido</text>
-<circle cx="1600" cy="1440" r="19" fill="#F2C9A5"/><text x="1600" y="1446" text-anchor="middle" class="small" font-weight="700">M</text>
-<text x="1630" y="1436" class="small" font-weight="700">Marina Alves</text>
-<text x="1630" y="1456" class="tiny muted">@marinaalves</text>
-<text x="1574" y="1500" class="small red">Essa pessoa já está em Meus contatos.</text>
-<text x="1574" y="1525" class="tiny muted">Não repetir solicitação; oferecer Remover.</text>
+<rect x="1350" y="1350" width="300" height="230" rx="12" class="surface border"/>
+<text x="1370" y="1388" class="h3">@ inexistente</text>
+<rect x="1370" y="1405" width="260" height="46" rx="7" fill="#FFFFFF" stroke="#D91515"/>
+<text x="1386" y="1434" class="small">@usuarioxyz</text>
+<text x="1370" y="1482" class="small red">Nenhum usuário encontrado</text>
+<text x="1370" y="1502" class="small red">com @usuarioxyz.</text>
+
+<rect x="1670" y="1350" width="260" height="230" rx="12" class="surface border"/>
+<text x="1690" y="1388" class="h3">Já é contato</text>
+<circle cx="1712" cy="1440" r="19" fill="#F2C9A5"/><text x="1712" y="1446" text-anchor="middle" class="small" font-weight="700">M</text>
+<text x="1742" y="1436" class="small" font-weight="700">Marina Alves</text>
+<text x="1742" y="1456" class="tiny muted">@marinaalves</text>
+<text x="1690" y="1500" class="small red">Já está em Meus contatos.</text>
+<text x="1690" y="1525" class="tiny muted">Ação disponível: Remover.</text>
 </g>
 <!-- design system notes -->
 <text x="70" y="1620" class="tiny muted">Acessibilidade: contraste AA (4,5:1 texto), foco visível, ordem de teclado, alvos ≥44×44 px e prefers-reduced-motion.</text>
