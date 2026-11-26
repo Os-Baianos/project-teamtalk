@@ -6,13 +6,14 @@ import type { FormEvent } from "react";
 import { ListaRegras } from "@design/componentes";
 import { modoLista } from "@design/modo-lista";
 import { regrasEmail, todasOk } from "@design/validacoes";
-import { contaDemo } from "../../mock/conta-demo";
+import { entrarAction } from "../../sessao/acoes";
 
 type Props = { mensagem: string; aviso: string };
 
 export function TelaLogin({ mensagem: mensagemInicial, aviso }: Props) {
   const roteador = useRouter();
   const [mensagem, setMensagem] = useState(mensagemInicial);
+  const [enviando, setEnviando] = useState(false);
   const [usuario, setUsuario] = useState("");
   const [senha, setSenha] = useState("");
   const [focado, setFocado] = useState<"usuario" | "senha" | null>(null);
@@ -29,13 +30,22 @@ export function TelaLogin({ mensagem: mensagemInicial, aviso }: Props) {
       setValidados({ usuario: true, senha: true });
       return;
     }
-    // Provisório: confere só a conta de demonstração até o login real do back-end.
-    if (usuario.trim().toLowerCase() === contaDemo.email && senha === contaDemo.senha) {
-      setMensagem("");
-      roteador.push("/contatos");
-    } else {
-      setMensagem("E-mail ou senha incorretos.");
-    }
+    setEnviando(true);
+    entrarAction(usuario, senha)
+      .then((resultado) => {
+        if (resultado.ok) {
+          setMensagem("");
+          roteador.push("/contatos");
+          roteador.refresh();
+        } else {
+          setMensagem("E-mail ou senha incorretos.");
+          setEnviando(false);
+        }
+      })
+      .catch(() => {
+        setMensagem("Não foi possível entrar agora. Tente novamente.");
+        setEnviando(false);
+      });
   }
 
   return (
@@ -85,7 +95,7 @@ export function TelaLogin({ mensagem: mensagemInicial, aviso }: Props) {
           />
           <ListaRegras id="regras-senha" regras={regrasSenha} modo={senhaInvalida ? "pendentes" : "oculta"} focado={focado === "senha"} />
           {mensagem && <p className="erro" id="erro-login" role="alert">{mensagem}</p>}
-          <button type="submit">Entrar</button>
+          <button type="submit" disabled={enviando} aria-busy={enviando}>{enviando ? "Entrando..." : "Entrar"}</button>
         </form>
       </section>
     </main>

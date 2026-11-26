@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { sairAction } from "../../sessao/acoes";
 import estilos from "@design/componentes/barra-topo.module.css";
 
 const itens = [
@@ -44,7 +45,9 @@ export function BarraTopo() {
                 Conta <span className={estilos.seta} aria-hidden="true" />
               </summary>
               <div className={estilos.suspenso}>
-                <Link href="/login" className={estilos.opcao}>Sair</Link>
+                <form action={sairAction}>
+                  <button type="submit" className={estilos.opcao}>Sair</button>
+                </form>
               </div>
             </details>
           </nav>
