@@ -5,9 +5,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { sairAction } from "../../sessao/acoes";
 import { souDevAction } from "../../dev/acoes";
+import { criarClienteNavegador } from "../../supabase/navegador";
 import estilos from "@design/componentes/barra-topo.module.css";
 
 const itens = [
+  { href: "/conversas", rotulo: "Conversas" },
   { href: "/contatos", rotulo: "Contatos" },
 ];
 
@@ -19,11 +21,13 @@ export function BarraTopo() {
   const publica = rotasPublicas.includes(caminho);
   const menu = useRef<HTMLDetailsElement>(null);
   const [dev, setDev] = useState(false);
+  const [email, setEmail] = useState("");
 
   // Só contas dev veem o Painel dev (a permissão de verdade fica no banco).
   useEffect(() => {
-    if (publica) { setDev(false); return; }
+    if (publica) { setDev(false); setEmail(""); return; }
     souDevAction().then(setDev);
+    criarClienteNavegador().auth.getUser().then(({ data }) => setEmail(data.user?.email ?? ""));
   }, [publica]);
 
   // Fecha o menu Conta ao clicar fora, apertar Esc ou trocar de página.
@@ -53,6 +57,21 @@ export function BarraTopo() {
           </svg>
           <span className={estilos.nome}>Team<span className={estilos.destaque}>Talk</span></span>
         </Link>
+      {!publica && (
+          <details className={`${estilos.menu} ${estilos.conta}`} ref={menu}>
+            <summary className={estilos.item}>
+              Conta <span className={estilos.seta} aria-hidden="true" />
+            </summary>
+            <div className={estilos.suspenso}>
+            {email && <div className={estilos.email}>{email}</div>}
+              <Link href="/perfil" className={estilos.opcao}>Perfil</Link>
+              {dev && <Link href="/dev" className={estilos.opcao}>Painel dev</Link>}
+              <form action={sairAction}>
+                <button type="submit" className={estilos.opcao}>Sair</button>
+              </form>
+            </div>
+          </details>
+      )}
       </div>
       {!publica && (
         <div className={estilos.linha}>
@@ -67,18 +86,6 @@ export function BarraTopo() {
                 {item.rotulo}
               </Link>
             ))}
-            <details className={estilos.menu} ref={menu}>
-              <summary className={estilos.item}>
-                Conta <span className={estilos.seta} aria-hidden="true" />
-              </summary>
-              <div className={estilos.suspenso}>
-                <Link href="/perfil" className={estilos.opcao}>Perfil</Link>
-                {dev && <Link href="/dev" className={estilos.opcao}>Painel dev</Link>}
-                <form action={sairAction}>
-                  <button type="submit" className={estilos.opcao}>Sair</button>
-                </form>
-              </div>
-            </details>
           </nav>
         </div>
       )}

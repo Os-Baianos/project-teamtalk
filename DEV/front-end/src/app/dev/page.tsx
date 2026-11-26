@@ -8,7 +8,7 @@ export default async function PaginaDev() {
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) redirect("/login");
   const { data: dev } = await supabase.rpc("sou_dev");
-  if (dev !== true) redirect("/contatos");
+  if (dev !== true) redirect("/conversas");
   const usuarios = await listarUsuariosAction();
   return <PainelDev inicial={usuarios} meuId={auth.user.id} />;
 }
