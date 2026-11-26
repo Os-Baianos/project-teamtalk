@@ -26,3 +26,9 @@ PR: ver PR "Aba Perfil na Conta"
 - Menu Conta no estilo das listas da AWS: caixa de cantos arredondados, fundo levemente transparente com desfoque, divisórias entre os itens e seleção que acompanha a borda.
 - Arquivos: `src/app/perfil/foto-perfil.tsx`, `perfil.module.css`, `page.tsx`, `barra-topo.module.css`, `DEV/supabase/migracoes/2026-11-25-foto-perfil.sql`.
 - Pendência: mostrar a foto também nos contatos e conversas (depende das telas de #116 e #117).
+
+## Menu da foto e fotos predefinidas
+- O botão grande "Enviar foto" saiu. Agora a foto tem um botão pequeno "Editar" no canto, que abre um menu: Escolher foto…, Enviar foto… e Remover foto.
+- "Escolher foto…" abre uma grade no estilo do seletor do macOS, com 12 imagens predefinidas; escolhe, clica em Salvar foto.
+- Exceção pedida pelo Ace: as 12 imagens são formas simples criadas em código (`src/app/perfil/avatares-predefinidos.ts`), pois não existem imagens em UI-UX. UI-UX (#132 a #139) pode substituir por um conjunto oficial, trocando só esse arquivo.
+- O botão "Editar" usa só texto, sem ícone novo.

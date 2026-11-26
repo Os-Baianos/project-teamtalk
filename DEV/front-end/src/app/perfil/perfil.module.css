@@ -40,3 +40,40 @@
 .zoom { display: grid; gap: var(--espaco-1); width: min(256px, 100%); font-size: var(--fonte-sm); color: var(--cor-secundaria); }
 .zoom input { width: 100%; }
 .dica { margin: 0; color: var(--cor-secundaria); font-size: var(--fonte-sm); }
+.moldura { position: relative; display: grid; }
+.canto {
+  position: absolute; right: -14px; bottom: 0;
+  min-height: 0; width: auto; padding: 4px 12px;
+  background: var(--cor-topo); color: var(--cor-topo-texto);
+  border: var(--borda-fina) solid #5f6b7a; border-radius: var(--raio-pill);
+  font-size: var(--fonte-sm); font-weight: var(--peso-forte); cursor: pointer;
+}
+.canto:hover { background: #232f3e; }
+.menuFoto {
+  position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%); z-index: 10; min-width: 11rem;
+  background: rgb(22 30 42 / 94%); border: var(--borda-fina) solid #5f6b7a; border-radius: var(--raio-md);
+  overflow: hidden; backdrop-filter: blur(8px); box-shadow: 0 8px 24px rgb(0 0 0 / 45%);
+}
+.opcaoFoto {
+  display: block; width: 100%; min-height: 0; margin: 0; padding: var(--espaco-2) var(--espaco-4);
+  background: none; border: 0; border-radius: 0; text-align: left;
+  color: var(--cor-topo-texto); font: inherit; font-size: var(--fonte-sm); cursor: pointer;
+}
+.opcaoFoto + .opcaoFoto { border-top: var(--borda-fina) solid #3a4656; }
+.opcaoFoto:hover { background: #232f3e; color: var(--cor-primaria); }
+.opcaoFoto:focus-visible { outline: 2px solid #fff; outline-offset: -3px; border-radius: var(--raio-sm); }
+.opcaoPerigo { color: #ff8f8f; }
+.tituloEscolha { margin: 0; font-size: var(--fonte-lg); }
+.grade {
+  list-style: none; margin: 0; padding: var(--espaco-3);
+  display: grid; grid-template-columns: repeat(4, 64px); gap: var(--espaco-3); justify-content: center;
+  background: var(--cor-superficie); border: var(--borda-fina) solid var(--cor-borda); border-radius: var(--raio-md);
+}
+.tile {
+  display: block; width: 64px; height: 64px; min-height: 0; padding: 0; margin: 0;
+  background: none; border: 2px solid transparent; border-radius: var(--raio-sm); overflow: hidden; cursor: pointer;
+}
+.tile img { display: block; width: 100%; height: 100%; border-radius: calc(var(--raio-sm) - 2px); }
+.tile:hover { border-color: var(--cor-borda-controle); }
+.tile[aria-pressed="true"] { border-color: #0a6cff; box-shadow: 0 0 0 2px rgb(10 108 255 / 25%); }
+@media (max-width: 360px) { .grade { grid-template-columns: repeat(3, 64px); } }

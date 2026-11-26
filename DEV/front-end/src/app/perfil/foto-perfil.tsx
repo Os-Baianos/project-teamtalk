@@ -5,6 +5,8 @@ import type { ChangeEvent, PointerEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Botao } from "@design/componentes";
 import { criarClienteNavegador } from "../../supabase/navegador";
+import { AVATARES_PREDEFINIDOS, urlDoAvatar } from "./avatares-predefinidos";
+import type { AvatarPredefinido } from "./avatares-predefinidos";
 import estilos from "./perfil.module.css";
 
 const TAMANHO = 256; // lado da foto final e da área de ajuste (px)
@@ -23,6 +25,20 @@ export function FotoPerfil({ usuarioId, inicial, fotoUrl, fotoPath }: Props) {
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [ocupado, setOcupado] = useState(false);
   const [mensagem, setMensagem] = useState("");
+  const [menuAberto, setMenuAberto] = useState(false);
+  const [escolhendo, setEscolhendo] = useState(false);
+  const [escolhido, setEscolhido] = useState<AvatarPredefinido | null>(null);
+  const area = useRef<HTMLDivElement>(null);
+
+  // Fecha o menu ao clicar fora ou apertar Esc.
+  useEffect(() => {
+    if (!menuAberto) return;
+    const fora = (e: MouseEvent) => { if (area.current && !area.current.contains(e.target as Node)) setMenuAberto(false); };
+    const tecla = (e: KeyboardEvent) => { if (e.key === "Escape") setMenuAberto(false); };
+    document.addEventListener("mousedown", fora);
+    document.addEventListener("keydown", tecla);
+    return () => { document.removeEventListener("mousedown", fora); document.removeEventListener("keydown", tecla); };
+  }, [menuAberto]);
 
   // Escala base: a imagem sempre cobre a área toda; o zoom aumenta a partir daí.
   const escala = imagem ? Math.max(TAMANHO / imagem.width, TAMANHO / imagem.height) * zoom : 1;
@@ -95,13 +111,7 @@ export function FotoPerfil({ usuarioId, inicial, fotoUrl, fotoPath }: Props) {
     setPos((p) => limitar(p, nova));
   }
 
-  async function salvar() {
-    const c = tela.current;
-    if (!c || !imagem) return;
-    setOcupado(true);
-    setMensagem("");
-    const blob: Blob | null = await new Promise((ok) => c.toBlob(ok, "image/jpeg", 0.9));
-    if (!blob) { setOcupado(false); setMensagem("Não foi possível preparar a foto."); return; }
+  async function enviarBlob(blob: Blob) {
     const supabase = criarClienteNavegador();
     const caminho = `${usuarioId}/foto-${Date.now()}.jpg`;
     const { error } = await supabase.storage.from("avatares").upload(caminho, blob, { contentType: "image/jpeg" });
@@ -110,8 +120,35 @@ export function FotoPerfil({ usuarioId, inicial, fotoUrl, fotoPath }: Props) {
     if (erroPerfil) { setOcupado(false); setMensagem("Não foi possível salvar a foto. Tente novamente."); return; }
     if (fotoPath) await supabase.storage.from("avatares").remove([fotoPath]);
     setImagem(null);
+    setEscolhendo(false);
+    setEscolhido(null);
     setOcupado(false);
     roteador.refresh();
+  }
+
+  async function salvar() {
+    const c = tela.current;
+    if (!c || !imagem) return;
+    setOcupado(true);
+    setMensagem("");
+    const blob: Blob | null = await new Promise((ok) => c.toBlob(ok, "image/jpeg", 0.9));
+    if (!blob) { setOcupado(false); setMensagem("Não foi possível preparar a foto."); return; }
+    await enviarBlob(blob);
+  }
+
+  async function salvarPredefinido() {
+    if (!escolhido) return;
+    setOcupado(true);
+    setMensagem("");
+    const img = new Image();
+    img.src = urlDoAvatar(escolhido);
+    try { await img.decode(); } catch { setOcupado(false); setMensagem("Não foi possível abrir essa imagem."); return; }
+    const c = document.createElement("canvas");
+    c.width = TAMANHO; c.height = TAMANHO;
+    c.getContext("2d")?.drawImage(img, 0, 0, TAMANHO, TAMANHO);
+    const blob: Blob | null = await new Promise((ok) => c.toBlob(ok, "image/jpeg", 0.92));
+    if (!blob) { setOcupado(false); setMensagem("Não foi possível preparar a foto."); return; }
+    await enviarBlob(blob);
   }
 
   async function remover() {
@@ -160,21 +197,65 @@ export function FotoPerfil({ usuarioId, inicial, fotoUrl, fotoPath }: Props) {
     );
   }
 
-  return (
-    <div className={estilos.fotoArea}>
-      {fotoUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={fotoUrl} alt="Sua foto de perfil" className={estilos.foto} width={96} height={96} />
-      ) : (
-        <span className={estilos.foto} aria-hidden="true">{inicial}</span>
-      )}
-      <input ref={entrada} type="file" accept="image/jpeg,image/png,image/webp" className={estilos.escondido} onChange={escolher} aria-label="Escolher foto de perfil" />
-      <div className={estilos.acoes}>
-        <Botao variante="secundaria" onClick={() => entrada.current?.click()} disabled={ocupado}>
-          {fotoUrl ? "Trocar foto" : "Enviar foto"}
-        </Botao>
-        {fotoUrl && <Botao variante="perigo" onClick={remover} ocupado={ocupado}>Remover foto</Botao>}
+  if (escolhendo) {
+    return (
+      <div className={estilos.ajuste}>
+        <h3 className={estilos.tituloEscolha}>Escolher foto</h3>
+        <ul className={estilos.grade} aria-label="Fotos predefinidas">
+          {AVATARES_PREDEFINIDOS.map((a) => (
+            <li key={a.id}>
+              <button
+                type="button"
+                className={estilos.tile}
+                aria-pressed={escolhido?.id === a.id}
+                aria-label={a.nome}
+                onClick={() => setEscolhido(a)}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={urlDoAvatar(a)} alt="" width={64} height={64} />
+              </button>
+            </li>
+          ))}
+        </ul>
+        {mensagem && <p className={estilos.erro} role="alert">{mensagem}</p>}
+        <div className={estilos.acoes}>
+          <Botao variante="secundaria" onClick={() => { setEscolhendo(false); setEscolhido(null); setMensagem(""); }} disabled={ocupado}>Cancelar</Botao>
+          <Botao onClick={salvarPredefinido} ocupado={ocupado} disabled={!escolhido}>Salvar foto</Botao>
+        </div>
       </div>
+    );
+  }
+
+  return (
+    <div className={estilos.fotoArea} ref={area}>
+      <div className={estilos.moldura}>
+        {fotoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={fotoUrl} alt="Sua foto de perfil" className={estilos.foto} width={96} height={96} />
+        ) : (
+          <span className={estilos.foto} aria-hidden="true">{inicial}</span>
+        )}
+        <button
+          type="button"
+          className={estilos.canto}
+          aria-haspopup="menu"
+          aria-expanded={menuAberto}
+          onClick={() => setMenuAberto((v) => !v)}
+          disabled={ocupado}
+        >
+          Editar
+        </button>
+        {menuAberto && (
+          <div className={estilos.menuFoto} role="menu">
+            <button type="button" role="menuitem" className={estilos.opcaoFoto} onClick={() => { setMenuAberto(false); setMensagem(""); setEscolhendo(true); }}>Escolher foto…</button>
+            <button type="button" role="menuitem" className={estilos.opcaoFoto} onClick={() => { setMenuAberto(false); entrada.current?.click(); }}>Enviar foto…</button>
+            {fotoUrl && (
+              <button type="button" role="menuitem" className={`${estilos.opcaoFoto} ${estilos.opcaoPerigo}`} onClick={() => { setMenuAberto(false); remover(); }}>Remover foto</button>
+            )}
+          </div>
+        )}
+      </div>
+      <input ref={entrada} type="file" accept="image/jpeg,image/png,image/webp" className={estilos.escondido} onChange={escolher} aria-label="Escolher foto de perfil" />
       {mensagem && <p className={estilos.erro} role="alert">{mensagem}</p>}
     </div>
   );
