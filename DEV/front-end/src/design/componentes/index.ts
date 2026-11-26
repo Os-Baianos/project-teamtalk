@@ -17,3 +17,5 @@ export { Aviso } from "./aviso";
 export type { PropsAviso } from "./aviso";
 export { Carregando } from "./carregando";
 export type { PropsCarregando } from "./carregando";
+export { MenuAcoes } from "./menu-acoes";
+export type { PropsMenuAcoes, ItemMenuAcoes } from "./menu-acoes";
