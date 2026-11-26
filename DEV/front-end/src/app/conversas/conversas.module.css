@@ -71,7 +71,7 @@
 .linhaMinha { justify-content: flex-end; }
 .balao { position: relative; max-width: min(36rem, 78%); min-width: 4.5rem; padding: 7px 10px 6px; border-radius: 10px 10px 10px 2px; background: var(--cor-superficie); box-shadow: 0 1px 1px rgb(0 0 0 / 12%); font-size: 1rem; line-height: 1.4; }
 .minha { border-radius: 10px 10px 2px 10px; background: #fff0d4; }
-.balao p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; padding-right: 1.1rem; }
+.balao p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
 .rodape { display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin: 2px 0 0 var(--espaco-4); font-size: 0.7rem; color: var(--cor-secundaria); }
 .rodape em { font-style: normal; }
 .apagada p { color: var(--cor-secundaria); font-style: italic; }
@@ -83,8 +83,9 @@
 .tique_falha { color: var(--cor-erro); }
 
 /* Menu da mensagem (seta no canto do balão, como no WhatsApp) */
+.minha .menuBox button { background: #fff0d4; }
 .menuBox { position: absolute; top: 2px; right: 2px; z-index: 2; }
-.raiz .abrirMenu { display: grid; place-items: center; width: 1.5rem; height: 1.5rem; border-radius: var(--raio-pill); color: var(--cor-secundaria); background: inherit; opacity: 0; transition: opacity .15s ease; }
+.raiz .abrirMenu { display: grid; place-items: center; width: 1.5rem; height: 1.5rem; border-radius: var(--raio-pill); color: var(--cor-secundaria); background: var(--cor-superficie); opacity: 0; transition: opacity .15s ease; }
 .balao:hover .abrirMenu, .raiz .abrirMenu:focus-visible, .raiz .abrirMenu[aria-expanded="true"] { opacity: 1; }
 @media (hover: none) { .raiz .abrirMenu { opacity: .7; } }
 .menu { position: absolute; top: 100%; right: 0; min-width: 11rem; margin: 2px 0 0; padding: var(--espaco-2) 0; list-style: none; background: var(--cor-superficie); border-radius: var(--raio-md); box-shadow: 0 4px 16px rgb(0 0 0 / 22%); }
