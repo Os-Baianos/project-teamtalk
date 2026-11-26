@@ -1,17 +1,17 @@
 {
   "extends": "../front-end/tsconfig.json",
   "compilerOptions": {
+    "noEmit": true,
+    "typeRoots": ["../front-end/node_modules/@types"],
     "paths": {
-      "react": ["../front-end/node_modules/@types/react/index.d.ts"],
-      "react/*": ["../front-end/node_modules/@types/react/*"],
-      "@design/*": ["../front-end/src/design/*"]
+      "@design/*": ["../front-end/src/design/*"],
+      "next/*": ["../front-end/node_modules/next/*"]
     }
   },
   "include": [
-    "./tela-conversas.tsx",
-    "./pagina-conversas.tsx",
     "../front-end/next-env.d.ts",
-    "../front-end/src/**/*.ts",
-    "../front-end/src/**/*.tsx"
+    "front-end/src/app/conversas/page.tsx",
+    "front-end/src/app/conversas/tela-conversas.tsx"
   ]
 }
+

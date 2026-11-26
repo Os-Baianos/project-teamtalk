@@ -1,24 +1,21 @@
-# Issue #117 — módulo isolado de Conversas
+# Issue #117 — conversas e chat
 
-Este diretório contém a entrega de interface para revisão e integração posterior. A rota compartilhada em `DEV/front-end/src/app/conversas` permanece intacta. As telas deste módulo recebem dados e callbacks por props para permitir sua ligação às ações existentes de contatos e mensagens.
+Esta pasta contém a implementação isolada da tela da issue #117, pronta para revisão e integração na aplicação em `DEV/front-end`.
 
-## Base existente reutilizada
+## Integração
 
-- `listarContatosAction` em `DEV/front-end/src/contatos/acoes.ts` para iniciar conversas com contatos.
-- `listarConversasAction`, `listarMensagensAction`, `enviarMensagemAction`, `marcarLidasAction` e `meuIdAction` em `DEV/front-end/src/mensagens/acoes.ts`.
-- `useMensagensAoVivo` em `DEV/front-end/src/mensagens/use-mensagens-ao-vivo.ts`.
-- Tokens em `UI-UX/Gil/tokens/teamtalk.css` e componentes existentes em `DEV/front-end/src/design/componentes`.
+1. Substitua os arquivos da rota `src/app/conversas/` pelos arquivos espelhados em `front-end/src/app/conversas/`.
+2. Ao mover `page.tsx` e `tela-conversas.tsx`, ajuste os imports `../../../../../front-end/src/...` para os imports locais correspondentes (`../../contatos/...`, `../../mensagens/...`, `../../design/...`).
+3. Importe `UI-UX/Gil/tokens/teamtalk.css` no layout global para disponibilizar os tokens `--tt-*` usados por `conversas.module.css`.
+4. Mantenha a barra superior e o rodapé do layout existentes; o componente ocupa a área flexível da página.
 
-Ao integrar, mova os arquivos `pagina-conversas.tsx`, `tela-conversas.tsx` e `tela-conversas.module.css` para `DEV/front-end/src/app/conversas/`; a rota existente pode renderizar `PaginaConversas`. Ajuste os imports de ações para os caminhos relativos do front-end e importe `UI-UX/Gil/tokens/teamtalk.css` pelo layout global. A tela usa `@design/componentes` e `@design/icones/icone` conforme os aliases existentes.
+## Integrações e limites identificados
 
-## Limitação de estado
+- A lista e o início de conversa usam `listarConversasAction` e `listarContatosAction`; abrir histórico, envio, status e tempo real usam as actions e o hook existentes em `src/mensagens/`.
+- A tela não cria conversas até que uma mensagem seja enviada. Falhas de envio ficam no histórico local com ação de nova tentativa.
+- O contrato atual de `listarConversasAction` converte falhas RPC em lista vazia e `listarMensagensAction` também devolve lista vazia sem expor o erro do Supabase. Por isso, a tela consegue mostrar estados de erro para exceções, mas o estado de erro real do Supabase exige que essas actions retornem os erros.
+- O back-end atual não fornece equipes nem favoritos. As abas correspondentes aparecem indisponíveis até existirem os dados e ações necessários.
+- A action de envio persiste mensagens de texto. Compartilhamento de PDF não está disponível neste contrato.
 
-O modelo fornece `lida_em` e permite distinguir enviada de lida. Não fornece confirmação separada de entrega. O hook Realtime atual escuta somente INSERTs endereçados ao usuário; a atualização de `lida_em` não chega ao remetente ao vivo. O estado lido pode ser exibido quando estiver presente nos dados carregados, mas a atualização ao vivo depende de uma assinatura Realtime de UPDATE no hook compartilhado.
+Nenhum token, ícone ou componente global foi criado ou alterado.
 
-Nenhuma tabela, política, função ou token visual foi criado ou alterado.
-
-O estado de envio é sinalizado pelo estado ocupado do botão. A ação existente não oferece uma fila persistente de mensagens com falha nem uma API de reenvio; por isso, não é apresentado um estado de entrega presumido nem uma opção de reenvio fictícia.
-
-As ações atuais de listagem e histórico retornam arrays vazios quando o Supabase retorna erro sem dados. Para exibir o estado de falha de modo confiável, essas ações precisam propagar erro tipado ao consumidor; o módulo já renderiza os estados de erro quando essa informação estiver disponível.
-
-O contrato atual só contém conversas individuais e contatos, sem metadados de equipe/favoritos; por isso a lista não inventa abas com conteúdo indisponível. O contrato de mensagens também não contempla anexos PDF nem emoji, então o compositor atende somente texto. A inclusão desses recursos depende de definição de Produto/Back-End.
