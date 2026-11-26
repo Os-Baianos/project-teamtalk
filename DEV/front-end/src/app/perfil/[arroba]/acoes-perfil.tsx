@@ -2,52 +2,64 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Botao } from "@design/componentes";
-import { excluirConversaAction } from "../../../mensagens/acoes";
-import { avisarMudancaDeContatos } from "../../../contatos/use-contatos-ao-vivo";
+import { Botao, MenuAcoes } from "@design/componentes";
+import type { ItemMenuAcoes } from "@design/componentes";
 import { BotoesRelacao } from "../../../contatos/botoes-relacao";
+import { removerContatoAction } from "../../../contatos/acoes";
 import type { Relacao } from "../../../contatos/acoes";
+import { avisarMudancaDeContatos } from "../../../contatos/use-contatos-ao-vivo";
+import { excluirConversaAction } from "../../../mensagens/acoes";
 import estilos from "../perfil.module.css";
 
 type Props = { id: string; arroba: string; relacao: Relacao; temConversa: boolean };
 
-/** Botões do perfil de outra pessoa: solicitação, aceitar/recusar, remover e conversar. */
+/** Botões do perfil de outra pessoa: Conversar em destaque e o menu "⋯" com remover contato e excluir conversa. */
 export function AcoesPerfil({ id, arroba, relacao: inicial, temConversa: inicialConversa }: Props) {
   const roteador = useRouter();
   const [relacao, setRelacao] = useState<Relacao>(inicial);
   const [temConversa, setTemConversa] = useState(inicialConversa);
-  const [confirmando, setConfirmando] = useState(false);
-  const [ocupado, setOcupado] = useState(false);
-  const [erro, setErro] = useState("");
 
-  async function excluirConversa() {
-    setOcupado(true);
-    setErro("");
-    const ok = await excluirConversaAction(id);
-    setOcupado(false);
-    if (!ok) { setErro("Não foi possível excluir a conversa. Tente novamente."); return; }
-    setTemConversa(false);
-    setConfirmando(false);
-    avisarMudancaDeContatos(); // atualiza a lista de conversas guardada
+  const itens: ItemMenuAcoes[] = [];
+  if (relacao === "contato") {
+    itens.push({
+      id: "remover", rotulo: "Remover contato", perigo: true,
+      confirmacao: "Remover este contato? A conversa também será excluída, só para você.",
+      aoEscolher: async () => {
+        const r = await removerContatoAction(id);
+        if (!r.ok) return r.mensagem ?? "Não foi possível agora. Tente novamente.";
+        setRelacao("nenhuma");
+        setTemConversa(false);
+        avisarMudancaDeContatos();
+        return null;
+      },
+    });
+  }
+  if (temConversa) {
+    itens.push({
+      id: "excluir", rotulo: "Excluir conversa", perigo: true,
+      confirmacao: "A conversa some só para você. A outra pessoa continua vendo.",
+      aoEscolher: async () => {
+        if (!(await excluirConversaAction(id))) return "Não foi possível excluir a conversa. Tente novamente.";
+        setTemConversa(false);
+        avisarMudancaDeContatos(); // atualiza a lista de conversas guardada
+        return null;
+      },
+    });
   }
 
   return (
     <div className={estilos.acoesPerfil}>
-      {relacao === "contato" && (
-        <Botao onClick={() => roteador.push(`/conversas?com=${encodeURIComponent(arroba)}`)}>Conversar</Botao>
-      )}
-      <BotoesRelacao pessoa={{ id, arroba }} relacao={relacao} aoMudar={(nova) => { if (relacao === "contato" && nova !== "contato") setTemConversa(false); setRelacao(nova); }} centralizado />
-      {temConversa && !confirmando && (
-        <Botao variante="perigo" onClick={() => setConfirmando(true)}>Excluir conversa</Botao>
-      )}
-      {temConversa && confirmando && (
+      {relacao === "contato" ? (
+        <div className={estilos.linhaAcoes}>
+          <Botao onClick={() => roteador.push(`/conversas?com=${encodeURIComponent(arroba)}`)}>Conversar</Botao>
+          <MenuAcoes itens={itens} rotulo="Mais ações do contato" />
+        </div>
+      ) : (
         <>
-          <p className={estilos.aviso}>A conversa some só para você. A outra pessoa continua vendo.</p>
-          <Botao variante="perigo" ocupado={ocupado} onClick={excluirConversa}>Confirmar exclusão</Botao>
-          <Botao variante="secundaria" disabled={ocupado} onClick={() => setConfirmando(false)}>Cancelar</Botao>
+          <BotoesRelacao pessoa={{ id, arroba }} relacao={relacao} aoMudar={setRelacao} centralizado />
+          {itens.length > 0 && <MenuAcoes itens={itens} rotulo="Mais ações" />}
         </>
       )}
-      {erro && <p role="alert" className={estilos.aviso}>{erro}</p>}
     </div>
   );
 }
