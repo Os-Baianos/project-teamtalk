@@ -1,6 +1,7 @@
 "use client";
 
 import { criarClienteNavegador } from "../supabase/navegador";
+import { gravarCache } from "../cache/cache-local";
 import type { Conversa, Mensagem } from "../mensagens/acoes";
 import type { ContatoDado, Relacao, Solicitacoes } from "../contatos/acoes";
 
@@ -68,4 +69,11 @@ export async function lerInicio(): Promise<{ conversas: Conversa[]; contatos: Co
 export async function lerContaContatos(): Promise<{ solicitacoes: Solicitacoes; contatos: ContatoDado[] }> {
   const [solicitacoes, contatos] = await Promise.all([lerSolicitacoes(), lerContatos()]);
   return { solicitacoes, contatos };
+}
+
+/** Deixa guardadas as mensagens das conversas mais recentes: ao abrir uma, ela aparece na hora. */
+export async function aquecerMensagens(contatoIds: string[]): Promise<void> {
+  await Promise.all(contatoIds.slice(0, 6).map(async (id) => {
+    try { gravarCache(`msgs:${id}`, await lerMensagens(id)); } catch { /* sem cache para essa conversa */ }
+  }));
 }
