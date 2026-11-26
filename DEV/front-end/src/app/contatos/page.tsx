@@ -7,6 +7,7 @@ import {
   adicionarContatoAction,
   buscarPerfilAction,
   listarContatosAction,
+  sugerirPerfisAction,
   removerContatoAction,
 } from "../../contatos/acoes";
 
@@ -31,6 +32,7 @@ export default function PaginaContatos() {
     <TelaContatos
       contatos={contatos}
       buscar={buscarPerfilAction}
+      sugerir={sugerirPerfisAction}
       aoAdicionar={adicionar}
       aoRemover={remover}
     />
