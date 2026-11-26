@@ -4,8 +4,8 @@
   flex: 1;
   display: grid;
   grid-template-columns: var(--lista-largura) 1fr;
-  height: calc(100svh - 8.5rem);
-  min-height: 28rem;
+  grid-template-rows: minmax(0, 1fr);
+  min-height: 0;
   background: var(--cor-superficie);
   border-top: var(--borda-fina) solid var(--cor-borda);
   overflow: hidden;
@@ -69,10 +69,12 @@
 .dia span { padding: 4px 12px; border-radius: var(--raio-sm); background: var(--cor-superficie); color: var(--cor-secundaria); font-size: var(--fonte-xs); box-shadow: var(--sombra-painel); }
 .linhaMsg { display: flex; }
 .linhaMinha { justify-content: flex-end; }
-.balao { position: relative; max-width: min(36rem, 78%); min-width: 4.5rem; padding: 7px 10px 6px; border-radius: 10px 10px 10px 2px; background: var(--cor-superficie); box-shadow: 0 1px 1px rgb(0 0 0 / 12%); font-size: 1rem; line-height: 1.4; }
+.balao { position: relative; max-width: min(36rem, 78%); min-width: 0; padding: 7px 10px 6px; border-radius: 10px 10px 10px 2px; background: var(--cor-superficie); box-shadow: 0 1px 1px rgb(0 0 0 / 12%); font-size: 1rem; line-height: 1.4; }
 .minha { border-radius: 10px 10px 2px 10px; background: #fff0d4; }
 .balao p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
-.rodape { display: flex; align-items: center; justify-content: flex-end; gap: 4px; margin: 2px 0 0 var(--espaco-4); font-size: 0.7rem; color: var(--cor-secundaria); }
+/* Flutua à direita depois do texto: cabe na mesma linha quando dá, senão desce para a linha de baixo. */
+.rodape { float: right; display: inline-flex; align-items: center; gap: 4px; margin: 0.6rem 0 -0.25rem var(--espaco-3); font-size: 0.7rem; line-height: 1; color: var(--cor-secundaria); }
+.balao::after { content: ""; display: block; clear: both; }
 .rodape em { font-style: normal; }
 .apagada p { color: var(--cor-secundaria); font-style: italic; }
 .falhou { box-shadow: 0 0 0 1px var(--cor-erro); }
@@ -120,7 +122,7 @@
 
 /* ---------- Celular: uma coluna por vez ---------- */
 @media (max-width: 719px) {
-  .raiz, .listaFechada { grid-template-columns: 1fr; height: calc(100svh - 7rem); }
+  .raiz, .listaFechada { grid-template-columns: 1fr; }
   .listaFechada .lista { visibility: visible; }
   .lista, .chat { grid-column: 1; grid-row: 1; }
   .comAtiva .lista { display: none; }

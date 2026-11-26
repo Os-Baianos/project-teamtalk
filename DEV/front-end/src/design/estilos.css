@@ -182,6 +182,9 @@ button:disabled { opacity: .65; cursor: wait; }
 
 .aplicacao { display: flex; flex-direction: column; min-height: 100vh; min-height: 100svh; }
 .aplicacao-conteudo { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+/* Telas que ocupam a janela inteira (Conversas): a página não rola, só o conteúdo interno. */
+.aplicacao.pagina-cheia { height: 100vh; height: 100dvh; overflow: hidden; }
+.pagina-cheia .aplicacao-conteudo { min-height: 0; }
 
 /* A marca já aparece na barra superior */
 .painel .marca { display: none; }
