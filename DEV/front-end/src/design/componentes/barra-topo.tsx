@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { sairAction } from "../../sessao/acoes";
@@ -15,6 +16,24 @@ const rotasPublicas = ["/login", "/cadastro"];
 export function BarraTopo() {
   const caminho = usePathname();
   const publica = rotasPublicas.includes(caminho);
+  const menu = useRef<HTMLDetailsElement>(null);
+
+  // Fecha o menu Conta ao clicar fora, apertar Esc ou trocar de página.
+  useEffect(() => {
+    const fechar = () => menu.current?.removeAttribute("open");
+    const aoClicar = (e: MouseEvent) => {
+      if (menu.current && !menu.current.contains(e.target as Node)) fechar();
+    };
+    const aoTeclar = (e: KeyboardEvent) => { if (e.key === "Escape") fechar(); };
+    document.addEventListener("mousedown", aoClicar);
+    document.addEventListener("keydown", aoTeclar);
+    return () => {
+      document.removeEventListener("mousedown", aoClicar);
+      document.removeEventListener("keydown", aoTeclar);
+    };
+  }, []);
+
+  useEffect(() => { menu.current?.removeAttribute("open"); }, [caminho]);
 
   return (
     <header className={estilos.topo}>
@@ -40,7 +59,7 @@ export function BarraTopo() {
                 {item.rotulo}
               </Link>
             ))}
-            <details className={estilos.menu}>
+            <details className={estilos.menu} ref={menu}>
               <summary className={estilos.item}>
                 Conta <span className={estilos.seta} aria-hidden="true" />
               </summary>
