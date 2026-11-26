@@ -5,3 +5,4 @@ Data: 2026-11-26
 
 ## O que foi feito
 - O nome "Painel dev" virou "Painel Dev" no menu Conta e no título da página /dev.
+- A etiqueta "dev" ao lado do nome virou "DEV".

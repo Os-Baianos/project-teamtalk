@@ -103,7 +103,7 @@ export function PainelDev({ inicial, meuId }: { inicial: UsuarioDev[]; meuId: st
             ) : (
               <>
                 <div className={estilos.dados}>
-                  <strong>{u.nome} {u.papel === "dev" && <span className={estilos.papel}>dev</span>}</strong>
+                  <strong>{u.nome} {u.papel === "dev" && <span className={estilos.papel}>DEV</span>}</strong>
                   <span>@{u.arroba}</span>
                   <span>{u.email}</span>
                   <span>Criada em {data(u.criado_em)}</span>
