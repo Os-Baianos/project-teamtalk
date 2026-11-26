@@ -61,4 +61,3 @@
   .cartao { transition: box-shadow .2s ease, border-color .2s ease; }
   .cartao:hover { border-color: var(--cor-borda-controle); box-shadow: 0 2px 8px rgb(0 0 0 / 8%); }
 }
-.carregando { display: grid; place-items: center; padding: var(--espaco-8, 2rem) 0; }

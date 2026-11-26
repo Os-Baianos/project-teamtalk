@@ -20,7 +20,7 @@ export default function PaginaConversas() {
   const [contatos, setContatos] = useState<Pessoa[]>([]);
   const [ativa, setAtiva] = useState<Pessoa | null>(null);
   const [mensagens, setMensagens] = useState<Mensagem[]>([]);
-  const [carregando, setCarregando] = useState(true);
+  const [carregando, setCarregando] = useState(true); // só segura a abertura via link; não mostra círculo
   const ativaRef = useRef<Pessoa | null>(null);
   ativaRef.current = ativa;
 
@@ -37,6 +37,17 @@ export default function PaginaConversas() {
     meuIdAction().then(setMeuId);
     carregarLista().finally(() => setCarregando(false));
   }, [carregarLista]);
+
+  // Vindo do perfil de alguém (/conversas?com=@usuario): abre a conversa com essa pessoa.
+  const abrirDoLink = useRef(false);
+  useEffect(() => {
+    if (abrirDoLink.current || carregando) return;
+    abrirDoLink.current = true;
+    const com = new URLSearchParams(window.location.search).get("com");
+    if (!com) return;
+    const pessoa = [...conversas, ...contatos].find((p) => p.arroba === com);
+    if (pessoa) abrir(pessoa);
+  }, [carregando]);
 
   const aoReceber = useCallback((m: Mensagem) => {
     if (ativaRef.current?.id === m.remetente_id) {
@@ -76,7 +87,6 @@ export default function PaginaConversas() {
 
   return (
     <TelaConversas
-      carregando={carregando}
       conversas={conversas}
       novos={novos}
       ativa={ativa}

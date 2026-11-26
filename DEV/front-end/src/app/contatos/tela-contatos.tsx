@@ -1,15 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import type { FormEvent } from "react";
-import { Botao, Campo, CabecalhoMobile, Carregando, LayoutMobile } from "@design/componentes";
+import { Botao, Campo, CabecalhoMobile, LayoutMobile } from "@design/componentes";
 import estilos from "./contatos.module.css";
 
 export type Contato = { id: string; nome: string; arroba: string; foto_url?: string | null };
 
 type Props = {
-  /** Primeira carga de "Meus contatos" em andamento. */
-  carregando?: boolean;
   contatos: Contato[];
   /** Procura um usuário pelo @; devolve null quando não existe. */
   buscar: (arroba: string) => Promise<Contato | null>;
@@ -28,12 +27,11 @@ function Avatar({ contato }: { contato: Contato }) {
     : <span className={estilos.avatar} aria-hidden="true">{contato.nome[0]}</span>;
 }
 
-export function TelaContatos({ carregando = false, contatos, buscar, sugerir, aoAdicionar, aoRemover }: Props) {
+export function TelaContatos({ contatos, buscar, sugerir, aoAdicionar, aoRemover }: Props) {
   const [termo, setTermo] = useState("");
   const [resultado, setResultado] = useState<Contato | null>(null);
   const [mensagem, setMensagem] = useState("");
   const [sugestoes, setSugestoes] = useState<Contato[]>([]);
-  const [carregandoSug, setCarregandoSug] = useState(false);
   const [erroSug, setErroSug] = useState("");
   const pedido = useRef(0);
   const guardadas = useRef(new Map<string, Contato[]>()); // respostas já buscadas (apagar letra volta na hora)
@@ -42,10 +40,9 @@ export function TelaContatos({ carregando = false, contatos, buscar, sugerir, ao
   useEffect(() => {
     const q = normalizar(termo);
     const numero = ++pedido.current;
-    if (!sugerir || q.length < 2 || resultado) { setSugestoes([]); setErroSug(""); setCarregandoSug(false); return; }
+    if (!sugerir || q.length < 2 || resultado) { setSugestoes([]); setErroSug(""); return; }
     const pronta = guardadas.current.get(q);
-    if (pronta) { setSugestoes(pronta.filter((c) => !contatos.some((x) => x.id === c.id))); setCarregandoSug(false); return; }
-    setCarregandoSug(true);
+    if (pronta) { setSugestoes(pronta.filter((c) => !contatos.some((x) => x.id === c.id))); return; }
     setErroSug("");
     const espera = setTimeout(async () => {
       try {
@@ -64,8 +61,6 @@ export function TelaContatos({ carregando = false, contatos, buscar, sugerir, ao
           if (Date.now() - ultima > 60_000) { sessionStorage.setItem("recarregou-em", String(Date.now())); location.reload(); return; }
         } catch { /* sem sessionStorage: só mostra o aviso */ }
         setErroSug("Não foi possível buscar agora. Atualize a página.");
-      } finally {
-        if (numero === pedido.current) setCarregandoSug(false);
       }
     }, 180);
     return () => clearTimeout(espera);
@@ -95,27 +90,26 @@ export function TelaContatos({ carregando = false, contatos, buscar, sugerir, ao
   const jaAdicionado = resultado ? contatos.some((c) => c.id === resultado.id) : false;
 
   return (
-    <LayoutMobile cabecalho={<CabecalhoMobile titulo="Contatos" subtitulo="Busque pessoas pelo nome ou @" />}>
+    <LayoutMobile cabecalho={<CabecalhoMobile titulo="Contatos" subtitulo="Adicione pessoas à sua lista" />}>
       <div className={estilos.busca}>
         <form onSubmit={procurar} role="search">
           <Campo
             id="busca-arroba"
-            rotulo="Buscar por nome ou @"
+            rotulo="Buscar pessoa"
             value={termo}
             onChange={(e) => { setTermo(e.target.value); setResultado(null); setMensagem(""); }}
-            placeholder="Nome ou @usuario"
+            placeholder="@usuario"
             autoCapitalize="none"
             autoComplete="off"
             spellCheck={false}
             enterKeyHint="search"
             erro={mensagem || undefined}
           />
-          {carregandoSug && sugestoes.length === 0 && <div className={estilos.sugCarregando}><Carregando tamanho="1.25rem" texto="Buscando sugestões" atraso /></div>}
           {erroSug && <p className={estilos.erroSug} role="alert">{erroSug}</p>}
           {sugestoes.length > 0 && (
             <ul className={estilos.sugestoes} aria-label="Sugestões">
               {sugestoes.map((c) => (
-                <li key={c.id}>
+                <li key={c.id} className={estilos.sugestaoLinha}>
                   <button type="button" className={estilos.sugestao} onClick={() => escolher(c)}>
                     <Avatar contato={c} />
                     <span className={estilos.dados}>
@@ -123,6 +117,7 @@ export function TelaContatos({ carregando = false, contatos, buscar, sugerir, ao
                       <span>@{c.arroba}</span>
                     </span>
                   </button>
+                  <Link className={estilos.verPerfil} href={`/perfil/${c.arroba}`}>Ver perfil</Link>
                 </li>
               ))}
             </ul>
@@ -132,11 +127,13 @@ export function TelaContatos({ carregando = false, contatos, buscar, sugerir, ao
         {resultado && (
           <ul className={estilos.lista} aria-label="Resultado da busca">
             <li className={estilos.cartao}>
-              <Avatar contato={resultado} />
-              <div className={estilos.dados}>
-                <strong>{resultado.nome}</strong>
-                <span>@{resultado.arroba}</span>
-              </div>
+              <Link className={estilos.perfilLink} href={`/perfil/${resultado.arroba}`} aria-label={`Ver o perfil de ${resultado.nome}`}>
+                <Avatar contato={resultado} />
+                <div className={estilos.dados}>
+                  <strong>{resultado.nome}</strong>
+                  <span>@{resultado.arroba}</span>
+                </div>
+              </Link>
               <Botao
                 variante={jaAdicionado ? "secundaria" : "primaria"}
                 disabled={jaAdicionado}
@@ -151,19 +148,19 @@ export function TelaContatos({ carregando = false, contatos, buscar, sugerir, ao
 
       <section className={estilos.secao} aria-labelledby="titulo-meus-contatos">
         <h2 id="titulo-meus-contatos">Meus contatos</h2>
-        {carregando ? (
-          <div className={estilos.carregando}><Carregando atraso /></div>
-        ) : contatos.length === 0 ? (
+        {contatos.length === 0 ? (
           <p className={estilos.vazio}>Você ainda não adicionou ninguém.</p>
         ) : (
           <ul className={estilos.lista}>
             {contatos.map((contato) => (
               <li className={estilos.cartao} key={contato.id}>
-                <Avatar contato={contato} />
-                <div className={estilos.dados}>
-                  <strong>{contato.nome}</strong>
-                  <span>@{contato.arroba}</span>
-                </div>
+                <Link className={estilos.perfilLink} href={`/perfil/${contato.arroba}`} aria-label={`Ver o perfil de ${contato.nome}`}>
+                  <Avatar contato={contato} />
+                  <div className={estilos.dados}>
+                    <strong>{contato.nome}</strong>
+                    <span>@{contato.arroba}</span>
+                  </div>
+                </Link>
                 <Botao
                   variante="perigo"
                   onClick={() => aoRemover(contato)}
