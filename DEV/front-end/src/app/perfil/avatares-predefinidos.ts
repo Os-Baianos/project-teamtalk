@@ -41,13 +41,6 @@ export const AVATARES_PREDEFINIDOS: AvatarPredefinido[] = [
   { id: "diamante", nome: "Diamante", svg: moldura(degrade("a", "#ff9a9e", "#d9436b"), `<polygon points="128,50 200,110 128,210 56,110" fill="#fff0f3"/><polygon points="128,50 164,110 128,210 92,110" fill="#ffd0d8"/>`) },
   { id: "hexagonos", nome: "Hexágonos", svg: moldura(degrade("a", "#7ee8c0", "#2a9d8f"), poli(regular(6, 86), "#e8fff6") + poli(regular(6, 46), "#52cfa6")) },
   { id: "por-do-sol", nome: "Pôr do sol", svg: moldura(degrade("a", "#ff8a5c", "#7a4fa3"), poli(regular(12, 54, 128, 150), "#ffd36e") + poli("0,206 52,150 92,186 144,128 196,180 256,142 256,256 0,256", "#4d3480") + poli("144,128 196,180 150,196 112,170", "#5f4399") + poli("0,236 62,196 114,230 172,192 256,238 256,256 0,256", "#2f2150")) },
-  { id: "pinguim", nome: "Pinguim", svg: moldura(degrade("a", "#a8e6ff", "#3f86c9"),
-    poli("68,116 36,178 74,180", "#26324f") + poli("188,116 220,178 182,180", "#26324f") +
-    poli("128,40 178,70 198,150 172,214 84,214 58,150 78,70", "#26324f") +
-    poli("128,100 160,114 172,162 154,206 128,214 102,206 84,162 96,114", "#f4fbff") +
-    poli("114,88 142,88 128,108", "#ff9f1a") +
-    `<circle cx="110" cy="72" r="6.5" fill="#fff"/><circle cx="146" cy="72" r="6.5" fill="#fff"/><circle cx="111" cy="73" r="3" fill="#14203a"/><circle cx="145" cy="73" r="3" fill="#14203a"/>` +
-    poli("88,214 122,214 102,234", "#ff9f1a") + poli("134,214 168,214 154,234", "#ff9f1a")) },
 ];
 
 export const urlDoAvatar = (a: AvatarPredefinido) => `data:image/svg+xml;utf8,${encodeURIComponent(a.svg)}`;
