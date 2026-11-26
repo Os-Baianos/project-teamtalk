@@ -85,16 +85,21 @@
 .tique_falha { color: var(--cor-erro); }
 
 /* Menu da mensagem (seta no canto do balão, como no WhatsApp) */
-.minha .menuBox button { background: #fff0d4; }
-.menuBox { position: absolute; top: 2px; right: 2px; z-index: 2; }
-.raiz .abrirMenu { display: grid; place-items: center; width: 1.5rem; height: 1.5rem; border-radius: var(--raio-pill); color: var(--cor-secundaria); background: var(--cor-superficie); opacity: 0; transition: opacity .15s ease; }
+/* A seta fica fora do balão (do lado de dentro da conversa), então nunca cobre o texto nem a hora. */
+.menuBox { position: absolute; top: 50%; right: 100%; z-index: 2; padding-right: 4px; transform: translateY(-50%); }
+.balao:not(.minha) .menuBox { right: auto; left: 100%; padding: 0 0 0 4px; }
+.raiz .abrirMenu { display: grid; place-items: center; width: 1.75rem; height: 1.75rem; border-radius: var(--raio-pill); color: var(--cor-secundaria); background: transparent; opacity: 0; transition: opacity .15s ease, background-color .15s ease; }
 .balao:hover .abrirMenu, .raiz .abrirMenu:focus-visible, .raiz .abrirMenu[aria-expanded="true"] { opacity: 1; }
+.raiz .abrirMenu:hover, .raiz .abrirMenu[aria-expanded="true"] { background: rgb(0 0 0 / 8%); }
+.raiz .abrirMenu:focus-visible { outline: 2px solid var(--cor-foco); outline-offset: 0; }
 @media (hover: none) { .raiz .abrirMenu { opacity: .7; } }
-.menu { position: absolute; top: 100%; right: 0; min-width: 11rem; margin: 2px 0 0; padding: var(--espaco-2) 0; list-style: none; background: var(--cor-superficie); border-radius: var(--raio-md); box-shadow: 0 4px 16px rgb(0 0 0 / 22%); }
-.menuEsq { right: auto; left: 0; }
-.raiz .menu button { display: block; width: 100%; padding: var(--espaco-2) var(--espaco-4); font-size: var(--fonte-sm); }
+.menu { position: absolute; top: 100%; right: 4px; min-width: 11rem; margin: 2px 0 0; padding: var(--espaco-2) 0; list-style: none; background: var(--cor-superficie); border-radius: var(--raio-md); box-shadow: 0 4px 16px rgb(0 0 0 / 22%); }
+.menuEsq { right: auto; left: 4px; }
+.raiz .menu button { display: block; width: 100%; padding: var(--espaco-2) var(--espaco-4); background: transparent; color: var(--cor-texto); font-size: var(--fonte-sm); }
+.menu li + li { border-top: var(--borda-fina) solid var(--cor-borda); }
 .raiz .menu button:hover { background: var(--cor-fundo); }
 .raiz .menu .perigo { color: var(--cor-erro); }
+.raiz .menu .perigo:hover { background: var(--cor-erro-fundo); }
 
 
 /* ---------- Envio ---------- */
