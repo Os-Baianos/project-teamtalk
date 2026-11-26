@@ -64,6 +64,7 @@ export function BarraTopo() {
                 Conta <span className={estilos.seta} aria-hidden="true" />
               </summary>
               <div className={estilos.suspenso}>
+                <Link href="/perfil" className={estilos.opcao}>Perfil</Link>
                 <form action={sairAction}>
                   <button type="submit" className={estilos.opcao}>Sair</button>
                 </form>
