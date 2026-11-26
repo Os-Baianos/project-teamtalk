@@ -97,13 +97,22 @@ export function TelaConversas({
   const [dados, setDados] = useState<BalaoDado | null>(null);
   const [editando, setEditando] = useState<BalaoDado | null>(null);
   const [aviso, setAviso] = useState("");
-  const fim = useRef<HTMLDivElement>(null);
+  const historico = useRef<HTMLDivElement>(null);
   const campo = useRef<HTMLTextAreaElement>(null);
 
   // Acompanha as mensagens novas só quando a pessoa está no fim; se subiu para ler, não puxa de volta.
   const noFim = useRef(true);
   useEffect(() => { noFim.current = true; }, [ativa?.id]);
-  useEffect(() => { if (noFim.current) fim.current?.scrollIntoView({ block: "end" }); }, [mensagens.length, carregandoMensagens, ativa?.id]);
+  // Rola só a caixa das mensagens (scrollIntoView puxava a página inteira para baixo).
+  useEffect(() => {
+    const el = historico.current;
+    if (el && noFim.current) el.scrollTop = el.scrollHeight;
+  }, [mensagens.length, carregandoMensagens, ativa?.id]);
+  // A tela de conversas ocupa a janela toda e só a lista e o histórico rolam.
+  useEffect(() => {
+    document.body.classList.add("pagina-cheia");
+    return () => document.body.classList.remove("pagina-cheia");
+  }, []);
   useEffect(() => { setTexto(""); setErro(""); setMenu(null); setDados(null); setEditando(null); }, [ativa?.id]);
   useEffect(() => {
     const el = campo.current;
@@ -138,6 +147,7 @@ export function TelaConversas({
     if (!limpo || enviando) return;
     setEnviando(true);
     setErro("");
+    noFim.current = true; // ao enviar, acompanha a própria mensagem
     if (editando) {
       const ok = limpo === editando.texto ? true : await aoEditar(editando.id, limpo);
       setEnviando(false);
@@ -295,7 +305,7 @@ export function TelaConversas({
               </Link>
             </header>
 
-            <div className={estilos.historico} aria-live="polite" onScroll={(e) => {
+            <div className={estilos.historico} ref={historico} aria-live="polite" onScroll={(e) => {
               const el = e.currentTarget;
               noFim.current = el.scrollHeight - el.scrollTop - el.clientHeight < 96;
             }}>
@@ -331,19 +341,21 @@ export function TelaConversas({
                             )}
                           </span>
                         )}
-                        <p>{it.m.apagada ? (it.m.minha ? "Você apagou esta mensagem" : "Esta mensagem foi apagada") : it.m.texto}</p>
+                        <p>
+                          {it.m.apagada ? (it.m.minha ? "Você apagou esta mensagem" : "Esta mensagem foi apagada") : it.m.texto}
+                          {/* Hora e tiques entram na última linha do texto quando cabem (como no WhatsApp). */}
+                          <span className={estilos.rodape}>
+                            {it.m.editadaEm && !it.m.apagada && <em>Editada</em>}
+                            <time dateTime={it.m.criadoEm}>{hora(it.m.criadoEm)}</time>
+                            {it.m.minha && !it.m.apagada && <Tiques status={it.m.status} />}
+                          </span>
+                        </p>
                         {it.m.status === "falha" && <button type="button" className={estilos.tentar} onClick={() => aoReenviar(it.m.id)}>Falha ao enviar. Tentar novamente</button>}
-                        <span className={estilos.rodape}>
-                          {it.m.editadaEm && !it.m.apagada && <em>Editada</em>}
-                          <time dateTime={it.m.criadoEm}>{hora(it.m.criadoEm)}</time>
-                          {it.m.minha && !it.m.apagada && <Tiques status={it.m.status} />}
-                        </span>
                       </div>
                     </div>
                   ),
                 )
               )}
-              <div ref={fim} />
             </div>
 
 
