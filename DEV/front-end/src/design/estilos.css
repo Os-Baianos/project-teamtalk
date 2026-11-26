@@ -147,8 +147,31 @@ button:focus-visible {
   border-radius: 10px;
   background: var(--cor-foco);
   color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-size: 14px;
 }
+
+[role="status"] svg { flex: 0 0 auto; }
+[role="status"] span { flex: 1 1 auto; }
+.aviso-fechar {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  min-height: 28px;
+  height: 28px;
+  margin: 0 -4px 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+.aviso-fechar:hover { background: rgba(255, 255, 255, .18); }
+.aviso-fechar:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
 
 @media (max-width: 380px) {
   .pagina { padding-right: 14px; padding-left: 14px; }
