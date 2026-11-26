@@ -66,9 +66,17 @@
 .menu[open] > summary { color: #44b9ff; }
 .suspenso {
   position: absolute; top: 100%; left: 0; z-index: 10; min-width: 10rem;
-  background: var(--cor-topo); border: var(--borda-fina) solid #5f6b7a; padding: var(--espaco-1) 0;
+  margin-top: var(--espaco-1);
+  background: rgb(22 30 42 / 94%); border: var(--borda-fina) solid #5f6b7a;
+  border-radius: var(--raio-md); overflow: hidden; padding: 0;
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 45%);
 }
-.opcao { display: block; padding: var(--espaco-2) var(--espaco-4); color: var(--cor-topo-texto); text-decoration: none; font-size: var(--fonte-sm); }
+.suspenso > * + *, .suspenso form + a { border-top: var(--borda-fina) solid #3a4656; }
+.suspenso > a, .suspenso > form { display: block; }
+.opcao { display: block; width: 100%; box-sizing: border-box; padding: var(--espaco-2) var(--espaco-4); color: var(--cor-topo-texto); text-decoration: none; font-size: var(--fonte-sm); }
 .opcao:hover { background: #232f3e; color: var(--cor-primaria); }
+.opcao:focus-visible { outline: 2px solid #fff; outline-offset: -3px; border-radius: var(--raio-sm, 6px); }
 .nav { overflow: visible; flex-wrap: wrap; }
 button.opcao { border-radius: 0; display: flex; align-items: center; width: 100%; min-height: 0; height: auto; margin: 0; background: none; border: 0; text-align: left; font: inherit; font-size: var(--fonte-sm); line-height: 1.2; cursor: pointer; }
+button.opcao:focus-visible { border-radius: var(--raio-sm); }

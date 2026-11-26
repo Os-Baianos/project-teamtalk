@@ -1,5 +1,6 @@
 .topo { display: grid; justify-items: center; gap: var(--espaco-2); text-align: center; padding: var(--espaco-4) 0; }
 .foto {
+  object-fit: cover;
   display: grid;
   place-items: center;
   width: 96px;
@@ -23,3 +24,19 @@
 .linha + .linha { border-top: var(--borda-fina) solid var(--cor-borda); }
 .linha dt { color: var(--cor-secundaria); font-size: var(--fonte-sm); }
 .linha dd { margin: 0; overflow-wrap: anywhere; }
+.fotoArea { display: grid; justify-items: center; gap: var(--espaco-3); }
+.escondido { display: none; }
+.acoes { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--espaco-2); }
+.erro { margin: 0; color: var(--cor-erro); font-size: var(--fonte-sm); }
+.ajuste { padding-bottom: var(--espaco-4); display: grid; justify-items: center; gap: var(--espaco-3); }
+.canvas {
+  width: 256px; height: 256px; max-width: 100%;
+  border-radius: var(--raio-pill);
+  background: var(--cor-selecionada);
+  touch-action: none; cursor: grab;
+  border: var(--borda-fina) solid var(--cor-borda);
+}
+.canvas:active { cursor: grabbing; }
+.zoom { display: grid; gap: var(--espaco-1); width: min(256px, 100%); font-size: var(--fonte-sm); color: var(--cor-secundaria); }
+.zoom input { width: 100%; }
+.dica { margin: 0; color: var(--cor-secundaria); font-size: var(--fonte-sm); }

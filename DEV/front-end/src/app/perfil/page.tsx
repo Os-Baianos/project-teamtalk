@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { CabecalhoMobile, LayoutMobile } from "@design/componentes";
 import { criarClienteServidor } from "../../supabase/servidor";
+import { FotoPerfil } from "./foto-perfil";
 import estilos from "./perfil.module.css";
 
 export default async function PaginaPerfil() {
@@ -10,7 +11,7 @@ export default async function PaginaPerfil() {
 
   const { data: perfil } = await supabase
     .from("perfis")
-    .select("nome, arroba, criado_em")
+    .select("nome, arroba, criado_em, foto_path")
     .eq("id", auth.user.id)
     .single();
 
@@ -19,10 +20,13 @@ export default async function PaginaPerfil() {
     ? new Date(perfil.criado_em).toLocaleDateString("pt-BR")
     : "—";
 
+  const fotoPath = perfil?.foto_path ?? null;
+  const fotoUrl = fotoPath ? supabase.storage.from("avatares").getPublicUrl(fotoPath).data.publicUrl : null;
+
   return (
     <LayoutMobile cabecalho={<CabecalhoMobile titulo="Perfil" subtitulo="Seus dados no TeamTalk" />}>
       <div className={estilos.topo}>
-        <span className={estilos.foto} aria-hidden="true">{nome[0]?.toUpperCase()}</span>
+        <FotoPerfil usuarioId={auth.user.id} inicial={nome[0]?.toUpperCase() ?? "?"} fotoUrl={fotoUrl} fotoPath={fotoPath} />
         <h2 className={estilos.nome}>{nome}</h2>
         <p className={estilos.arroba}>@{perfil?.arroba}</p>
       </div>
