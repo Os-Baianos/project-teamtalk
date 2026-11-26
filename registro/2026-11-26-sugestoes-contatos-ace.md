@@ -24,3 +24,7 @@ Data: 2026-11-26
 - Corrigido um erro meu: o Avatar sem foto chamava a si mesmo e a página caía com "Out of Memory" (PR #179).
 - Sugestões mais rápidas: espera de 180 ms ao digitar e respostas já buscadas ficam guardadas (apagar uma letra volta na hora).
 - O círculo de carregamento só aparece depois de 0,3 s (prop `atraso` do componente Carregando), para não piscar em carregamentos rápidos.
+
+## Página desatualizada (erro "Failed to find Server Action")
+- Causa do círculo girando sem fim: a aba tinha sido aberta antes de uma atualização do site, e a ação de buscar não existia mais na versão nova.
+- Agora a busca tem limite de 8 s. Se falhar, a página recarrega sozinha uma vez (para pegar a versão nova) e, se ainda falhar, mostra "Não foi possível buscar agora. Atualize a página."
