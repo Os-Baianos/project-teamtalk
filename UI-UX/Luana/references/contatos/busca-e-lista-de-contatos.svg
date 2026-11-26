@@ -1,0 +1,171 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="1660" viewBox="0 0 2000 1660" role="img" aria-labelledby="titulo descricao">
+<title id="titulo">TeamTalk — buscar por @ e gerenciar contatos</title>
+<desc id="descricao">Prancha responsiva com composição desktop e mobile, resultado de busca, envio de solicitação, lista de contatos com remoção e estados vazio, carregando, erro, usuário inexistente e contato repetido.</desc>
+<defs>
+<style>
+*{box-sizing:border-box} text{font-family:"Amazon Ember","Helvetica Neue",Arial,sans-serif;fill:#0F141A}
+.h1{font-size:34px;font-weight:700}.h2{font-size:22px;font-weight:700}.h3{font-size:17px;font-weight:700}.body{font-size:15px}.small{font-size:13px}.tiny{font-size:11px}.muted{fill:#545B64}.white{fill:#F9F9FA}.soft{fill:#C6C6CD}
+.top{fill:#161D26}.orange{fill:#FF9900}.link{fill:#006CE0}.red{fill:#D91515}.green{fill:#037F0C}
+.bg{fill:#F5F5F5}.surface{fill:#FFFFFF}.border{stroke:#D5DBDB;stroke-width:1.5}.field{fill:#FFFFFF;stroke:#7D8998;stroke-width:1.5}
+.btn{fill:#FF9900}.btntext{font-size:14px;font-weight:700}.outline{fill:#FFFFFF;stroke:#D91515;stroke-width:1.5}.outlinetext{fill:#D91515;font-size:13px;font-weight:700}
+.card{fill:#FFFFFF;stroke:#D5DBDB;stroke-width:1.2}.section{font-size:19px;font-weight:700}
+</style>
+</defs>
+<rect width="2000" height="1660" fill="#EEF1F4"/>
+<text x="70" y="72" class="h1">Contatos · busca por @ e lista</text>
+<text x="70" y="108" class="body muted">Issue #135 · Sprint 1 · proposta visual para revisão conjunta de UI-UX</text>
+<rect x="1640" y="48" width="290" height="42" rx="21" fill="#FFF5D6"/><text x="1785" y="75" text-anchor="middle" class="small" fill="#76520A">PRANCHA PARA REVISÃO</text>
+<text x="70" y="165" class="h2">01 · Desktop</text>
+<text x="70" y="193" class="small muted">Composição em duas colunas: busca e resultado à esquerda; “Meus contatos” à direita.</text>
+<!-- Desktop browser -->
+<rect x="70" y="220" width="1180" height="1010" rx="18" fill="#FFFFFF" stroke="#C7CDD4" stroke-width="2"/>
+<rect x="70" y="220" width="1180" height="84" rx="18" class="top"/>
+<rect x="70" y="286" width="1180" height="18" class="top"/>
+<circle cx="111" cy="262" r="17" fill="#FF9900"/><path d="M103 254h16v12h-8l-5 4v-4h-3z" fill="#161D26"/>
+<text x="141" y="270" class="h2 white">Team<tspan fill="#FF9900">Talk</tspan></text>
+<text x="330" y="270" class="body white">Conversas</text>
+<rect x="438" y="239" width="112" height="46" rx="5" fill="#263342"/><text x="494" y="268" text-anchor="middle" class="body white" font-weight="700">Contatos</text>
+<rect x="438" y="282" width="112" height="3" fill="#FF9900"/>
+<text x="1160" y="270" text-anchor="end" class="body white">Conta ⌄</text>
+<rect x="70" y="304" width="1180" height="926" fill="#F5F5F5"/>
+<text x="112" y="364" class="h1">Contatos</text>
+<text x="112" y="394" class="body muted">Encontre pessoas pelo identificador e gerencie sua rede.</text>
+<!-- desktop search panel -->
+<rect x="110" y="426" width="500" height="755" rx="12" class="surface border"/>
+<text x="144" y="470" class="section">Buscar por @</text>
+<text x="144" y="506" class="small" font-weight="700">Identificador da pessoa</text>
+<rect x="144" y="522" width="432" height="54" rx="7" class="field"/>
+<text x="164" y="556" class="body muted">@marinaalves</text>
+
+<text x="144" y="600" class="tiny muted">Digite pelo menos 2 caracteres para ver sugestões.</text>
+<!-- result -->
+<text x="144" y="650" class="small" font-weight="700">Resultado da busca</text>
+<rect x="144" y="668" width="432" height="108" rx="9" class="card"/>
+<circle cx="190" cy="722" r="27" fill="#F2C9A5"/><text x="190" y="729" text-anchor="middle" class="h3">M</text>
+<text x="234" y="713" class="h3">Marina Alves</text><text x="234" y="741" class="small muted">@marinaalves</text>
+<rect x="352" y="746" width="204" height="0" fill="none"/>
+<rect x="343" y="735" width="214" height="0" fill="none"/>
+<rect x="144" y="796" width="432" height="50" rx="25" class="btn"/>
+<text x="360" y="827" text-anchor="middle" class="btntext">Enviar solicitação</text>
+<text x="144" y="889" class="small muted">Ao enviar, a pessoa poderá aceitar ou recusar.</text>
+<line x1="144" y1="923" x2="576" y2="923" stroke="#D5DBDB"/>
+<text x="144" y="960" class="small" font-weight="700">Dica</text>
+<text x="144" y="989" class="small muted">Confira o identificador antes de enviar.</text>
+<text x="144" y="1012" class="small muted">Se já houver uma relação, o botão mostra</text>
+<text x="144" y="1035" class="small muted">a ação correspondente.</text>
+<!-- right contacts -->
+<rect x="636" y="426" width="574" height="755" rx="12" class="surface border"/>
+<text x="672" y="470" class="section">Meus contatos</text>
+<text x="1174" y="470" text-anchor="end" class="small muted">12 contatos</text>
+<text x="672" y="505" class="small muted">Pessoas que já aceitaram sua solicitação.</text>
+<!-- contact rows -->
+<g>
+<rect x="672" y="530" width="502" height="94" rx="8" class="card"/>
+<circle cx="715" cy="577" r="25" fill="#F2C9A5"/><text x="715" y="584" text-anchor="middle" class="h3">M</text>
+<text x="755" y="570" class="h3">Marina Alves</text><text x="755" y="595" class="small muted">@marinaalves</text>
+<rect x="1030" y="552" width="124" height="46" rx="23" class="outline"/><text x="1092" y="580" text-anchor="middle" class="outlinetext">Remover</text>
+<rect x="672" y="638" width="502" height="94" rx="8" class="card"/>
+<circle cx="715" cy="685" r="25" fill="#B9CBE0"/><text x="715" y="692" text-anchor="middle" class="h3">C</text>
+<text x="755" y="678" class="h3">Caio Rocha</text><text x="755" y="703" class="small muted">@caiorocha</text>
+<rect x="1030" y="660" width="124" height="46" rx="23" class="outline"/><text x="1092" y="688" text-anchor="middle" class="outlinetext">Remover</text>
+<rect x="672" y="746" width="502" height="94" rx="8" class="card"/>
+<circle cx="715" cy="793" r="25" fill="#D8C4E5"/><text x="715" y="800" text-anchor="middle" class="h3">J</text>
+<text x="755" y="786" class="h3">Joana Santos</text><text x="755" y="811" class="small muted">@joanasantos</text>
+<rect x="1030" y="768" width="124" height="46" rx="23" class="outline"/><text x="1092" y="796" text-anchor="middle" class="outlinetext">Remover</text>
+</g>
+<line x1="672" y1="872" x2="1174" y2="872" stroke="#D5DBDB"/>
+<text x="672" y="914" class="small" font-weight="700">Remoção com confirmação</text>
+<rect x="672" y="932" width="502" height="104" rx="8" fill="#FFF0EF" stroke="#D91515"/>
+<text x="696" y="968" class="body" font-weight="700">Remover Marina Alves dos contatos?</text>
+<text x="696" y="993" class="small muted">A remoção afeta os dois lados da relação.</text>
+<rect x="696" y="1004" width="154" height="44" rx="22" fill="#D91515"/><text x="773" y="1032" text-anchor="middle" class="small white" font-weight="700">Confirmar remoção</text>
+<rect x="864" y="1004" width="110" height="44" rx="22" fill="#FFFFFF" stroke="#006CE0"/><text x="919" y="1032" text-anchor="middle" class="small link" font-weight="700">Cancelar</text>
+<text x="672" y="1090" class="small muted">Ação destrutiva sempre explícita; sem remover por toque acidental.</text>
+<text x="672" y="1120" class="small muted">A lista preserva avatar, nome, @ e ação textual acessível.</text>
+<!-- desktop footer -->
+<rect x="110" y="1192" width="1100" height="1" fill="#D5DBDB"/>
+<text x="112" y="1215" class="tiny muted">Barra superior reaproveitada do front-end · sem criar nova navegação, cor, fonte, botão ou ícone.</text>
+<!-- mobile -->
+<text x="1320" y="165" class="h2">02 · Mobile</text>
+<text x="1320" y="193" class="small muted">Fluxo em coluna, com rolagem natural.</text>
+<rect x="1320" y="220" width="610" height="1010" rx="34" fill="#FFFFFF" stroke="#C7CDD4" stroke-width="2"/>
+<rect x="1320" y="220" width="610" height="78" rx="34" class="top"/>
+<rect x="1320" y="278" width="610" height="20" class="top"/>
+<circle cx="1360" cy="258" r="15" fill="#FF9900"/><path d="M1353 252h14v10h-7l-4 3v-3h-3z" fill="#161D26"/>
+<text x="1387" y="266" class="h2 white">Team<tspan fill="#FF9900">Talk</tspan></text><text x="1888" y="264" text-anchor="end" class="small white">Conta</text>
+<rect x="1320" y="298" width="610" height="932" fill="#F5F5F5"/>
+<text x="1360" y="350" class="h1">Contatos</text>
+<text x="1360" y="379" class="small muted">Busque por @ e adicione pessoas.</text>
+<rect x="1352" y="406" width="546" height="230" rx="12" class="surface border"/>
+<text x="1380" y="446" class="section">Buscar por @</text>
+<text x="1380" y="481" class="small" font-weight="700">Identificador da pessoa</text>
+<rect x="1380" y="495" width="490" height="54" rx="7" class="field"/>
+<text x="1400" y="529" class="body muted">@marinaalves</text>
+<rect x="1380" y="565" width="490" height="52" rx="26" class="btn"/>
+<text x="1625" y="598" text-anchor="middle" class="btntext">Enviar solicitação</text>
+<text x="1352" y="684" class="section">Meus contatos <tspan class="muted" font-weight="400">(12)</tspan></text>
+<rect x="1352" y="704" width="546" height="94" rx="9" class="card"/>
+<circle cx="1397" cy="751" r="25" fill="#F2C9A5"/><text x="1397" y="758" text-anchor="middle" class="h3">M</text>
+<text x="1437" y="744" class="h3">Marina Alves</text><text x="1437" y="769" class="small muted">@marinaalves</text>
+<rect x="1748" y="728" width="126" height="46" rx="23" class="outline"/><text x="1811" y="756" text-anchor="middle" class="outlinetext">Remover</text>
+<rect x="1352" y="812" width="546" height="94" rx="9" class="card"/>
+<circle cx="1397" cy="859" r="25" fill="#B9CBE0"/><text x="1397" y="866" text-anchor="middle" class="h3">C</text>
+<text x="1437" y="852" class="h3">Caio Rocha</text><text x="1437" y="877" class="small muted">@caiorocha</text>
+<rect x="1748" y="836" width="126" height="46" rx="23" class="outline"/><text x="1811" y="864" text-anchor="middle" class="outlinetext">Remover</text>
+<rect x="1352" y="920" width="546" height="94" rx="9" class="card"/>
+<circle cx="1397" cy="967" r="25" fill="#D8C4E5"/><text x="1397" y="974" text-anchor="middle" class="h3">J</text>
+<text x="1437" y="960" class="h3">Joana Santos</text><text x="1437" y="985" class="small muted">@joanasantos</text>
+<rect x="1748" y="944" width="126" height="46" rx="23" class="outline"/><text x="1811" y="972" text-anchor="middle" class="outlinetext">Remover</text>
+<text x="1360" y="1060" class="small link" font-weight="700">Ver todos os contatos</text>
+<text x="1360" y="1100" class="tiny muted">Botões e campos com altura mínima de 44 px.</text>
+<text x="1360" y="1120" class="tiny muted">Conteúdo rola sem sobrepor teclado ou barra superior.</text>
+<text x="1360" y="1174" class="tiny muted">Safe areas respeitadas · campo com fonte de 16 px.</text>
+<!-- states strip -->
+<text x="70" y="1300" class="h2">03 · Estados obrigatórios e mensagens</text>
+<text x="70" y="1328" class="small muted">Variações para busca e lista; usar os componentes e as cores de estado existentes.</text>
+<g>
+<rect x="70" y="1350" width="300" height="230" rx="12" class="surface border"/>
+<text x="90" y="1388" class="h3">Lista vazia</text>
+<text x="90" y="1430" class="body">Você ainda não tem contatos.</text>
+<text x="90" y="1455" class="small muted">Busque alguém por @ para começar.</text>
+<text x="90" y="1525" class="tiny muted">Texto simples + acesso à busca.</text>
+
+<rect x="390" y="1350" width="300" height="230" rx="12" class="surface border"/>
+<text x="410" y="1388" class="h3">Carregando</text>
+<circle cx="438" cy="1450" r="15" fill="none" stroke="#006CE0" stroke-width="3" stroke-dasharray="48 18"/>
+<text x="468" y="1456" class="body">Carregando…</text>
+<text x="410" y="1525" class="tiny muted">Usar Carregando existente; sem piscar.</text>
+
+<rect x="710" y="1350" width="300" height="230" rx="12" class="surface border"/>
+<text x="730" y="1388" class="h3">Erro ao carregar</text>
+<text x="730" y="1430" class="small red">Não foi possível carregar</text>
+<text x="730" y="1452" class="small red">seus contatos.</text>
+<rect x="730" y="1470" width="170" height="44" rx="22" fill="#FFFFFF" stroke="#006CE0"/>
+<text x="815" y="1498" text-anchor="middle" class="small link" font-weight="700">Tentar novamente</text>
+
+<rect x="1030" y="1350" width="300" height="230" rx="12" class="surface border"/>
+<text x="1050" y="1388" class="h3">Falha na busca</text>
+<text x="1050" y="1430" class="small red">Não foi possível buscar agora.</text>
+<text x="1050" y="1452" class="small muted">Tente novamente em instantes.</text>
+<rect x="1050" y="1470" width="160" height="44" rx="22" fill="#FFFFFF" stroke="#006CE0"/>
+<text x="1130" y="1498" text-anchor="middle" class="small link" font-weight="700">Tentar novamente</text>
+
+<rect x="1350" y="1350" width="300" height="230" rx="12" class="surface border"/>
+<text x="1370" y="1388" class="h3">@ inexistente</text>
+<rect x="1370" y="1405" width="260" height="46" rx="7" fill="#FFFFFF" stroke="#D91515"/>
+<text x="1386" y="1434" class="small">@usuarioxyz</text>
+<text x="1370" y="1482" class="small red">Nenhum usuário encontrado</text>
+<text x="1370" y="1502" class="small red">com @usuarioxyz.</text>
+
+<rect x="1670" y="1350" width="260" height="230" rx="12" class="surface border"/>
+<text x="1690" y="1388" class="h3">Já é contato</text>
+<circle cx="1712" cy="1440" r="19" fill="#F2C9A5"/><text x="1712" y="1446" text-anchor="middle" class="small" font-weight="700">M</text>
+<text x="1742" y="1436" class="small" font-weight="700">Marina Alves</text>
+<text x="1742" y="1456" class="tiny muted">@marinaalves</text>
+<text x="1690" y="1500" class="small red">Já está em Meus contatos.</text>
+<text x="1690" y="1525" class="tiny muted">Ação disponível: Remover.</text>
+</g>
+<!-- design system notes -->
+<text x="70" y="1620" class="tiny muted">Acessibilidade: contraste AA (4,5:1 texto), foco visível, ordem de teclado, alvos ≥44×44 px e prefers-reduced-motion.</text>
+<text x="1930" y="1620" text-anchor="end" class="tiny muted">Tokens existentes · sem novas cores, fontes, espaçamentos, ícones ou componentes</text>
+</svg>
