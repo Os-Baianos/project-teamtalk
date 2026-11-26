@@ -17,7 +17,7 @@ export default async function PaginaPerfil() {
 
   const nome = perfil?.nome ?? "Sem nome";
   const desde = perfil?.criado_em
-    ? new Date(perfil.criado_em).toLocaleDateString("pt-BR")
+    ? new Date(perfil.criado_em).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })
     : "—";
 
   const fotoPath = perfil?.foto_path ?? null;

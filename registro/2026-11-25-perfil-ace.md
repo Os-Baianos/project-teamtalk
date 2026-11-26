@@ -32,3 +32,7 @@ PR: ver PR "Aba Perfil na Conta"
 - "Escolher foto…" abre uma grade no estilo do seletor do macOS, com 12 imagens predefinidas; escolhe, clica em Salvar foto.
 - Exceção pedida pelo Ace: as 12 imagens são formas simples criadas em código (`src/app/perfil/avatares-predefinidos.ts`), pois não existem imagens em UI-UX. UI-UX (#132 a #139) pode substituir por um conjunto oficial, trocando só esse arquivo.
 - O botão "Editar" usa só texto, sem ícone novo.
+
+## Animações e data
+- Animações do padrão do site (entrar, aparecer, transições curtas, respeitando "reduzir movimento") na página Perfil, no menu da foto, na grade de fotos e no menu Conta (a seta gira ao abrir).
+- A data "Conta criada em" agora usa o horário de Brasília (America/Sao_Paulo); antes saía no horário do servidor (UTC) e podia mostrar o dia seguinte.

@@ -80,3 +80,13 @@
 .nav { overflow: visible; flex-wrap: wrap; }
 button.opcao { border-radius: 0; display: flex; align-items: center; width: 100%; min-height: 0; height: auto; margin: 0; background: none; border: 0; text-align: left; font: inherit; font-size: var(--fonte-sm); line-height: 1.2; cursor: pointer; }
 button.opcao:focus-visible { border-radius: var(--raio-sm); }
+
+/* Menu Conta: mesma entrada suave dos outros elementos do site. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes aparecer-conta { from { opacity: 0; transform: translateY(-4px) scale(.98); } to { opacity: 1; transform: none; } }
+  .suspenso { animation: aparecer-conta .18s cubic-bezier(.2, .7, .2, 1) both; transform-origin: top left; }
+  .opcao { transition: background-color .15s ease, color .15s ease; }
+  .opcao:not(:disabled):hover, .opcao:not(:disabled):active { transform: none; box-shadow: none; }
+  .seta { transition: transform .2s ease; }
+  .menu[open] .seta { transform: rotate(180deg); }
+}
