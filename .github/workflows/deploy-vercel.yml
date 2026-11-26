@@ -1,0 +1,54 @@
+name: Deploy front-end (Vercel)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "DEV/front-end/**"
+      - ".github/workflows/deploy-vercel.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-vercel
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+    defaults:
+      run:
+        working-directory: DEV/front-end
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verifica credenciais do deploy
+        id: credenciais
+        working-directory: .
+        run: |
+          if [ -n "$VERCEL_TOKEN" ] && [ -n "$VERCEL_ORG_ID" ] && [ -n "$VERCEL_PROJECT_ID" ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Deploy ignorado: faltam VERCEL_TOKEN (secret) e VERCEL_ORG_ID / VERCEL_PROJECT_ID (variables)."
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.credenciais.outputs.ok == 'true'
+        with:
+          node-version: 22
+
+      - name: Baixa a configuração do projeto na Vercel
+        if: steps.credenciais.outputs.ok == 'true'
+        run: npx --yes vercel@latest pull --yes --environment=production --token="$VERCEL_TOKEN"
+
+      - name: Build
+        if: steps.credenciais.outputs.ok == 'true'
+        run: npx --yes vercel@latest build --prod --token="$VERCEL_TOKEN"
+
+      - name: Publica
+        if: steps.credenciais.outputs.ok == 'true'
+        run: npx --yes vercel@latest deploy --prebuilt --prod --token="$VERCEL_TOKEN"
