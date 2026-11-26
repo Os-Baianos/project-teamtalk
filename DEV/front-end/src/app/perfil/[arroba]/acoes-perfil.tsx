@@ -8,6 +8,7 @@ import { BotoesRelacao } from "../../../contatos/botoes-relacao";
 import { removerContatoAction } from "../../../contatos/acoes";
 import type { Relacao } from "../../../contatos/acoes";
 import { avisarMudancaDeContatos } from "../../../contatos/use-contatos-ao-vivo";
+import { gravarCache } from "../../../cache/cache-local";
 import { excluirConversaAction } from "../../../mensagens/acoes";
 import estilos from "../perfil.module.css";
 
@@ -29,6 +30,7 @@ export function AcoesPerfil({ id, arroba, relacao: inicial, temConversa: inicial
         if (!r.ok) return r.mensagem ?? "Não foi possível agora. Tente novamente.";
         setRelacao("nenhuma");
         setTemConversa(false);
+        gravarCache(`msgs:${id}`, []);
         avisarMudancaDeContatos();
         return null;
       },
@@ -41,6 +43,7 @@ export function AcoesPerfil({ id, arroba, relacao: inicial, temConversa: inicial
       aoEscolher: async () => {
         if (!(await excluirConversaAction(id))) return "Não foi possível excluir a conversa. Tente novamente.";
         setTemConversa(false);
+        gravarCache(`msgs:${id}`, []);
         avisarMudancaDeContatos(); // atualiza a lista de conversas guardada
         return null;
       },

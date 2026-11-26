@@ -85,19 +85,27 @@ export default function PaginaConversas() {
   }, [carregarLista]);
   useMensagensAoVivo(meuId, aoReceber, aoAtualizar);
 
+  // Mantém guardada a cópia da conversa aberta (só mensagens já confirmadas).
+  useEffect(() => {
+    if (!ativa || carregandoMensagens) return;
+    gravarCache(`msgs:${ativa.id}`, mensagens.filter((m) => !m.id.startsWith("tmp-") && !m.falhou));
+  }, [mensagens, ativa, carregandoMensagens]);
+
   async function abrir(pessoa: Pessoa) {
     setAtiva(pessoa);
-    setMensagens([]);
     setErroHistorico(false);
-    setCarregandoMensagens(true);
+    // Se já temos as mensagens guardadas, mostra na hora (sem círculo) e atualiza por trás.
+    const guardadas = lerCache<Mensagem[]>(`msgs:${pessoa.id}`);
+    setMensagens(guardadas ?? []);
+    setCarregandoMensagens(!guardadas);
     try {
       const lista = await lerMensagens(pessoa.id);
       if (ativaRef.current?.id !== pessoa.id) return; // trocou de conversa enquanto carregava
       setMensagens(lista);
-      await marcarLidas(pessoa.id);
-      carregarLista();
+      setCarregandoMensagens(false);
+      marcarLidas(pessoa.id).then(carregarLista).catch(() => {});
     } catch {
-      if (ativaRef.current?.id === pessoa.id) setErroHistorico(true);
+      if (ativaRef.current?.id === pessoa.id && !guardadas) setErroHistorico(true);
     } finally {
       if (ativaRef.current?.id === pessoa.id) setCarregandoMensagens(false);
     }

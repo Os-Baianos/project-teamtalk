@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { sairAction } from "../../sessao/acoes";
 import { souDevAction } from "../../dev/acoes";
 import { criarClienteNavegador } from "../../supabase/navegador";
-import { lerContaContatos, lerInicio } from "../../dados/leituras";
+import { aquecerMensagens, lerContaContatos, lerInicio } from "../../dados/leituras";
 import { gravarCache, limparCache } from "../../cache/cache-local";
 import { useContatosAoVivo } from "../../contatos/use-contatos-ao-vivo";
 import estilos from "@design/componentes/barra-topo.module.css";
@@ -32,10 +32,10 @@ export function BarraTopo() {
   useEffect(() => {
     if (publica) { setDev(false); setEmail(""); setMeuId(null); setPendentes(0); return; }
     souDevAction().then(setDev);
-    criarClienteNavegador().auth.getUser().then(({ data }) => { setEmail(data.user?.email ?? ""); setMeuId(data.user?.id ?? null); });
+    criarClienteNavegador().auth.getSession().then(({ data }) => { setEmail(data.session?.user.email ?? ""); setMeuId(data.session?.user.id ?? null); }); // só exibição: lê da sessão local
     // Já deixa Conversas e Meus contatos prontos: ao abrir essas telas aparecem na hora.
     lerContaContatos().then((d) => { gravarCache("conta-contatos", d); setPendentes(d.solicitacoes.recebidas.length); });
-    lerInicio().then((d) => gravarCache("inicio", d));
+    lerInicio().then((d) => { gravarCache("inicio", d); void aquecerMensagens(d.conversas.map((c) => c.contato_id)); });
   }, [publica]);
 
   // Número de solicitações de contato novas no menu Conta (atualiza em tempo real).
