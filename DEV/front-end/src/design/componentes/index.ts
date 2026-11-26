@@ -15,3 +15,5 @@ export { ListaRegras } from "./lista-regras";
 export type { Regra } from "./lista-regras";
 export { Aviso } from "./aviso";
 export type { PropsAviso } from "./aviso";
+export { Carregando } from "./carregando";
+export type { PropsCarregando } from "./carregando";
