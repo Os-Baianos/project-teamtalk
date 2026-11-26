@@ -25,7 +25,7 @@
 }
 .avatarFoto { object-fit: cover; }
 .sugestoes {
-  list-style: none; margin: calc(-1 * var(--espaco-1)) 0 0; padding: 0;
+  list-style: none; margin: 0; padding: 0;
   background: var(--cor-superficie);
   border: var(--borda-fina) solid var(--cor-borda-controle);
   border-radius: var(--raio-md);
@@ -34,7 +34,7 @@
 .sugestoes li + li { border-top: var(--borda-fina) solid var(--cor-borda); }
 .sugestao {
   display: flex; align-items: center; gap: var(--espaco-3); width: 100%;
-  padding: var(--espaco-2) var(--espaco-4);
+  padding: var(--espaco-3) var(--espaco-4);
   border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer;
 }
 .sugestao:hover, .sugestao:focus-visible { background: var(--cor-selecionada); }

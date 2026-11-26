@@ -61,9 +61,12 @@ export function TelaContatos({ contatos, buscar, sugerir, aoAdicionar, aoRemover
     setMensagem("");
     setResultado(null);
     const encontrado = await buscar(arroba);
+    if (encontrado) { setBuscando(false); setResultado(encontrado); return; }
+    // Sem @ exatamente igual: mostra as pessoas parecidas em vez de um erro.
+    const parecidos = sugerir ? (await sugerir(arroba)).filter((c) => !contatos.some((x) => x.id === c.id)) : [];
     setBuscando(false);
-    if (!encontrado) setMensagem(`Nenhum usuário encontrado com @${arroba}.`);
-    else setResultado(encontrado);
+    if (parecidos.length) setSugestoes(parecidos);
+    else setMensagem(`Nenhum usuário encontrado com @${arroba}.`);
   }
 
   const jaAdicionado = resultado ? contatos.some((c) => c.id === resultado.id) : false;
