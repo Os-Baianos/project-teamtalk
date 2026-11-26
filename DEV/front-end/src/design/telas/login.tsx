@@ -1,14 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
 import { ListaRegras } from "@design/componentes";
 import { modoLista } from "@design/modo-lista";
 import { regrasEmail, todasOk } from "@design/validacoes";
+import { entrarAction } from "../../sessao/acoes";
 
-type Props = { entrar: (dados: FormData) => Promise<void>; mensagem: string; aviso: string };
+type Props = { mensagem: string; aviso: string };
 
-export function TelaLogin({ entrar, mensagem, aviso }: Props) {
+export function TelaLogin({ mensagem: mensagemInicial, aviso }: Props) {
+  const roteador = useRouter();
+  const [mensagem, setMensagem] = useState(mensagemInicial);
+  const [enviando, setEnviando] = useState(false);
   const [usuario, setUsuario] = useState("");
   const [senha, setSenha] = useState("");
   const [focado, setFocado] = useState<"usuario" | "senha" | null>(null);
@@ -20,10 +25,27 @@ export function TelaLogin({ entrar, mensagem, aviso }: Props) {
   const senhaInvalida = validados.senha && !todasOk(regrasSenha);
 
   function aoEnviar(evento: FormEvent<HTMLFormElement>) {
+    evento.preventDefault();
     if (!todasOk(regrasUsuario, regrasSenha)) {
-      evento.preventDefault();
       setValidados({ usuario: true, senha: true });
+      return;
     }
+    setEnviando(true);
+    entrarAction(usuario, senha)
+      .then((resultado) => {
+        if (resultado.ok) {
+          setMensagem("");
+          roteador.push("/contatos");
+          roteador.refresh();
+        } else {
+          setMensagem("E-mail ou senha incorretos.");
+          setEnviando(false);
+        }
+      })
+      .catch(() => {
+        setMensagem("Não foi possível entrar agora. Tente novamente.");
+        setEnviando(false);
+      });
   }
 
   return (
@@ -36,7 +58,7 @@ export function TelaLogin({ entrar, mensagem, aviso }: Props) {
         <h1 id="titulo-login">Acesse sua conta</h1>
         <p>Entre com suas credenciais corporativas autorizadas.</p>
         {aviso && <p role="status">{aviso}</p>}
-        <form action={entrar} onSubmit={aoEnviar} className="formulario" noValidate>
+        <form onSubmit={aoEnviar} className="formulario" noValidate>
           <label htmlFor="usuario">E-mail corporativo</label>
           <input
             id="usuario"
@@ -73,7 +95,7 @@ export function TelaLogin({ entrar, mensagem, aviso }: Props) {
           />
           <ListaRegras id="regras-senha" regras={regrasSenha} modo={senhaInvalida ? "pendentes" : "oculta"} focado={focado === "senha"} />
           {mensagem && <p className="erro" id="erro-login" role="alert">{mensagem}</p>}
-          <button type="submit">Entrar</button>
+          <button type="submit" disabled={enviando} aria-busy={enviando}>{enviando ? "Entrando..." : "Entrar"}</button>
         </form>
       </section>
     </main>

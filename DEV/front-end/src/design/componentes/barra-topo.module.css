@@ -51,3 +51,24 @@
   .marca:hover .simbolo { transform: rotate(-8deg) scale(1.08); }
   .item { transition: color .15s ease, border-color .2s ease; }
 }
+
+/* Segunda linha no estilo do AWS Skill Builder */
+.linha + .linha { border-top-color: #5f6b7a; }
+.nav { gap: var(--espaco-4); align-items: center; }
+.item { font-size: var(--fonte-sm); gap: var(--espaco-2); list-style: none; cursor: pointer; }
+.item[aria-current="page"] { color: #44b9ff; border-bottom-color: transparent; }
+.item::-webkit-details-marker { display: none; }
+.seta {
+  width: 0; height: 0;
+  border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid currentColor;
+}
+.menu { position: relative; }
+.menu[open] > summary { color: #44b9ff; }
+.suspenso {
+  position: absolute; top: 100%; left: 0; z-index: 10; min-width: 10rem;
+  background: var(--cor-topo); border: var(--borda-fina) solid #5f6b7a; padding: var(--espaco-1) 0;
+}
+.opcao { display: block; padding: var(--espaco-2) var(--espaco-4); color: var(--cor-topo-texto); text-decoration: none; font-size: var(--fonte-sm); }
+.opcao:hover { background: #232f3e; color: var(--cor-primaria); }
+.nav { overflow: visible; flex-wrap: wrap; }
+button.opcao { width: 100%; background: none; border: 0; text-align: left; font: inherit; font-size: var(--fonte-sm); cursor: pointer; }

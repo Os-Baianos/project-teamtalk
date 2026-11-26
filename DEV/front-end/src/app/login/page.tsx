@@ -1,15 +1,11 @@
 import Link from "next/link";
 import { TelaLogin } from "@design/telas/login";
 
-// Ação provisória: a autenticação real é feita no card [BACK] Cadastro e login.
-async function entrar() {
-  "use server";
-}
-
-export default function PaginaLogin() {
+export default async function PaginaLogin({ searchParams }: { searchParams: Promise<{ aviso?: string }> }) {
+  const { aviso } = await searchParams;
   return (
     <>
-      <TelaLogin entrar={entrar} mensagem="" aviso="" />
+      <TelaLogin mensagem="" aviso={aviso === "entre" ? "Entre para continuar." : ""} />
       <p className="rodape-auth">
         Ainda não tem conta? <Link href="/cadastro">Criar conta</Link>
       </p>
