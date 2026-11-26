@@ -1,0 +1,17 @@
+{
+  "extends": "../front-end/tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "react": ["../front-end/node_modules/@types/react/index.d.ts"],
+      "react/*": ["../front-end/node_modules/@types/react/*"],
+      "@design/*": ["../front-end/src/design/*"]
+    }
+  },
+  "include": [
+    "./tela-conversas.tsx",
+    "./pagina-conversas.tsx",
+    "../front-end/next-env.d.ts",
+    "../front-end/src/**/*.ts",
+    "../front-end/src/**/*.tsx"
+  ]
+}
