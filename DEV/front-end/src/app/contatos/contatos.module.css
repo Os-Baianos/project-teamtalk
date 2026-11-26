@@ -57,6 +57,11 @@
 .sugestaoLinha:focus-within { background: var(--cor-selecionada); }
 @media (hover: hover) { .sugestaoLinha:hover { background: var(--cor-selecionada); } }
 .sugestaoLinha .sugestao { flex: 1 1 auto; width: auto; min-width: 0; }
+/* O botão global fica laranja e sobe no hover: aqui só a linha (li) muda de cor, o botão fica neutro. */
+.sugestaoLinha .sugestao:not(:disabled):hover,
+.sugestaoLinha .sugestao:not(:disabled):active,
+.sugestaoLinha .sugestao:focus-visible { background: transparent; transform: none; box-shadow: none; }
+.sugestaoLinha .sugestao:focus-visible { outline-offset: -3px; }
 .verPerfil { flex: 0 0 auto; display: flex; align-items: center; padding: 0 var(--espaco-4); color: var(--cor-link); font-size: var(--fonte-sm); font-weight: var(--peso-forte); text-decoration: none; }
 .verPerfil:hover { text-decoration: underline; }
 .atalho { margin: var(--espaco-6) 0 0; padding-top: var(--espaco-5); border-top: var(--borda-fina) solid var(--cor-borda-controle); }
