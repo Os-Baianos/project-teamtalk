@@ -25,7 +25,7 @@ const normalizar = (valor: string) => valor.trim().replace(/^@/, "").toLowerCase
 function Avatar({ contato }: { contato: Contato }) {
   return contato.foto_url
     ? <img className={`${estilos.avatar} ${estilos.avatarFoto}`} src={contato.foto_url} alt="" />
-    : <Avatar contato={contato} />;
+    : <span className={estilos.avatar} aria-hidden="true">{contato.nome[0]}</span>;
 }
 
 export function TelaContatos({ carregando = false, contatos, buscar, sugerir, aoAdicionar, aoRemover }: Props) {
