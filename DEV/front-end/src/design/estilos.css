@@ -143,10 +143,10 @@ button:focus-visible {
 }
 [role="status"] {
   padding: 11px 13px;
-  border: 1px solid #b8d9ce;
+  border: 0;
   border-radius: 10px;
-  background: #f0faf6;
-  color: #155b45;
+  background: var(--cor-foco);
+  color: #fff;
   font-size: 14px;
 }
 
