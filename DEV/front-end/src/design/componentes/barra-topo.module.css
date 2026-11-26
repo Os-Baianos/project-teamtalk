@@ -31,7 +31,7 @@
   border-bottom: 3px solid transparent;
   white-space: nowrap;
 }
-.item:hover { color: var(--cor-primaria); }
+@media (hover: hover) { .item:hover { color: var(--cor-primaria); } }
 .item[aria-current="page"] { border-bottom-color: var(--cor-primaria); }
 .item:focus-visible, .marca:focus-visible {
   outline: var(--foco-espessura) solid var(--cor-foco);
@@ -48,7 +48,7 @@
   @keyframes descer { from { opacity: 0; transform: translateY(-100%); } to { opacity: 1; transform: none; } }
   .topo { animation: descer .4s cubic-bezier(.2, .7, .2, 1) both; }
   .simbolo { transition: transform .25s ease; }
-  .marca:hover .simbolo { transform: rotate(-8deg) scale(1.08); }
+  @media (hover: hover) { .marca:hover .simbolo { transform: rotate(-8deg) scale(1.08); } }
   .item { transition: color .15s ease, border-color .2s ease; }
 }
 
@@ -75,7 +75,7 @@
 .suspenso > * + *, .suspenso form + a { border-top: var(--borda-fina) solid #3a4656; }
 .suspenso > a, .suspenso > form { display: block; }
 .opcao { display: block; width: 100%; box-sizing: border-box; padding: var(--espaco-2) var(--espaco-4); color: var(--cor-topo-texto); text-decoration: none; font-size: var(--fonte-sm); }
-.opcao:hover { background: #232f3e; color: var(--cor-primaria); }
+@media (hover: hover) { .opcao:hover { background: #232f3e; color: var(--cor-primaria); } }
 .opcao:focus-visible { outline: 2px solid #fff; outline-offset: -3px; border-radius: var(--raio-sm, 6px); }
 .nav { overflow: visible; flex-wrap: wrap; }
 button.opcao { border-radius: 0; display: flex; align-items: center; width: 100%; min-height: 0; height: auto; margin: 0; background: none; border: 0; text-align: left; font: inherit; font-size: var(--fonte-sm); line-height: 1.2; cursor: pointer; }
