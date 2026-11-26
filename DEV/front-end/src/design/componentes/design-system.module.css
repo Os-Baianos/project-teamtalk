@@ -4,10 +4,10 @@
   justify-content: center;
   gap: var(--espaco-2);
   width: auto;
-  min-width: var(--toque-confortavel);
-  min-height: var(--toque-confortavel);
+  min-width: 2rem;
+  min-height: 2rem;
   margin: 0;
-  padding: var(--espaco-2) var(--espaco-5);
+  padding: 0.125rem var(--espaco-5);
   border: var(--borda-fina) solid transparent;
   border-radius: var(--raio-pill);
   background: var(--cor-primaria);
