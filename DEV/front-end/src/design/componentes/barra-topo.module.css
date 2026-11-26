@@ -102,3 +102,6 @@ button.opcao:focus-visible { border-radius: var(--raio-sm); }
   font-size: var(--fonte-sm);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
+
+/* "Conta" na primeira linha: sem a borda de 3px das abas, que empurrava o texto para cima. */
+.conta > summary { border-bottom: 0; }

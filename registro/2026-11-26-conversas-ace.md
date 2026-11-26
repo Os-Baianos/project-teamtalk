@@ -25,3 +25,4 @@ PR: ver PR "Conversas: lista e tela de conversa, Conta no canto da barra"
 ## Ajuste (menu Conta)
 - A caixa do menu Conta agora termina alinhada com a seta do "Conta" (antes passava alguns pixels para a direita).
 - Menu Conta padronizado: caixa com fundo sólido (a transparência mostrava cores diferentes ao cruzar a barra), linha do e-mail com a mesma altura das opções, texto suave e cortado com reticências se for longo.
+- "Conta" centralizada na vertical na primeira linha (o texto estava ~1,5px acima do meio por causa da borda transparente das abas).
