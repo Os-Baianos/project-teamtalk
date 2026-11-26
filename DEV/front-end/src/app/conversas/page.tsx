@@ -20,6 +20,7 @@ export default function PaginaConversas() {
   const [contatos, setContatos] = useState<Pessoa[]>([]);
   const [ativa, setAtiva] = useState<Pessoa | null>(null);
   const [mensagens, setMensagens] = useState<Mensagem[]>([]);
+  const [carregando, setCarregando] = useState(true);
   const ativaRef = useRef<Pessoa | null>(null);
   ativaRef.current = ativa;
 
@@ -34,7 +35,7 @@ export default function PaginaConversas() {
 
   useEffect(() => {
     meuIdAction().then(setMeuId);
-    carregarLista();
+    carregarLista().finally(() => setCarregando(false));
   }, [carregarLista]);
 
   const aoReceber = useCallback((m: Mensagem) => {
@@ -75,6 +76,7 @@ export default function PaginaConversas() {
 
   return (
     <TelaConversas
+      carregando={carregando}
       conversas={conversas}
       novos={novos}
       ativa={ativa}

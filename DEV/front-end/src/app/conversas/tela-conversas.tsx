@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
-import { Botao, Campo, CabecalhoMobile, LayoutMobile } from "@design/componentes";
+import { Botao, Campo, CabecalhoMobile, Carregando, LayoutMobile } from "@design/componentes";
 import estilos from "./conversas.module.css";
 
 export type Pessoa = { id: string; nome: string; arroba: string };
@@ -10,6 +10,8 @@ export type ResumoConversa = Pessoa & { ultimaTexto: string; ultimaEm: string; n
 export type BalaoDado = { id: string; minha: boolean; texto: string; criadoEm: string };
 
 type Props = {
+  /** Primeira carga da lista em andamento. */
+  carregando?: boolean;
   conversas: ResumoConversa[];
   /** Contatos que ainda não têm conversa (para começar uma). */
   novos: Pessoa[];
@@ -24,7 +26,7 @@ type Props = {
 const hora = (iso: string) =>
   new Date(iso).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: "America/Sao_Paulo" });
 
-export function TelaConversas({ conversas, novos, ativa, mensagens, aoAbrir, aoVoltar, aoEnviar }: Props) {
+export function TelaConversas({ carregando = false, conversas, novos, ativa, mensagens, aoAbrir, aoVoltar, aoEnviar }: Props) {
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState("");
@@ -77,7 +79,9 @@ export function TelaConversas({ conversas, novos, ativa, mensagens, aoAbrir, aoV
   return (
     <LayoutMobile cabecalho={<CabecalhoMobile titulo="Conversas" subtitulo="Suas mensagens" />}>
       <section aria-label="Conversas">
-        {conversas.length === 0 ? (
+        {carregando ? (
+          <div className={estilos.carregando}><Carregando /></div>
+        ) : conversas.length === 0 ? (
           <p className={estilos.vazio}>Nenhuma conversa ainda.</p>
         ) : (
           <ul className={estilos.lista}>

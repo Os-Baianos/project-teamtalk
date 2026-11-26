@@ -1,4 +1,5 @@
 import type { ComponentPropsWithRef } from "react";
+import { Carregando } from "./carregando";
 import estilos from "@design/componentes/design-system.module.css";
 
 export type PropsBotao = ComponentPropsWithRef<"button"> & {
@@ -21,7 +22,7 @@ export function Botao({
       disabled={disabled || ocupado}
       aria-busy={ocupado || undefined}
     >
-      {ocupado && <span aria-hidden="true">…</span>}
+      {ocupado && <Carregando tamanho="1.1em" texto="" cor="herdar" />}
       {children}
       {ocupado && <span className={estilos.somenteLeitor}>Em andamento.</span>}
     </button>
