@@ -18,4 +18,3 @@ Esta pasta contém a implementação isolada da tela da issue #117, pronta para 
 - A action de envio persiste mensagens de texto. Compartilhamento de PDF não está disponível neste contrato.
 
 Nenhum token, ícone ou componente global foi criado ou alterado.
-

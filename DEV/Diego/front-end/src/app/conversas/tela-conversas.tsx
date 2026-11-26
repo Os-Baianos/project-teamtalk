@@ -242,4 +242,3 @@ export function TelaConversas(props: Props) {
     </div>
   );
 }
-

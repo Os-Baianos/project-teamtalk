@@ -315,4 +315,3 @@
   .balao { animation: aparecer 160ms ease-out both; }
   @keyframes aparecer { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 }
-
