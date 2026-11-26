@@ -1,4 +1,4 @@
-.topo { background: var(--cor-topo); color: var(--cor-topo-texto); }
+.topo { position: relative; z-index: 30; background: var(--cor-topo); color: var(--cor-topo-texto); }
 .linha {
   display: flex;
   align-items: center;
