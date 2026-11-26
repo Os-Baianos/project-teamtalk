@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent, KeyboardEvent } from "react";
 import { Aviso } from "@design/componentes/aviso";
@@ -262,11 +263,13 @@ export function TelaConversas({
                   <Icone nome="menu" width={20} height={20} />
                 </button>
               )}
-              <Avatar nome={ativa.nome} fotoUrl={ativa.fotoUrl} />
-              <span className={estilos.chatNome}>
-                <strong>{ativa.nome}</strong>
-                <span>@{ativa.arroba}</span>
-              </span>
+              <Link className={estilos.chatPerfil} href={`/perfil/${ativa.arroba}`} aria-label={`Ver o perfil de ${ativa.nome}`}>
+                <Avatar nome={ativa.nome} fotoUrl={ativa.fotoUrl} />
+                <span className={estilos.chatNome}>
+                  <strong>{ativa.nome}</strong>
+                  <span>@{ativa.arroba}</span>
+                </span>
+              </Link>
             </header>
 
             <div className={estilos.historico} aria-live="polite">
