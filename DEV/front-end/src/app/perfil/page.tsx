@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { CabecalhoMobile, LayoutMobile } from "@design/componentes";
 import { criarClienteServidor } from "../../supabase/servidor";
+import { EditarNome } from "./editar-nome";
 import { FotoPerfil } from "./foto-perfil";
 import estilos from "./perfil.module.css";
 
@@ -31,7 +32,7 @@ export default async function PaginaPerfil() {
         <p className={estilos.arroba}>@{perfil?.arroba}</p>
       </div>
       <dl className={estilos.lista}>
-        <div className={estilos.linha}><dt>Nome</dt><dd>{nome}</dd></div>
+        <div className={estilos.linha}><dt>Nome</dt><EditarNome nome={nome} /></div>
         <div className={estilos.linha}><dt>Usuário (@)</dt><dd>@{perfil?.arroba}</dd></div>
         <div className={estilos.linha}><dt>E-mail</dt><dd>{auth.user.email}</dd></div>
         <div className={estilos.linha}><dt>Conta criada em</dt><dd>{desde}</dd></div>
