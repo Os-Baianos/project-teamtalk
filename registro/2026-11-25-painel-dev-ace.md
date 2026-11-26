@@ -37,3 +37,6 @@ PR: ver PR "Contas dev e Painel dev"
 - Os painéis de editar, trocar senha e confirmar exclusão aparecem com animação suave; mensagens de erro e de sucesso também.
 - Ao excluir, o cartão esmaece e sai deslizando antes de sumir da lista.
 - Tudo respeita "reduzir movimento" do sistema.
+
+## Etiqueta "dev"
+- A etiqueta "dev" usava o Badge azul em pílula (fora do visual dos botões e cartões). Agora é uma etiqueta sóbria, com o mesmo contorno e cantos dos botões do site. O componente `Badge` não foi alterado.

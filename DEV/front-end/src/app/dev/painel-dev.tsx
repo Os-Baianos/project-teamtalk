@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
-import { Badge, Botao, Campo, CabecalhoMobile, LayoutMobile } from "@design/componentes";
+import { Botao, Campo, CabecalhoMobile, LayoutMobile } from "@design/componentes";
 import { editarUsuarioAction, excluirUsuarioAction, listarUsuariosAction, trocarSenhaAction } from "../../dev/acoes";
 import type { UsuarioDev } from "../../dev/acoes";
 import estilos from "./dev.module.css";
@@ -103,7 +103,7 @@ export function PainelDev({ inicial, meuId }: { inicial: UsuarioDev[]; meuId: st
             ) : (
               <>
                 <div className={estilos.dados}>
-                  <strong>{u.nome} {u.papel === "dev" && <Badge tom="informacao">dev</Badge>}</strong>
+                  <strong>{u.nome} {u.papel === "dev" && <span className={estilos.papel}>dev</span>}</strong>
                   <span>@{u.arroba}</span>
                   <span>{u.email}</span>
                   <span>Criada em {data(u.criado_em)}</span>
