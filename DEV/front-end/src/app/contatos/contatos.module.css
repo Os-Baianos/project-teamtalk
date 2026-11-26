@@ -1,6 +1,6 @@
 .busca { display: grid; gap: var(--espaco-3); }
 .busca form { display: grid; gap: var(--espaco-3); }
-.secao { margin-top: var(--espaco-6); }
+.secao { margin-top: var(--espaco-6); padding-top: var(--espaco-5); border-top: var(--borda-fina) solid var(--cor-borda-controle); }
 .secao h2 { font-size: var(--fonte-lg); margin: 0 0 var(--espaco-3); }
 .lista { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--espaco-3); }
 .cartao {
@@ -35,7 +35,7 @@
 .sugestao {
   display: flex; align-items: center; gap: var(--espaco-3); width: 100%;
   padding: var(--espaco-3) var(--espaco-4);
-  border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer;
+  min-height: 0; margin: 0; border: 0; border-radius: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer;
 }
 .sugestao:hover, .sugestao:focus-visible { background: var(--cor-selecionada); }
 .dados { flex: 1 1 auto; min-width: 0; }

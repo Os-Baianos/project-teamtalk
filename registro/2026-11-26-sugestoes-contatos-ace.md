@@ -13,3 +13,9 @@ Data: 2026-11-26
 ## Ajuste
 - Ao tocar em Buscar com um @ incompleto, a tela mostra as pessoas parecidas (as mesmas sugestões) em vez de "Nenhum usuário encontrado". O erro só aparece quando não há nenhuma parecida.
 - Itens da lista de sugestões com o mesmo espaçamento em cima e embaixo, foto e texto alinhados no centro.
+
+## Busca automática
+- Como a busca já acontece enquanto digita, o botão Buscar saiu (Enter continua funcionando). O campo agora diz "Buscar por nome ou @".
+- Corrigido o espaço extra acima da primeira sugestão (vinha da margem padrão dos botões).
+- Linha de divisão entre a busca e "Meus contatos".
+- Contas de teste que começam com "ma": mariasouza, marcoslima, mateusrocha, manuelacosta, marinaalves, matheusribeiro, maiarapereira (e-mail <arroba>@teamtalk.com).

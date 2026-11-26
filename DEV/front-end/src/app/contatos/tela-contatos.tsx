@@ -30,7 +30,6 @@ function Avatar({ contato }: { contato: Contato }) {
 
 export function TelaContatos({ carregando = false, contatos, buscar, sugerir, aoAdicionar, aoRemover }: Props) {
   const [termo, setTermo] = useState("");
-  const [buscando, setBuscando] = useState(false);
   const [resultado, setResultado] = useState<Contato | null>(null);
   const [mensagem, setMensagem] = useState("");
   const [sugestoes, setSugestoes] = useState<Contato[]>([]);
@@ -61,14 +60,12 @@ export function TelaContatos({ carregando = false, contatos, buscar, sugerir, ao
     evento.preventDefault();
     const arroba = normalizar(termo);
     if (!arroba) return;
-    setBuscando(true);
     setMensagem("");
     setResultado(null);
     const encontrado = await buscar(arroba);
-    if (encontrado) { setBuscando(false); setResultado(encontrado); return; }
+    if (encontrado) { setResultado(encontrado); return; }
     // Sem @ exatamente igual: mostra as pessoas parecidas em vez de um erro.
     const parecidos = sugerir ? (await sugerir(arroba)).filter((c) => !contatos.some((x) => x.id === c.id)) : [];
-    setBuscando(false);
     if (parecidos.length) setSugestoes(parecidos);
     else setMensagem(`Nenhum usuário encontrado com @${arroba}.`);
   }
@@ -76,15 +73,15 @@ export function TelaContatos({ carregando = false, contatos, buscar, sugerir, ao
   const jaAdicionado = resultado ? contatos.some((c) => c.id === resultado.id) : false;
 
   return (
-    <LayoutMobile cabecalho={<CabecalhoMobile titulo="Contatos" subtitulo="Busque pessoas pelo @" />}>
+    <LayoutMobile cabecalho={<CabecalhoMobile titulo="Contatos" subtitulo="Busque pessoas pelo nome ou @" />}>
       <div className={estilos.busca}>
         <form onSubmit={procurar} role="search">
           <Campo
             id="busca-arroba"
-            rotulo="Buscar por @"
+            rotulo="Buscar por nome ou @"
             value={termo}
             onChange={(e) => { setTermo(e.target.value); setResultado(null); setMensagem(""); }}
-            placeholder="@usuario"
+            placeholder="Nome ou @usuario"
             autoCapitalize="none"
             autoComplete="off"
             spellCheck={false}
@@ -107,7 +104,6 @@ export function TelaContatos({ carregando = false, contatos, buscar, sugerir, ao
               ))}
             </ul>
           )}
-          <Botao type="submit" expandido ocupado={buscando}>Buscar</Botao>
         </form>
 
         {resultado && (
