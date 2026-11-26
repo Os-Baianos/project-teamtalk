@@ -1,6 +1,6 @@
 import type { SVGProps } from "react";
 
-export type NomeIcone = "inbox" | "equipes" | "arquivos" | "menu" | "nova-conversa" | "busca" | "erro" | "lista-vazia" | "voltar" | "anexar-pdf" | "enviar" | "arquivo-pdf" | "enviada" | "lida" | "aguardando" | "falha" | "informacao" | "fechar";
+export type NomeIcone = "inbox" | "equipes" | "arquivos" | "menu" | "nova-conversa" | "busca" | "erro" | "lista-vazia" | "simbolo" | "voltar" | "anexar-pdf" | "enviar" | "arquivo-pdf" | "enviada" | "lida" | "aguardando" | "falha" | "informacao" | "fechar";
 
 /** Geometrias de Gilson; a cor vem exclusivamente dos tokens do TeamTalk. */
 export function Icone({ nome, ...props }: SVGProps<SVGSVGElement> & { nome: NomeIcone }) {
@@ -30,6 +30,7 @@ export function Icone({ nome, ...props }: SVGProps<SVGSVGElement> & { nome: Nome
   <circle cx="19.2" cy="23.1" r="2.35" fill="currentColor"/>
   <circle cx="29.7" cy="23.1" r="2.35" fill="currentColor"/>
   <circle cx="40.2" cy="23.1" r="2.35" fill="currentColor"/></svg>;
+    case "simbolo": return <svg viewBox="0 0 64 64" fill="none" {...comum}><path d="M13 3h38a10 10 0 0 1 10 10v27a10 10 0 0 1-10 10H31L14 62a2 2 0 0 1-3-1.7V50A10 10 0 0 1 3 40V13A10 10 0 0 1 13 3Z" fill="var(--cor-primaria)"/><path d="M15 18h34v7H36v20h-8V25H15Z" fill="var(--cor-superficie)"/></svg>;
     case "voltar": return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" {...comum}><path d="M19.2 12H4.8"/><path d="M11.4 5.4 4.8 12l6.6 6.6"/></svg>;
     case "anexar-pdf": return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.0" strokeLinecap="round" strokeLinejoin="round" {...comum}><path d="M12 5v14M5 12h14"/></svg>;
     case "enviar": return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.55" strokeLinecap="round" strokeLinejoin="round" {...comum}><path d="M21 3.1 13.9 20.4a.55.55 0 0 1-1.02-.03l-3.05-7.2-7.2-3.05a.55.55 0 0 1 .03-1.02L20.2 2.1A.62.62 0 0 1 21 3.1Z"/><path d="m9.85 13.15 6.2-6.2"/></svg>;

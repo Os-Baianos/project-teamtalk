@@ -282,7 +282,7 @@ export function TelaConversas({
                 <Icone nome="menu" width={20} height={20} />
               </button>
             )}
-            <Icone nome="lista-vazia" width={72} height={60} />
+            <Icone nome="simbolo" width={72} height={72} />
             <p>Escolha uma conversa para começar</p>
           </div>
         ) : (
