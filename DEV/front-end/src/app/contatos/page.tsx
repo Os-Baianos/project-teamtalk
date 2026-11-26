@@ -13,10 +13,9 @@ import {
 
 export default function PaginaContatos() {
   const [contatos, setContatos] = useState<Contato[]>([]);
-  const [carregando, setCarregando] = useState(true);
 
   useEffect(() => {
-    listarContatosAction().then(setContatos).finally(() => setCarregando(false));
+    listarContatosAction().then(setContatos);
   }, []);
 
   async function adicionar(c: Contato) {
@@ -31,7 +30,6 @@ export default function PaginaContatos() {
 
   return (
     <TelaContatos
-      carregando={carregando}
       contatos={contatos}
       buscar={buscarPerfilAction}
       sugerir={sugerirPerfisAction}
