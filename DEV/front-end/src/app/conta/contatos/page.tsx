@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { TelaContaContatos } from "./tela-conta-contatos";
-import { carregarContaContatosAction } from "../../../contatos/acoes";
+import { lerContaContatos } from "../../../dados/leituras";
 import type { ContatoDado, Solicitacoes } from "../../../contatos/acoes";
 import { useContatosAoVivo } from "../../../contatos/use-contatos-ao-vivo";
 import { lerCache, gravarCache } from "../../../cache/cache-local";
@@ -16,7 +16,7 @@ export default function PaginaContaContatos() {
   const [carregando, setCarregando] = useState(true);
 
   const carregar = useCallback(async () => {
-    const novos = await carregarContaContatosAction();
+    const novos = await lerContaContatos();
     gravarCache("conta-contatos", novos);
     setDados(novos);
     setCarregando(false);

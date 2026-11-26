@@ -29,30 +29,7 @@ export async function sugerirPerfisAction(termo: string): Promise<ContatoDado[]>
   return ((data ?? []) as Linha[]).map((l) => comFoto(supabase, l));
 }
 
-/** Contatos aceitos. */
-export async function listarContatosAction(): Promise<ContatoDado[]> {
-  const supabase = await criarClienteServidor();
-  const { data } = await supabase.rpc("listar_contatos");
-  return ((data ?? []) as Linha[]).map((l) => comFoto(supabase, l));
-}
-
 export type Solicitacoes = { recebidas: ContatoDado[]; enviadas: ContatoDado[] };
-
-export async function listarSolicitacoesAction(): Promise<Solicitacoes> {
-  const supabase = await criarClienteServidor();
-  const { data } = await supabase.rpc("listar_solicitacoes");
-  const linhas = (data ?? []) as (Linha & { direcao: "recebida" | "enviada" })[];
-  return {
-    recebidas: linhas.filter((l) => l.direcao === "recebida").map((l) => comFoto(supabase, l)),
-    enviadas: linhas.filter((l) => l.direcao === "enviada").map((l) => comFoto(supabase, l)),
-  };
-}
-
-export async function contarSolicitacoesAction(): Promise<number> {
-  const supabase = await criarClienteServidor();
-  const { data } = await supabase.rpc("contar_solicitacoes_recebidas");
-  return typeof data === "number" ? data : 0;
-}
 
 /** Resultado de uma ação de contato: `relacao` é como ficou a relação depois dela. */
 export type ResultadoContato = { ok: boolean; mensagem?: string; relacao?: Relacao };
@@ -84,8 +61,3 @@ export async function recusarSolicitacaoAction(id: string) { return acao("recusa
 export async function cancelarSolicitacaoAction(id: string) { return acao("cancelar_solicitacao", { para: id }, "nenhuma"); }
 export async function removerContatoAction(id: string) { return acao("remover_contato", { contato: id }, "nenhuma"); }
 
-/** Solicitações e contatos juntos, numa chamada só (tela Meus contatos e número no menu). */
-export async function carregarContaContatosAction(): Promise<{ solicitacoes: Solicitacoes; contatos: ContatoDado[] }> {
-  const [solicitacoes, contatos] = await Promise.all([listarSolicitacoesAction(), listarContatosAction()]);
-  return { solicitacoes, contatos };
-}

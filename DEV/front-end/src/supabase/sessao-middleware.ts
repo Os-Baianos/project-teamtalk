@@ -19,6 +19,8 @@ export async function atualizarSessao(requisicao: NextRequest) {
     },
   });
 
-  const { data } = await supabase.auth.getUser();
-  return { resposta, logado: Boolean(data.user) };
+  // getClaims confere a assinatura do login na própria função (sem ir ao Supabase) quando o projeto usa chaves
+  // assimétricas; com a chave antiga ele cai no getUser sozinho. Evita um salto de rede em cada requisição.
+  const { data } = await supabase.auth.getClaims();
+  return { resposta, logado: Boolean(data?.claims) };
 }
