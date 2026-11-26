@@ -2,27 +2,41 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { TelaContaContatos } from "./tela-conta-contatos";
-import { listarContatosAction, listarSolicitacoesAction } from "../../../contatos/acoes";
+import { carregarContaContatosAction } from "../../../contatos/acoes";
 import type { ContatoDado, Solicitacoes } from "../../../contatos/acoes";
 import { useContatosAoVivo } from "../../../contatos/use-contatos-ao-vivo";
-import { meuIdAction } from "../../../mensagens/acoes";
+import { lerCache, gravarCache } from "../../../cache/cache-local";
+import { meuIdLocal } from "../../../supabase/meu-id";
+
+type Dados = { solicitacoes: Solicitacoes; contatos: ContatoDado[] };
 
 export default function PaginaContaContatos() {
   const [meuId, setMeuId] = useState<string | null>(null);
-  const [solicitacoes, setSolicitacoes] = useState<Solicitacoes>({ recebidas: [], enviadas: [] });
-  const [contatos, setContatos] = useState<ContatoDado[]>([]);
+  const [dados, setDados] = useState<Dados>(() => ({ solicitacoes: { recebidas: [], enviadas: [] }, contatos: [] }));
+  const [carregando, setCarregando] = useState(true);
 
   const carregar = useCallback(async () => {
-    const [s, c] = await Promise.all([listarSolicitacoesAction(), listarContatosAction()]);
-    setSolicitacoes(s);
-    setContatos(c);
+    const novos = await carregarContaContatosAction();
+    gravarCache("conta-contatos", novos);
+    setDados(novos);
+    setCarregando(false);
   }, []);
 
   useEffect(() => {
-    meuIdAction().then(setMeuId);
+    meuIdLocal().then(setMeuId);
+    const guardado = lerCache<Dados>("conta-contatos");
+    if (guardado) { setDados(guardado); setCarregando(false); }
     carregar();
   }, [carregar]);
   useContatosAoVivo(meuId, carregar);
 
-  return <TelaContaContatos recebidas={solicitacoes.recebidas} enviadas={solicitacoes.enviadas} contatos={contatos} aoMudar={carregar} />;
+  return (
+    <TelaContaContatos
+      carregando={carregando}
+      recebidas={dados.solicitacoes.recebidas}
+      enviadas={dados.solicitacoes.enviadas}
+      contatos={dados.contatos}
+      aoMudar={carregar}
+    />
+  );
 }
