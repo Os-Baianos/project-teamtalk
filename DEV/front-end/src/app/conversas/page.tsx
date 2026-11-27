@@ -15,7 +15,8 @@ import { lerInicio, lerMensagens, marcarLidas, marcarRecebidas } from "../../dad
 import type { Mensagem } from "../../mensagens/acoes";
 import { useMensagensAoVivo } from "../../mensagens/use-mensagens-ao-vivo";
 import { criarClienteNavegador } from "../../supabase/navegador";
-import { ehImagem, nomeSeguro, resumoMensagem, validarArquivo } from "../../mensagens/anexos";
+import { anexoExpirado, ehImagem, ehVideo, nomeSeguro, resumoMensagem, validarArquivo } from "../../mensagens/anexos";
+import { limparAnexosVencidos } from "../../mensagens/limpar-anexos";
 import type { Anexo } from "../../mensagens/anexos";
 
 type Local = Mensagem & { falhou?: boolean };
@@ -40,7 +41,7 @@ export default function PaginaConversas() {
 
   useEffect(() => {
     const faltam = mensagens
-      .filter((m) => m.anexo_caminho && !m.apagada_em && ehImagem(m.anexo_tipo) && !m.anexo_caminho.startsWith("tmp/") && !pedidas.current.has(m.anexo_caminho))
+      .filter((m) => m.anexo_caminho && !m.apagada_em && (ehImagem(m.anexo_tipo) || ehVideo(m.anexo_tipo)) && !anexoExpirado(m.criado_em, m.anexo_caminho) && !m.anexo_caminho.startsWith("tmp/") && !pedidas.current.has(m.anexo_caminho))
       .map((m) => m.anexo_caminho as string);
     if (faltam.length === 0) return;
     faltam.forEach((c) => pedidas.current.add(c));
@@ -73,6 +74,9 @@ export default function PaginaConversas() {
       setErroLista(true);
     }
   }, [aplicarInicio]);
+
+  // Apaga do servidor os meus arquivos com mais de 7 dias (o servidor também faz isso uma vez por dia).
+  useEffect(() => { if (meuId) void limparAnexosVencidos(meuId); }, [meuId]);
 
   useEffect(() => {
     meuIdLocal().then(setMeuId);
@@ -183,7 +187,7 @@ export default function PaginaConversas() {
     };
     if (arquivo) {
       pendentes.current.set(tmpId, { arquivo });
-      if (ehImagem(arquivo.type)) setUrls((atual) => ({ ...atual, [`tmp/${tmpId}`]: URL.createObjectURL(arquivo) }));
+      if (ehImagem(arquivo.type) || ehVideo(arquivo.type)) setUrls((atual) => ({ ...atual, [`tmp/${tmpId}`]: URL.createObjectURL(arquivo) }));
     }
     setMensagens((atual) => [...atual, provisoria]);
     const r = await subirEEnviar(tmpId, ativa.id, texto, respondeA, arquivo);
@@ -212,7 +216,7 @@ export default function PaginaConversas() {
   /** Baixa o arquivo com o nome original (link temporário só para este clique); imagens podem só abrir. */
   async function baixar(id: string, visualizar = false) {
     const m = mensagens.find((x) => x.id === id);
-    if (!m?.anexo_caminho || !m.anexo_nome) return false;
+    if (!m?.anexo_caminho || !m.anexo_nome || anexoExpirado(m.criado_em, m.anexo_caminho)) return false;
     const aberta = urls[m.anexo_caminho];
     if (visualizar && aberta) { window.open(aberta, "_blank", "noopener"); return true; }
     const { data } = await criarClienteNavegador().storage.from("anexos").createSignedUrl(m.anexo_caminho, 60, { download: m.anexo_nome });
@@ -257,8 +261,12 @@ export default function PaginaConversas() {
       id: m.id, minha, texto: m.texto, criadoEm: m.criado_em, resposta,
       recebidaEm: m.recebida_em, lidaEm: m.lida_em, editadaEm: m.editada_em,
       apagada: !!m.apagada_em, status,
-      anexo: m.anexo_caminho && m.anexo_nome && !m.apagada_em
-        ? { nome: m.anexo_nome, tipo: m.anexo_tipo ?? "", tamanho: m.anexo_tamanho ?? 0, url: urls[m.anexo_caminho] ?? null }
+      anexo: m.anexo_nome && !m.apagada_em
+        ? {
+            nome: m.anexo_nome, tipo: m.anexo_tipo ?? "", tamanho: m.anexo_tamanho ?? 0,
+            expirado: anexoExpirado(m.criado_em, m.anexo_caminho),
+            url: m.anexo_caminho ? urls[m.anexo_caminho] ?? null : null,
+          }
         : null,
     };
   });

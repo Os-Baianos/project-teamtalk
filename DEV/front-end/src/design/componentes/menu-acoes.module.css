@@ -18,6 +18,10 @@
 .painel button.item:focus-visible { outline: 2px solid #fff; outline-offset: -3px; }
 .painel button.perigo { color: #ff8f8f; }
 @media (hover: hover) { .painel button.perigo:hover { color: #ff8f8f; } }
+/* Menu no rodapé (ex.: botão "+" do chat): abre para cima, alinhado à esquerda do botão. */
+.painel.cima { top: auto; bottom: 100%; right: auto; left: 0; margin-top: 0; margin-bottom: var(--espaco-1); }
+.painel button.item:has(.icone) { display: flex; align-items: center; gap: var(--espaco-3); }
+.icone { display: grid; place-items: center; color: var(--cor-primaria); }
 .confirmar { display: grid; gap: var(--espaco-2); padding: var(--espaco-3); }
 .confirmar p { margin: 0; font-size: var(--fonte-sm); color: var(--cor-topo-texto-suave); }
 .erro { margin: 0; padding: 0 var(--espaco-3) var(--espaco-3); color: #ff8f8f; font-size: var(--fonte-sm); }
@@ -25,4 +29,5 @@
 @media (prefers-reduced-motion: no-preference) {
   @keyframes abrir { from { opacity: 0; transform: translateY(-4px) scale(.98); } to { opacity: 1; transform: none; } }
   .painel { animation: abrir .15s ease backwards; transform-origin: top right; }
+  .painel.cima { transform-origin: bottom left; }
 }
