@@ -11,7 +11,7 @@ self.addEventListener("push", (e) => {
   e.waitUntil((async () => {
     // Com o app aberto e à vista, o tempo real já mostra a mensagem: não precisa avisar de novo.
     const janelas = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
-    if (janelas.some((j) => j.visibilityState === "visible")) return;
+    if (!d.forcar && janelas.some((j) => j.visibilityState === "visible")) return;
     await self.registration.showNotification(d.titulo || "TeamTalk", {
       body: d.corpo || "",
       icon: d.icone || "/icones/icone-192.png",

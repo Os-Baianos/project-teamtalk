@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Botao } from "@design/componentes";
 import { criarClienteNavegador } from "../../supabase/navegador";
 import { chaveParaBytes, guardarEndpoint, suportaPush } from "../../push/cliente";
-import { obterChavePublicaAction, removerAssinaturaAction, salvarAssinaturaAction } from "../../push/acoes";
+import { enviarPushTesteAction, obterChavePublicaAction, removerAssinaturaAction, salvarAssinaturaAction } from "../../push/acoes";
 import type { AssinaturaPush } from "../../push/acoes";
 import estilos from "./configuracoes.module.css";
 
@@ -15,6 +15,7 @@ export function Notificacoes() {
   const [estado, setEstado] = useState<Estado>("carregando");
   const [ocupado, setOcupado] = useState(false);
   const [erro, setErro] = useState("");
+  const [resultado, setResultado] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -54,6 +55,15 @@ export function Notificacoes() {
     }
   }
 
+  async function testar() {
+    setOcupado(true);
+    setErro("");
+    setResultado("");
+    const r = await enviarPushTesteAction();
+    setOcupado(false);
+    if (r.ok) setResultado(r.mensagem); else setErro(r.mensagem);
+  }
+
   async function desativar() {
     setOcupado(true);
     setErro("");
@@ -84,6 +94,8 @@ export function Notificacoes() {
     <>
       <dd>{texto}</dd>
       {erro && <dd className={estilos.dica} role="alert">{erro}</dd>}
+      {resultado && <dd className={estilos.dica} role="status">{resultado}</dd>}
+      {estado === "ligado" && <dd><Botao disabled={ocupado} onClick={testar}>Enviar teste</Botao></dd>}
       {estado === "desligado" && <div className={estilos.botaoCanto}><Botao ocupado={ocupado} onClick={ativar}>Ativar</Botao></div>}
       {estado === "ligado" && <div className={estilos.botaoCanto}><Botao ocupado={ocupado} onClick={desativar}>Desativar</Botao></div>}
     </>

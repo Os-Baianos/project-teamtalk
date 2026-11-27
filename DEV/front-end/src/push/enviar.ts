@@ -10,7 +10,8 @@ export async function enviarPushDaMensagem(supabase: SupabaseClient, meuId: stri
   const privada = process.env.VAPID_PRIVATE_KEY;
   if (!publica || !privada) return;
   try {
-    const { data: destinos } = await supabase.rpc("push_destinos", { dest: destinoId });
+    const { data: destinos, error } = await supabase.rpc("push_destinos", { dest: destinoId });
+    if (error) console.error("push: destinos", error.message);
     if (!destinos?.length) return;
     const { data: eu } = await supabase.from("perfis").select("nome, arroba, foto_path").eq("id", meuId).single();
     if (!eu) return;
@@ -28,8 +29,9 @@ export async function enviarPushDaMensagem(supabase: SupabaseClient, meuId: stri
         await webpush.sendNotification({ endpoint: d.endpoint, keys: { p256dh: d.p256dh, auth: d.auth } }, carga, { TTL: 60 * 60 * 24, urgency: "high" });
       } catch (e) {
         const status = (e as { statusCode?: number }).statusCode;
+        console.error("push: falha ao enviar", status, (e as { body?: string }).body ?? "");
         if (status === 404 || status === 410) await supabase.rpc("push_remover_morto", { dest: destinoId, ponto: d.endpoint });
       }
     }));
-  } catch { /* sem notificação desta vez */ }
+  } catch (e) { console.error("push: erro", e); /* sem notificação desta vez */ }
 }
