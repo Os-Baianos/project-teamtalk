@@ -3,7 +3,7 @@
 import { after } from "next/server";
 import { criarClienteServidor } from "../supabase/servidor";
 import { enviarPushDaMensagem } from "../push/enviar";
-import { ehImagem, LIMITE_ANEXO, TIPOS_ANEXO } from "./anexos";
+import { ehImagem, ehVideo, LIMITE_ANEXO, TIPOS_ANEXO } from "./anexos";
 import type { Anexo } from "./anexos";
 
 export type Mensagem = {
@@ -60,7 +60,7 @@ export async function enviarMensagemAction(
     .single();
   if (error || !data) return { ok: false, mensagem: "Não foi possível enviar agora. Tente novamente." };
   // Notificação no celular de quem recebe, sem atrasar a resposta de quem enviou.
-  after(() => enviarPushDaMensagem(supabase, meuId, contatoId, anexo && !limpo ? (ehImagem(anexo.tipo) ? "Enviou uma foto" : `Enviou um arquivo: ${anexo.nome}`) : limpo));
+  after(() => enviarPushDaMensagem(supabase, meuId, contatoId, anexo && !limpo ? (ehImagem(anexo.tipo) ? "Enviou uma foto" : ehVideo(anexo.tipo) ? "Enviou um vídeo" : `Enviou um arquivo: ${anexo.nome}`) : limpo));
   return { ok: true, mensagem: data };
 }
 

@@ -70,6 +70,7 @@
 /* Anexos: imagem, arquivo e miniatura no campo de envio. Mesmo padrão da citação (sem o estilo global de botão). */
 .raiz .anexoImagem { display: block; width: 18rem; max-width: 100%; min-height: 0; margin: 0 0 4px; padding: 0; border: 0; border-radius: 6px; background: rgb(0 0 0 / 6%); overflow: hidden; cursor: pointer; transform: none; box-shadow: none; }
 .raiz .anexoImagem:hover, .raiz .anexoImagem:active { background: rgb(0 0 0 / 6%); transform: none; box-shadow: none; }
+.anexoImagem video { display: block; width: 100%; max-height: 20rem; background: #000; }
 .anexoImagem img { display: block; width: 100%; max-height: 20rem; object-fit: cover; }
 .anexoCarregando { display: block; width: 100%; aspect-ratio: 4 / 3; background: rgb(0 0 0 / 6%); }
 .raiz .anexoArquivo { display: flex; align-items: center; gap: var(--espaco-2); width: 100%; min-width: min(14rem, 100%); min-height: 0; margin: 0 0 4px; padding: 8px; border: 0; border-radius: 6px; background: rgb(0 0 0 / 6%); color: var(--cor-texto); font: inherit; text-align: left; cursor: pointer; transform: none; box-shadow: none; }
@@ -77,13 +78,16 @@
 .anexoArquivo > span { min-width: 0; display: grid; gap: 1px; }
 .anexoArquivo strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--fonte-sm); }
 .anexoArquivo em { font-style: normal; font-size: var(--fonte-xs); color: var(--cor-secundaria); }
+.anexoExpirado { display: flex; align-items: center; gap: var(--espaco-2); width: 100%; min-width: min(14rem, 100%); margin: 0 0 4px; padding: 8px; border-radius: 6px; background: rgb(0 0 0 / 6%); color: var(--cor-secundaria); }
+.anexoExpirado > span { min-width: 0; display: grid; gap: 1px; }
+.anexoExpirado strong { font-size: var(--fonte-sm); }
+.anexoExpirado em { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-style: normal; font-size: var(--fonte-xs); }
 .miniatura { flex: none; width: 2.5rem; height: 2.5rem; border-radius: 6px; object-fit: cover; }
 .balao:has(.citacao) { min-width: min(14rem, 78%); }
 .citacaoBarra { flex: 1; min-width: 0; display: grid; gap: 1px; padding: 2px 8px; font-size: var(--fonte-sm); }
 .citacaoBarra strong { color: var(--cor-primaria); font-size: var(--fonte-xs); }
 .citacaoBarra span { color: var(--cor-secundaria); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .destaque .balao { box-shadow: 0 0 0 2px var(--cor-primaria), 0 1px 1px rgb(0 0 0 / 12%); transition: box-shadow .2s ease; }
-.raiz .anexar { width: 2.75rem; height: 2.75rem; }
 .raiz .icone:hover { background: var(--cor-fundo); color: var(--cor-texto); }
 
 .historico { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; padding: var(--espaco-4) clamp(var(--espaco-3), 6%, 4rem); }

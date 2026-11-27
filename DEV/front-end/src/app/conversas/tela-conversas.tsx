@@ -4,10 +4,11 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ClipboardEvent, FormEvent, KeyboardEvent } from "react";
 import { Aviso } from "@design/componentes/aviso";
+import { MenuAcoes } from "@design/componentes/menu-acoes";
 import { Carregando } from "@design/componentes/carregando";
 import { Icone } from "@design/icones/icone";
 import { Avatar } from "../../contatos/avatar";
-import { ehImagem, formatarTamanho, resumoMensagem, TIPOS_ANEXO, validarArquivo } from "../../mensagens/anexos";
+import { ehImagem, ehVideo, formatarTamanho, resumoMensagem, TIPOS_DOCUMENTO, TIPOS_MIDIA, validarArquivo } from "../../mensagens/anexos";
 import estilos from "./conversas.module.css";
 
 export type Pessoa = { id: string; nome: string; arroba: string; fotoUrl?: string | null };
@@ -32,7 +33,7 @@ export type BalaoDado = {
   apagada: boolean;
   status: StatusEnvio;
   /** Arquivo anexado (url só existe para imagens, depois de carregar). */
-  anexo: { nome: string; tipo: string; tamanho: number; url: string | null } | null;
+  anexo: { nome: string; tipo: string; tamanho: number; url: string | null; expirado: boolean } | null;
 };
 
 type Props = {
@@ -122,9 +123,12 @@ export function TelaConversas({
   const [aviso, setAviso] = useState("");
   const historico = useRef<HTMLDivElement>(null);
   const campo = useRef<HTMLTextAreaElement>(null);
-  const seletor = useRef<HTMLInputElement>(null);
+  const entradaDocumento = useRef<HTMLInputElement>(null);
+  const entradaMidia = useRef<HTMLInputElement>(null);
+  const entradaCamera = useRef<HTMLInputElement>(null);
   const [arquivo, setArquivo] = useState<File | null>(null);
   const previa = useMemo(() => (arquivo && ehImagem(arquivo.type) ? URL.createObjectURL(arquivo) : null), [arquivo]);
+  const abrirEntrada = (ref: React.RefObject<HTMLInputElement | null>) => async () => { ref.current?.click(); return null; };
   useEffect(() => () => { if (previa) URL.revokeObjectURL(previa); }, [previa]);
 
   function escolher(f: File | null | undefined) {
@@ -399,7 +403,7 @@ export function TelaConversas({
                                 <li><button type="button" role="menuitem" onClick={() => comecarResposta(it.m)}>Responder</button></li>
                                 <li><button type="button" role="menuitem" onClick={() => { setMenu(null); setDados(it.m); }}>Dados da mensagem</button></li>
                                 {it.m.texto.trim() && <li><button type="button" role="menuitem" onClick={() => copiar(it.m)}>Copiar</button></li>}
-                                {it.m.anexo && <li><button type="button" role="menuitem" onClick={() => { setMenu(null); void aoBaixar(it.m.id).then((ok) => { if (!ok) setAviso("Não foi possível baixar"); }); }}>Baixar</button></li>}
+                                {it.m.anexo && !it.m.anexo.expirado && <li><button type="button" role="menuitem" onClick={() => { setMenu(null); void aoBaixar(it.m.id).then((ok) => { if (!ok) setAviso("Não foi possível baixar"); }); }}>Baixar</button></li>}
                                 {it.m.minha && <li><button type="button" role="menuitem" onClick={() => comecarEdicao(it.m)}>Editar</button></li>}
                                 {it.m.minha && <li><button type="button" role="menuitem" className={estilos.perigo} onClick={() => apagar(it.m)}>Apagar</button></li>}
                               </ul>
@@ -412,13 +416,22 @@ export function TelaConversas({
                             <span>{it.m.resposta.texto}</span>
                           </button>
                         )}
-                        {it.m.anexo && (it.m.anexo.tipo && ehImagem(it.m.anexo.tipo) ? (
+                        {it.m.anexo && (it.m.anexo.expirado ? (
+                          <div className={estilos.anexoExpirado}>
+                            <Icone nome="documento" width={28} height={28} />
+                            <span><strong>Arquivo expirado</strong><em>{it.m.anexo.nome}</em></span>
+                          </div>
+                        ) : ehImagem(it.m.anexo.tipo) ? (
                           <button type="button" className={estilos.anexoImagem} onClick={() => void aoBaixar(it.m.id, true)} aria-label={`Abrir imagem ${it.m.anexo.nome}`} title="Abrir imagem" disabled={it.m.status === "enviando"}>
                             {it.m.anexo.url ? <img src={it.m.anexo.url} alt={it.m.anexo.nome} loading="lazy" /> : <span className={estilos.anexoCarregando} />}
                           </button>
+                        ) : ehVideo(it.m.anexo.tipo) ? (
+                          <div className={estilos.anexoImagem}>
+                            {it.m.anexo.url ? <video src={it.m.anexo.url} controls playsInline preload="metadata" aria-label={it.m.anexo.nome} /> : <span className={estilos.anexoCarregando} />}
+                          </div>
                         ) : (
                           <button type="button" className={estilos.anexoArquivo} onClick={() => void aoBaixar(it.m.id).then((ok) => { if (!ok) setAviso("Não foi possível baixar"); })} aria-label={`Baixar ${it.m.anexo.nome}`} title="Baixar" disabled={it.m.status === "enviando"}>
-                            <Icone nome="arquivo-pdf" width={28} height={28} />
+                            <Icone nome="documento" width={28} height={28} />
                             <span><strong>{it.m.anexo.nome}</strong><em>{formatarTamanho(it.m.anexo.tamanho)}</em></span>
                           </button>
                         ))}
@@ -454,7 +467,7 @@ export function TelaConversas({
               )}
               {arquivo && !editando && (
                 <div className={estilos.respondendo}>
-                  {previa ? <img className={estilos.miniatura} src={previa} alt="" /> : <Icone nome="arquivo-pdf" width={28} height={28} />}
+                  {previa ? <img className={estilos.miniatura} src={previa} alt="" /> : <Icone nome={ehVideo(arquivo.type) ? "foto-video" : "documento"} width={28} height={28} />}
                   <div className={estilos.citacaoBarra}>
                     <strong>{arquivo.name}</strong>
                     <span>{formatarTamanho(arquivo.size)}</span>
@@ -471,11 +484,20 @@ export function TelaConversas({
                 </div>
               )}
               <div className={estilos.entrada}>
-                <input ref={seletor} type="file" hidden accept={TIPOS_ANEXO.join(",")} onChange={(e) => { escolher(e.target.files?.[0]); e.target.value = ""; }} />
+                <input ref={entradaDocumento} type="file" hidden accept={TIPOS_DOCUMENTO.join(",")} onChange={(e) => { escolher(e.target.files?.[0]); e.target.value = ""; }} />
+                <input ref={entradaMidia} type="file" hidden accept={TIPOS_MIDIA.join(",")} onChange={(e) => { escolher(e.target.files?.[0]); e.target.value = ""; }} />
+                <input ref={entradaCamera} type="file" hidden accept="image/*" capture="environment" onChange={(e) => { escolher(e.target.files?.[0]); e.target.value = ""; }} />
                 {!editando && (
-                  <button type="button" className={`${estilos.icone} ${estilos.anexar}`} onClick={() => seletor.current?.click()} aria-label="Anexar arquivo" title="Anexar imagem, PDF ou arquivo">
-                    <Icone nome="anexar-pdf" width={22} height={22} />
-                  </button>
+                  <MenuAcoes
+                    rotulo="Anexar"
+                    paraCima
+                    gatilho={<Icone nome="anexar-pdf" width={22} height={22} />}
+                    itens={[
+                      { id: "documento", rotulo: "Documento", icone: <Icone nome="documento" width={20} height={20} />, aoEscolher: abrirEntrada(entradaDocumento) },
+                      { id: "midia", rotulo: "Fotos e vídeos", icone: <Icone nome="foto-video" width={20} height={20} />, aoEscolher: abrirEntrada(entradaMidia) },
+                      { id: "camera", rotulo: "Câmera", icone: <Icone nome="camera" width={20} height={20} />, aoEscolher: abrirEntrada(entradaCamera) },
+                    ]}
+                  />
                 )}
                 <textarea ref={campo} rows={1} value={texto} onChange={(e) => { setTexto(e.target.value); aoDigitar(e.target.value.trim() !== ""); }} onKeyDown={teclas} onPaste={colar} placeholder={arquivo ? "Adicione uma legenda (opcional)" : "Digite uma mensagem"} aria-label="Mensagem" maxLength={2000} autoComplete="off" />
                 <button type="submit" className={estilos.enviar} disabled={(!texto.trim() && !arquivo && !editando?.anexo) || enviando} aria-label={editando ? "Salvar edição" : "Enviar"}>
