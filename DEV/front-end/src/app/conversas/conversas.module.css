@@ -92,7 +92,15 @@
 .balao:hover .abrirMenu, .raiz .abrirMenu:focus-visible, .raiz .abrirMenu[aria-expanded="true"] { opacity: 1; }
 .raiz .abrirMenu:hover, .raiz .abrirMenu[aria-expanded="true"] { background: rgb(0 0 0 / 8%); }
 .raiz .abrirMenu:focus-visible { outline: 2px solid var(--cor-foco); outline-offset: 0; }
-@media (hover: none) { .raiz .abrirMenu { opacity: .7; } }
+/* Celular: sem setinha; segura a mensagem para abrir o menu, que cai logo abaixo do balão. */
+@media (hover: none) {
+  .raiz .abrirMenu { display: none; }
+  .raiz .balao { -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; }
+  .raiz .menuBox, .raiz .balao:not(.minha) .menuBox { top: 100%; left: 0; right: 0; padding: 0; transform: none; }
+  .raiz .menu, .raiz .menuEsq { top: 0; left: 0; right: auto; }
+  .raiz .minha .menu { left: auto; right: 0; }
+}
+.menuBox[data-aberto="true"] { z-index: 20; }
 .menu { position: absolute; top: 100%; right: 4px; min-width: 11rem; margin: 2px 0 0; padding: var(--espaco-2) 0; list-style: none; background: var(--cor-superficie); border-radius: var(--raio-md); box-shadow: 0 4px 16px rgb(0 0 0 / 22%); }
 .menuEsq { right: auto; left: 4px; }
 .raiz .menu button { display: block; width: 100%; padding: var(--espaco-2) var(--espaco-4); background: transparent; color: var(--cor-texto); font-size: var(--fonte-sm); }

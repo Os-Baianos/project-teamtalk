@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { BarraTopo, RodapeTopo } from "@design/componentes";
+import { RegistrarSw } from "../pwa/registrar-sw";
 import "@design/estilos.css";
 
 export const metadata: Metadata = {
@@ -13,6 +14,7 @@ export default function LayoutRaiz({ children }: { children: ReactNode }) {
   return (
     <html lang="pt-BR">
       <body className="aplicacao">
+        <RegistrarSw />
         <BarraTopo />
         <div className="aplicacao-conteudo">{children}</div>
         <RodapeTopo />
