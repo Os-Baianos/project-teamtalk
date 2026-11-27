@@ -1,0 +1,31 @@
+/* Mesmo visual das listas do Perfil: caixa branca, linhas separadas, botão laranja no canto. */
+.lista {
+  margin: 0;
+  display: grid;
+  background: var(--cor-superficie);
+  border: var(--borda-fina) solid var(--cor-borda);
+  border-radius: var(--raio-md);
+}
+.linha { position: relative; display: grid; gap: 2px; padding: var(--espaco-3) var(--espaco-4); padding-right: 7.5rem; }
+.linha + .linha { border-top: var(--borda-fina) solid var(--cor-borda); }
+.linha dt { color: var(--cor-secundaria); font-size: var(--fonte-sm); }
+.linha dd { margin: 0; overflow-wrap: anywhere; }
+.botaoCanto { position: absolute; right: var(--espaco-4); top: 50%; transform: translateY(-50%); }
+.dica { margin: 0; color: var(--cor-secundaria); font-size: var(--fonte-sm); }
+.erro { margin: 0; color: var(--cor-erro); font-size: var(--fonte-sm); }
+.edicao { display: grid; gap: var(--espaco-3); margin-right: -7.5rem; padding-top: var(--espaco-2); }
+.acoes { display: flex; flex-wrap: wrap; gap: var(--espaco-2); }
+.avisoLinha { margin-top: var(--espaco-2); }
+
+/* Animações no mesmo padrão do resto do site: entram suave e respeitam "menos movimento". */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes entrar-config { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @keyframes aparecer-config { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+  .lista { animation: entrar-config .3s cubic-bezier(.2, .7, .2, 1) backwards; }
+  .linha { animation: entrar-config .3s cubic-bezier(.2, .7, .2, 1) backwards; }
+  .linha:nth-child(2) { animation-delay: .05s; }
+  .linha:nth-child(3) { animation-delay: .1s; }
+  .edicao { animation: aparecer-config .22s cubic-bezier(.2, .7, .2, 1) both; }
+  .edicao .acoes { animation: aparecer-config .22s cubic-bezier(.2, .7, .2, 1) .05s both; }
+  .erro, .dica, .avisoLinha { animation: aparecer-config .22s cubic-bezier(.2, .7, .2, 1) both; }
+}
