@@ -94,6 +94,11 @@ export function TelaConversas({
   const [busca, setBusca] = useState("");
   const [listaAberta, setListaAberta] = useState(true);
   const [menu, setMenu] = useState<string | null>(null);
+  const abertoEm = useRef(0);
+  const toque = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Abre o menu da mensagem (clique na setinha no computador, segurar a mensagem no celular). */
+  const abrirMenu = (id: string) => { abertoEm.current = Date.now(); setMenu(id); };
+  const soltarToque = () => { if (toque.current) { clearTimeout(toque.current); toque.current = null; } };
   const [dados, setDados] = useState<BalaoDado | null>(null);
   const [editando, setEditando] = useState<BalaoDado | null>(null);
   const [aviso, setAviso] = useState("");
@@ -126,12 +131,13 @@ export function TelaConversas({
     const fechar = (e: Event) => {
       if (e instanceof KeyboardEvent && e.key !== "Escape") return;
       if (e instanceof MouseEvent && (e.target as HTMLElement).closest("[data-menu]")) return;
+      if (Date.now() - abertoEm.current < 400) return; // o toque que abriu não pode fechar logo em seguida
       setMenu(null);
     };
-    document.addEventListener("mousedown", fechar);
+    document.addEventListener("pointerdown", fechar);
     document.addEventListener("keydown", fechar as EventListener);
     return () => {
-      document.removeEventListener("mousedown", fechar);
+      document.removeEventListener("pointerdown", fechar);
       document.removeEventListener("keydown", fechar as EventListener);
     };
   }, [menu]);
@@ -325,10 +331,15 @@ export function TelaConversas({
                     <div key={`d-${it.chave}`} className={estilos.dia}><span>{it.rotulo}</span></div>
                   ) : (
                     <div key={it.m.id} className={`${estilos.linhaMsg} ${it.m.minha ? estilos.linhaMinha : ""}`}>
-                      <div className={`${estilos.balao} ${it.m.minha ? estilos.minha : ""} ${it.m.apagada ? estilos.apagada : ""} ${it.m.status === "falha" ? estilos.falhou : ""}`}>
+                      <div
+                        className={`${estilos.balao} ${it.m.minha ? estilos.minha : ""} ${it.m.apagada ? estilos.apagada : ""} ${it.m.status === "falha" ? estilos.falhou : ""}`}
+                        onContextMenu={(e) => { if (it.m.apagada || it.m.status === "enviando" || it.m.status === "falha") return; e.preventDefault(); abrirMenu(it.m.id); }}
+                        onTouchStart={() => { if (it.m.apagada || it.m.status === "enviando" || it.m.status === "falha") return; soltarToque(); toque.current = setTimeout(() => { toque.current = null; abrirMenu(it.m.id); }, 450); }}
+                        onTouchMove={soltarToque} onTouchEnd={soltarToque} onTouchCancel={soltarToque}
+                      >
                         {!it.m.apagada && it.m.status !== "enviando" && it.m.status !== "falha" && (
-                          <span className={estilos.menuBox} data-menu>
-                            <button type="button" className={estilos.abrirMenu} aria-label="Opções da mensagem" aria-haspopup="menu" aria-expanded={menu === it.m.id} onClick={() => setMenu(menu === it.m.id ? null : it.m.id)}>
+                          <span className={estilos.menuBox} data-menu data-aberto={menu === it.m.id}>
+                            <button type="button" className={estilos.abrirMenu} aria-label="Opções da mensagem" aria-haspopup="menu" aria-expanded={menu === it.m.id} onClick={() => (menu === it.m.id ? setMenu(null) : abrirMenu(it.m.id))}>
                               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
                             </button>
                             {menu === it.m.id && (
