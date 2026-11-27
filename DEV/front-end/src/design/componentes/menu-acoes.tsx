@@ -26,10 +26,12 @@ export type PropsMenuAcoes = {
   gatilho?: ReactNode;
   /** Abre a lista acima do botão (para menus no rodapé da tela). */
   paraCima?: boolean;
+  /** Botão redondo, igual ao botão de enviar do chat. */
+  redondo?: boolean;
 };
 
 /** Botão "⋯" que abre uma lista curta de ações (com confirmação opcional). Fecha ao clicar fora ou com Esc. */
-export function MenuAcoes({ itens, rotulo = "Mais ações", gatilho, paraCima = false }: PropsMenuAcoes) {
+export function MenuAcoes({ itens, rotulo = "Mais ações", gatilho, paraCima = false, redondo = false }: PropsMenuAcoes) {
   const raiz = useRef<HTMLDivElement>(null);
   const [aberto, setAberto] = useState(false);
   const [pendente, setPendente] = useState<ItemMenuAcoes | null>(null);
@@ -60,7 +62,7 @@ export function MenuAcoes({ itens, rotulo = "Mais ações", gatilho, paraCima = 
 
   return (
     <div className={estilos.raiz} ref={raiz}>
-      <Botao className={estilos.gatilho} aria-label={rotulo} aria-haspopup="menu" aria-expanded={aberto} onClick={() => (aberto ? fechar() : setAberto(true))}>
+      <Botao className={`${estilos.gatilho} ${redondo ? estilos.redondo : ""}`} aria-label={rotulo} aria-haspopup="menu" aria-expanded={aberto} onClick={() => (aberto ? fechar() : setAberto(true))}>
         {gatilho ?? <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="19" cy="12" r="2" /></svg>}
       </Botao>
       {aberto && (

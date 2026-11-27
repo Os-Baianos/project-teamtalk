@@ -491,7 +491,8 @@ export function TelaConversas({
                   <MenuAcoes
                     rotulo="Anexar"
                     paraCima
-                    gatilho={<Icone nome="anexar-pdf" width={22} height={22} />}
+                    redondo
+                    gatilho={<Icone nome="anexar-pdf" width={20} height={20} />}
                     itens={[
                       { id: "documento", rotulo: "Documento", icone: <Icone nome="documento" width={20} height={20} />, aoEscolher: abrirEntrada(entradaDocumento) },
                       { id: "midia", rotulo: "Fotos e vídeos", icone: <Icone nome="foto-video" width={20} height={20} />, aoEscolher: abrirEntrada(entradaMidia) },
