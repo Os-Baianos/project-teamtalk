@@ -23,7 +23,6 @@
   color: var(--cor-primaria);
   font-weight: var(--peso-forte);
 }
-.avatarFoto { object-fit: cover; }
 .sugestoes {
   list-style: none; margin: 0; padding: 0;
   background: var(--cor-superficie);

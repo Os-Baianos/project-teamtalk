@@ -47,7 +47,7 @@ export async function enviarPushTesteAction(): Promise<{ ok: boolean; mensagem: 
   const falhas: string[] = [];
   for (const a of aparelhos) {
     try {
-      await webpush.sendNotification({ endpoint: a.endpoint, keys: { p256dh: a.p256dh, auth: a.auth } }, carga, { TTL: 60, urgency: "high" });
+      await webpush.sendNotification({ endpoint: a.endpoint, keys: { p256dh: a.p256dh, auth: a.auth } }, carga, { TTL: 60, urgency: "high", timeout: 8000 });
     } catch (e) {
       const st = (e as { statusCode?: number }).statusCode;
       falhas.push(String(st ?? "erro"));

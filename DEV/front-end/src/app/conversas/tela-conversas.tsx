@@ -127,11 +127,6 @@ export function TelaConversas({
     const el = historico.current;
     if (el && noFim.current) el.scrollTop = el.scrollHeight;
   }, [mensagens.length, carregandoMensagens, ativa?.id]);
-  // A tela de conversas ocupa a janela toda e só a lista e o histórico rolam.
-  useEffect(() => {
-    document.body.classList.add("pagina-cheia");
-    return () => document.body.classList.remove("pagina-cheia");
-  }, []);
   useEffect(() => { setTexto(""); setErro(""); setMenu(null); setDados(null); setEditando(null); setRespondendo(null); }, [ativa?.id]);
   useEffect(() => {
     const el = campo.current;
