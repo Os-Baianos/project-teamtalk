@@ -6,14 +6,22 @@
   border: var(--borda-fina) solid var(--cor-borda);
   border-radius: var(--raio-md);
 }
-.linha { position: relative; display: grid; gap: 2px; padding: var(--espaco-3) var(--espaco-4); padding-right: 7.5rem; }
+.linha { position: relative; display: grid; gap: 2px; padding: var(--espaco-3) var(--espaco-4); }
 .linha + .linha { border-top: var(--borda-fina) solid var(--cor-borda); }
 .linha dt { color: var(--cor-secundaria); font-size: var(--fonte-sm); }
 .linha dd { margin: 0; overflow-wrap: anywhere; }
-.botaoCanto { position: absolute; right: var(--espaco-4); top: 50%; transform: translateY(-50%); }
+.botaoCanto { justify-self: start; margin-top: var(--espaco-2); }
+.testar { margin-top: var(--espaco-2); }
 .dica { margin: 0; color: var(--cor-secundaria); font-size: var(--fonte-sm); }
 .erro { margin: 0; color: var(--cor-erro); font-size: var(--fonte-sm); }
-.edicao { display: grid; gap: var(--espaco-3); margin-right: -7.5rem; padding-top: var(--espaco-2); }
+.edicao { display: grid; gap: var(--espaco-3); padding-top: var(--espaco-2); }
+
+/* Tela larga: o botão vai para o canto direito da linha. */
+@media (min-width: 40rem) {
+  .linha { padding-right: 9rem; }
+  .botaoCanto { position: absolute; right: var(--espaco-4); top: 50%; margin-top: 0; transform: translateY(-50%); }
+  .edicao { margin-right: -9rem; }
+}
 .acoes { display: flex; flex-wrap: wrap; gap: var(--espaco-2); }
 .avisoLinha { margin-top: var(--espaco-2); }
 

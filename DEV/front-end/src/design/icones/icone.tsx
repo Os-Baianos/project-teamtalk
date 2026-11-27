@@ -1,6 +1,6 @@
 import type { SVGProps } from "react";
 
-export type NomeIcone = "inbox" | "equipes" | "arquivos" | "menu" | "nova-conversa" | "busca" | "erro" | "lista-vazia" | "simbolo" | "voltar" | "anexar-pdf" | "enviar" | "arquivo-pdf" | "enviada" | "lida" | "aguardando" | "falha" | "informacao" | "fechar";
+export type NomeIcone = "inbox" | "equipes" | "arquivos" | "menu" | "nova-conversa" | "busca" | "erro" | "simbolo" | "voltar" | "anexar-pdf" | "enviar" | "arquivo-pdf" | "enviada" | "lida" | "aguardando" | "falha" | "informacao" | "fechar";
 
 /** Geometrias de Gilson; a cor vem exclusivamente dos tokens do TeamTalk. */
 export function Icone({ nome, ...props }: SVGProps<SVGSVGElement> & { nome: NomeIcone }) {
@@ -15,21 +15,6 @@ export function Icone({ nome, ...props }: SVGProps<SVGSVGElement> & { nome: Nome
     case "erro": return <svg viewBox="0 0 24 24" fill="none" {...comum}><circle cx="12" cy="12" r="9.1" stroke="currentColor" strokeWidth="1.9"/>
   <path d="M12 6.9v6.05" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round"/>
   <circle cx="12" cy="16.65" r="1.05" fill="currentColor"/></svg>;
-    case "lista-vazia": return <svg viewBox="0 0 72 60"
-    
-     fill="none" {...comum}><path d="M32 13.5H58.2C64.1 13.5 68 17.4 68 23.1V41.3C68 47.1 64.1 51 58.2 51H54.1V58.1L43.7 51H32C26.1 51 22.2 47.1 22.2 41.3V23.1C22.2 17.4 26.1 13.5 32 13.5Z"
-        fill="currentColor" stroke="currentColor" strokeWidth="1.7"
-        strokeLinecap="round" strokeLinejoin="round"/>
-
-  
-  <path d="M14.1 3.5H45.7C53 3.5 57.7 8.2 57.7 15.2V31.4C57.7 38.5 53 43.2 45.7 43.2H23.4L13.5 51.2V43.2H12.1C5.1 43.2 1.5 38.5 1.5 31.4V15.2C1.5 8.2 6.2 3.5 14.1 3.5Z"
-        fill="currentColor" stroke="currentColor" strokeWidth="3.1"
-        strokeLinecap="round" strokeLinejoin="round"/>
-
-  
-  <circle cx="19.2" cy="23.1" r="2.35" fill="currentColor"/>
-  <circle cx="29.7" cy="23.1" r="2.35" fill="currentColor"/>
-  <circle cx="40.2" cy="23.1" r="2.35" fill="currentColor"/></svg>;
     case "simbolo": return <svg viewBox="0 0 32 32" fill="none" {...comum}><path d="M6 3h20a4 4 0 0 1 4 4v13a4 4 0 0 1-4 4H14l-6.2 5.1a.8.8 0 0 1-1.3-.6V24H6a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4Z" fill="var(--cor-primaria)"/><path d="M10.5 9h11v2.8h-4.1V20h-2.8v-8.2h-4.1Z" fill="var(--cor-topo)"/></svg>;
     case "voltar": return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" {...comum}><path d="M19.2 12H4.8"/><path d="M11.4 5.4 4.8 12l6.6 6.6"/></svg>;
     case "anexar-pdf": return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.0" strokeLinecap="round" strokeLinejoin="round" {...comum}><path d="M12 5v14M5 12h14"/></svg>;

@@ -8,6 +8,11 @@ import { enviarPushTesteAction, obterChavePublicaAction, removerAssinaturaAction
 import type { AssinaturaPush } from "../../push/acoes";
 import estilos from "./configuracoes.module.css";
 
+/** Espera no máximo `ms`; passado o tempo, falha em vez de ficar travado para sempre. */
+function comLimite<T>(promessa: Promise<T>, ms = 10000): Promise<T> {
+  return Promise.race([promessa, new Promise<never>((_, falha) => setTimeout(() => falha(new Error("tempo esgotado")), ms))]);
+}
+
 type Estado = "carregando" | "sem-suporte" | "bloqueado" | "desligado" | "ligado";
 
 /** Linha "Notificações" do perfil: liga/desliga o aviso de mensagens neste aparelho. */
@@ -22,7 +27,7 @@ export function Notificacoes() {
       if (!suportaPush()) { setEstado("sem-suporte"); return; }
       if (Notification.permission === "denied") { setEstado("bloqueado"); return; }
       try {
-        const reg = await navigator.serviceWorker.ready;
+        const reg = await comLimite(navigator.serviceWorker.ready, 6000);
         const sub = await reg.pushManager.getSubscription();
         if (!sub || Notification.permission !== "granted") { setEstado("desligado"); return; }
         // Só conta como ligado se este aparelho está registrado para a conta de agora.
@@ -39,12 +44,12 @@ export function Notificacoes() {
     try {
       const permissao = await Notification.requestPermission();
       if (permissao !== "granted") { setEstado(permissao === "denied" ? "bloqueado" : "desligado"); return; }
-      const chave = await obterChavePublicaAction();
+      const chave = await comLimite(obterChavePublicaAction());
       if (!chave) { setErro("Notificações indisponíveis no momento."); return; }
-      const reg = await navigator.serviceWorker.ready;
+      const reg = await comLimite(navigator.serviceWorker.ready, 6000);
       const sub = (await reg.pushManager.getSubscription())
         ?? (await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: chaveParaBytes(chave) }));
-      const ok = await salvarAssinaturaAction(sub.toJSON() as AssinaturaPush);
+      const ok = await comLimite(salvarAssinaturaAction(sub.toJSON() as AssinaturaPush));
       if (!ok) { setErro("Não foi possível ativar agora. Tente novamente."); return; }
       guardarEndpoint(sub.endpoint);
       setEstado("ligado");
@@ -59,19 +64,24 @@ export function Notificacoes() {
     setOcupado(true);
     setErro("");
     setResultado("");
-    const r = await enviarPushTesteAction();
-    setOcupado(false);
-    if (r.ok) setResultado(r.mensagem); else setErro(r.mensagem);
+    try {
+      const r = await comLimite(enviarPushTesteAction(), 15000);
+      if (r.ok) setResultado(r.mensagem); else setErro(r.mensagem);
+    } catch {
+      setErro("O teste demorou demais ou falhou. Tente de novo; se repetir, desative e ative as notificações.");
+    } finally {
+      setOcupado(false);
+    }
   }
 
   async function desativar() {
     setOcupado(true);
     setErro("");
     try {
-      const reg = await navigator.serviceWorker.ready;
+      const reg = await comLimite(navigator.serviceWorker.ready, 6000);
       const sub = await reg.pushManager.getSubscription();
       if (sub) {
-        await removerAssinaturaAction(sub.endpoint);
+        await comLimite(removerAssinaturaAction(sub.endpoint));
         await sub.unsubscribe();
       }
       guardarEndpoint(null);
@@ -84,9 +94,9 @@ export function Notificacoes() {
   }
 
   const texto =
-    estado === "ligado" ? "Ativadas neste aparelho. Você recebe o nome e a foto de quem mandou, mesmo com o app fechado."
-    : estado === "bloqueado" ? "Bloqueadas no navegador. Libere nas configurações do site para ativar."
-    : estado === "sem-suporte" ? "Este navegador não permite. No iPhone, instale o app na tela inicial primeiro."
+    estado === "ligado" ? "Ativadas neste aparelho."
+    : estado === "bloqueado" ? "Bloqueadas no navegador. Libere nas configurações do site."
+    : estado === "sem-suporte" ? "Este navegador não permite. No iPhone, instale o app na tela inicial."
     : estado === "carregando" ? "Verificando…"
     : "Desativadas neste aparelho.";
 
@@ -95,7 +105,7 @@ export function Notificacoes() {
       <dd>{texto}</dd>
       {erro && <dd className={estilos.dica} role="alert">{erro}</dd>}
       {resultado && <dd className={estilos.dica} role="status">{resultado}</dd>}
-      {estado === "ligado" && <dd><Botao disabled={ocupado} onClick={testar}>Enviar teste</Botao></dd>}
+      {estado === "ligado" && <dd className={estilos.testar}><Botao disabled={ocupado} onClick={testar}>Enviar teste</Botao></dd>}
       {estado === "desligado" && <div className={estilos.botaoCanto}><Botao ocupado={ocupado} onClick={ativar}>Ativar</Botao></div>}
       {estado === "ligado" && <div className={estilos.botaoCanto}><Botao ocupado={ocupado} onClick={desativar}>Desativar</Botao></div>}
     </>
