@@ -105,9 +105,13 @@ export function Notificacoes() {
       <dd>{texto}</dd>
       {erro && <dd className={estilos.dica} role="alert">{erro}</dd>}
       {resultado && <dd className={estilos.dica} role="status">{resultado}</dd>}
-      {estado === "ligado" && <dd className={estilos.testar}><Botao disabled={ocupado} onClick={testar}>Enviar teste</Botao></dd>}
-      {estado === "desligado" && <div className={estilos.botaoCanto}><Botao ocupado={ocupado} onClick={ativar}>Ativar</Botao></div>}
-      {estado === "ligado" && <div className={estilos.botaoCanto}><Botao ocupado={ocupado} onClick={desativar}>Desativar</Botao></div>}
+      {(estado === "desligado" || estado === "ligado") && (
+        <div className={estilos.botaoCanto}>
+          {estado === "desligado" && <Botao ocupado={ocupado} onClick={ativar}>Ativar</Botao>}
+          {estado === "ligado" && <Botao disabled={ocupado} onClick={testar}>Enviar teste</Botao>}
+          {estado === "ligado" && <Botao ocupado={ocupado} onClick={desativar}>Desativar</Botao>}
+        </div>
+      )}
     </>
   );
 }
