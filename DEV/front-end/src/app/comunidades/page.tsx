@@ -11,6 +11,9 @@ import { anexoExpirado, ehImagem, ehVideo, nomeSeguro, resumoMensagem, validarAr
 import type { Anexo } from "../../mensagens/anexos";
 import { souDevAction } from "../../dev/acoes";
 import { enviarMensagemGrupoAction } from "../../grupos/acoes";
+import { useExtras } from "../../mensagens/use-extras";
+import { criarEnqueteAction, enviarContatoAction } from "../../mensagens/extras-acoes";
+import { lerContatos } from "../../dados/leituras";
 import { lerAutores, lerGrupos, lerMembros, lerMensagensGrupo, marcarLidoGrupo } from "../../grupos/leituras";
 import { useGruposAoVivo } from "../../grupos/use-grupos-ao-vivo";
 import { InfoGrupo } from "../../grupos/info-grupo";
@@ -217,6 +220,32 @@ export default function PaginaComunidades() {
     return ok;
   }
 
+  const { pessoas, enquetes, votar, encerrar } = useExtras(meuId, mensagens);
+
+  function acrescentar(mensagem: Mensagem) {
+    setMensagens((atual) => (atual.some((x) => x.id === mensagem.id) ? atual : [...atual, mensagem]));
+    void carregarLista();
+  }
+  const extras = {
+    carregarContatos: async () => (await lerContatos()).map((c) => ({ id: c.id, nome: c.nome, arroba: c.arroba, fotoUrl: c.foto_url })),
+    aoEnviarContato: async (pessoaId: string) => {
+      if (!ativa) return "Escolha uma comunidade.";
+      const r = await enviarContatoAction({ grupoId: ativa.id }, pessoaId);
+      if (!r.ok) return r.mensagem;
+      acrescentar(r.mensagem);
+      return null;
+    },
+    aoCriarEnquete: async (pergunta: string, opcoes: string[], multipla: boolean) => {
+      if (!ativa) return "Escolha uma comunidade.";
+      const r = await criarEnqueteAction({ grupoId: ativa.id }, pergunta, opcoes, multipla);
+      if (!r.ok) return r.mensagem;
+      acrescentar(r.mensagem);
+      return null;
+    },
+    aoVotar: votar,
+    aoEncerrar: encerrar,
+  };
+
   const nomeDe = (id: string) => (id === meuId ? "Você" : autores[id]?.nome ?? membros.find((m) => m.id === id)?.nome ?? "Ex-membro");
   // "Lida por todos": todos os outros membros já abriram o grupo depois desta mensagem.
   const outros = membros.filter((m) => m.id !== meuId);
@@ -243,6 +272,7 @@ export default function PaginaComunidades() {
       id: m.id, minha, texto: m.sistema ? `${nomeDe(m.remetente_id)} ${m.texto}` : m.texto, criadoEm: m.criado_em, resposta,
       recebidaEm: null, lidaEm: lida, editadaEm: m.editada_em,
       apagada: !!m.apagada_em, status, sistema: !!m.sistema,
+      contato: m.contato_ref ? pessoas[m.contato_ref] ?? null : null, ehEnquete: !!m.enquete, enquete: enquetes[m.id] ?? null,
       autor: autor ? { nome: autor.nome, fotoUrl: autor.foto_url } : null,
       anexo: m.anexo_nome && !m.apagada_em
         ? { nome: m.anexo_nome, tipo: m.anexo_tipo ?? "", tamanho: m.anexo_tamanho ?? 0, expirado: anexoExpirado(m.criado_em, m.anexo_caminho), url: m.anexo_caminho ? urls[m.anexo_caminho] ?? null : null }
@@ -279,6 +309,7 @@ export default function PaginaComunidades() {
         aoEditar={editar}
         aoApagar={apagar}
         aoBaixar={baixar}
+        extras={extras}
         grupo={{
           titulo: "Comunidades",
           vazio: "Você ainda não está em nenhuma comunidade.",

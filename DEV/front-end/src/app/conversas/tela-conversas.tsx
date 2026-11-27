@@ -9,6 +9,9 @@ import { Carregando } from "@design/componentes/carregando";
 import { Icone } from "@design/icones/icone";
 import { Avatar } from "../../contatos/avatar";
 import { ehImagem, ehVideo, formatarTamanho, resumoMensagem, TIPOS_DOCUMENTO, TIPOS_MIDIA, validarArquivo } from "../../mensagens/anexos";
+import { DialogoContato, DialogoEnquete } from "../../mensagens/dialogos-extras";
+import type { PessoaEscolhivel } from "../../mensagens/dialogos-extras";
+import type { DadosEnquete } from "../../mensagens/extras";
 import estilos from "./conversas.module.css";
 
 export type Pessoa = { id: string; nome: string; arroba: string; fotoUrl?: string | null };
@@ -38,6 +41,20 @@ export type BalaoDado = {
   autor?: { nome: string; fotoUrl: string | null } | null;
   /** Aviso centralizado do grupo ("Fulano adicionou Beltrano"). */
   sistema?: boolean;
+  /** Cartão de contato compartilhado. */
+  contato?: { id: string; nome: string; arroba: string; fotoUrl: string | null } | null;
+  /** Mensagem que é uma enquete (os dados chegam depois de carregar). */
+  ehEnquete?: boolean;
+  enquete?: DadosEnquete | null;
+};
+
+/** Contato e enquete no menu "+". */
+export type Extras = {
+  carregarContatos: () => Promise<PessoaEscolhivel[]>;
+  aoEnviarContato: (pessoaId: string) => Promise<string | null>;
+  aoCriarEnquete: (pergunta: string, opcoes: string[], multipla: boolean) => Promise<string | null>;
+  aoVotar: (msg: string, opcao: string, marcar: boolean) => Promise<boolean>;
+  aoEncerrar: (msg: string) => Promise<boolean>;
 };
 
 type Props = {
@@ -64,6 +81,7 @@ type Props = {
   aoEditar: (id: string, texto: string) => Promise<boolean>;
   aoApagar: (id: string) => Promise<boolean>;
   aoBaixar: (id: string, visualizar?: boolean) => Promise<boolean>;
+  extras?: Extras;
   /** Modo comunidades: título da lista, textos próprios e informações do grupo. */
   grupo?: {
     titulo: string;
@@ -113,8 +131,9 @@ function Tiques({ status }: { status: StatusEnvio | "enviada" | "recebida" | "li
 
 export function TelaConversas({
   carregandoLista, carregandoMensagens, erroLista, aoTentarLista, erroHistorico, aoTentarHistorico, aoReenviar, conversas, novos, ativa, mensagens,
-  aoAbrir, aoVoltar, aoEnviar, aoEditar, aoApagar, aoBaixar, digitando, aoDigitar, grupo,
+  aoAbrir, aoVoltar, aoEnviar, aoEditar, aoApagar, aoBaixar, digitando, aoDigitar, grupo, extras,
 }: Props) {
+  const [dialogo, setDialogo] = useState<"contato" | "enquete" | null>(null);
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState("");
@@ -431,9 +450,9 @@ export function TelaConversas({
                               <ul ref={mostrarMenu} className={`${estilos.menu} ${it.m.minha ? "" : estilos.menuEsq}`} role="menu">
                                 <li><button type="button" role="menuitem" onClick={() => comecarResposta(it.m)}>Responder</button></li>
                                 <li><button type="button" role="menuitem" onClick={() => { setMenu(null); setDados(it.m); }}>Dados da mensagem</button></li>
-                                {it.m.texto.trim() && <li><button type="button" role="menuitem" onClick={() => copiar(it.m)}>Copiar</button></li>}
+                                {it.m.texto.trim() && !it.m.contato && <li><button type="button" role="menuitem" onClick={() => copiar(it.m)}>Copiar</button></li>}
                                 {it.m.anexo && !it.m.anexo.expirado && <li><button type="button" role="menuitem" onClick={() => { setMenu(null); void aoBaixar(it.m.id).then((ok) => { if (!ok) setAviso("Não foi possível baixar"); }); }}>Baixar</button></li>}
-                                {it.m.minha && <li><button type="button" role="menuitem" onClick={() => comecarEdicao(it.m)}>Editar</button></li>}
+                                {it.m.minha && !it.m.contato && !it.m.ehEnquete && <li><button type="button" role="menuitem" onClick={() => comecarEdicao(it.m)}>Editar</button></li>}
                                 {it.m.minha && <li><button type="button" role="menuitem" className={estilos.perigo} onClick={() => apagar(it.m)}>Apagar</button></li>}
                               </ul>
                             )}
@@ -465,8 +484,38 @@ export function TelaConversas({
                             <span><strong>{it.m.anexo.nome}</strong><em>{formatarTamanho(it.m.anexo.tamanho)}</em></span>
                           </button>
                         ))}
+                        {!it.m.apagada && it.m.contato && (
+                          <div className={estilos.cartaoContato}>
+                            <Avatar nome={it.m.contato.nome} fotoUrl={it.m.contato.fotoUrl} />
+                            <span><strong>{it.m.contato.nome}</strong><em>@{it.m.contato.arroba}</em></span>
+                            <Link href={`/perfil/${it.m.contato.arroba}`}>Ver perfil</Link>
+                          </div>
+                        )}
+                        {!it.m.apagada && it.m.ehEnquete && (
+                          <div className={estilos.enquete}>
+                            <strong className={estilos.enquetePergunta}>{it.m.texto}</strong>
+                            {it.m.enquete ? (
+                              <>
+                                <small>{it.m.enquete.encerrada ? "Enquete encerrada" : it.m.enquete.multipla ? "Selecione uma ou mais opções" : "Selecione uma opção"}</small>
+                                {it.m.enquete.opcoes.map((o) => (
+                                  <button key={o.id} type="button" className={estilos.opcaoEnquete} data-marcada={o.meuVoto} disabled={it.m.enquete!.encerrada || it.m.status === "enviando"}
+                                    onClick={() => void extras?.aoVotar(it.m.id, o.id, !o.meuVoto).then((ok) => { if (!ok) setAviso("Não foi possível votar"); })}>
+                                    <span className={estilos.marcaEnquete} aria-hidden="true">{o.meuVoto && <Icone nome="enviada" width={12} height={12} />}</span>
+                                    <span className={estilos.textoOpcao}>{o.texto}</span>
+                                    <b>{o.votos}</b>
+                                    <i style={{ width: `${it.m.enquete!.total ? Math.round((o.votos / it.m.enquete!.total) * 100) : 0}%` }} />
+                                  </button>
+                                ))}
+                                <small>{it.m.enquete.total} voto{it.m.enquete.total === 1 ? "" : "s"}</small>
+                                {it.m.minha && !it.m.enquete.encerrada && (
+                                  <button type="button" className={estilos.encerrarEnquete} onClick={() => { if (window.confirm("Encerrar a enquete? Ninguém poderá votar depois.")) void extras?.aoEncerrar(it.m.id).then((ok) => { if (!ok) setAviso("Não foi possível encerrar"); }); }}>Encerrar enquete</button>
+                                )}
+                              </>
+                            ) : <small>Carregando enquete…</small>}
+                          </div>
+                        )}
                         <p>
-                          {it.m.apagada ? (it.m.minha ? "Você apagou esta mensagem" : "Esta mensagem foi apagada") : it.m.texto}
+                          {it.m.apagada ? (it.m.minha ? "Você apagou esta mensagem" : "Esta mensagem foi apagada") : it.m.contato ? null : it.m.texto}
                           {/* Hora e tiques entram na última linha do texto quando cabem (como no WhatsApp). */}
                           <span className={estilos.rodape}>
                             {it.m.editadaEm && !it.m.apagada && <em>Editada</em>}
@@ -530,6 +579,10 @@ export function TelaConversas({
                       { id: "documento", rotulo: "Documento", icone: <Icone nome="documento" width={20} height={20} />, aoEscolher: abrirEntrada(entradaDocumento) },
                       { id: "midia", rotulo: "Fotos e vídeos", icone: <Icone nome="foto-video" width={20} height={20} />, aoEscolher: abrirEntrada(entradaMidia) },
                       { id: "camera", rotulo: "Câmera", icone: <Icone nome="camera" width={20} height={20} />, aoEscolher: abrirEntrada(entradaCamera) },
+                      ...(extras ? [
+                        { id: "contato", rotulo: "Contato", icone: <Icone nome="contato" width={20} height={20} />, aoEscolher: async () => { setDialogo("contato"); return null; } },
+                        { id: "enquete", rotulo: "Enquete", icone: <Icone nome="enquete" width={20} height={20} />, aoEscolher: async () => { setDialogo("enquete"); return null; } },
+                      ] : []),
                     ]}
                   />
                 )}
@@ -545,6 +598,8 @@ export function TelaConversas({
         )}
       </section>
 
+      {dialogo === "contato" && extras && <DialogoContato carregar={extras.carregarContatos} aoEscolher={extras.aoEnviarContato} aoFechar={() => setDialogo(null)} />}
+      {dialogo === "enquete" && extras && <DialogoEnquete aoCriar={extras.aoCriarEnquete} aoFechar={() => setDialogo(null)} />}
       {dados && (
         <div className={estilos.fundoDialogo} onMouseDown={() => setDados(null)}>
           <div className={estilos.dialogo} role="dialog" aria-modal="true" aria-label="Dados da mensagem" onMouseDown={(e) => e.stopPropagation()}>

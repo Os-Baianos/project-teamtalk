@@ -202,3 +202,23 @@
 .autorFoto > * { width: 100%; height: 100%; }
 .autorNome { display: block; margin-bottom: 2px; font-size: var(--fonte-xs); color: var(--cor-primaria); }
 .chatFechado { margin: 0; padding: var(--espaco-4); text-align: center; background: var(--cor-fundo); border-top: var(--borda-fina) solid var(--cor-borda); color: var(--cor-secundaria); font-size: var(--fonte-sm); }
+
+/* Cartão de contato e enquete dentro do balão */
+.cartaoContato { display: flex; align-items: center; gap: var(--espaco-3); min-width: 15rem; padding: var(--espaco-2) 0; }
+.cartaoContato > span { display: grid; flex: 1; min-width: 0; }
+.cartaoContato strong, .cartaoContato em { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cartaoContato em { font-style: normal; font-size: var(--fonte-xs); color: var(--cor-secundaria); }
+.cartaoContato a { flex: none; padding: 4px 10px; border: var(--borda-fina) solid var(--cor-borda-controle); border-radius: var(--raio-pill); color: var(--cor-primaria); font-size: var(--fonte-sm); text-decoration: none; }
+.enquete { display: grid; gap: var(--espaco-2); min-width: min(16rem, 100%); }
+.enquetePergunta { overflow-wrap: anywhere; }
+.enquete small { color: var(--cor-secundaria); font-size: var(--fonte-xs); }
+.raiz .opcaoEnquete { position: relative; display: flex; align-items: center; gap: var(--espaco-2); width: 100%; padding: 8px 10px; overflow: hidden; border: var(--borda-fina) solid var(--cor-borda); border-radius: var(--raio-sm); background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.raiz .opcaoEnquete:disabled { cursor: default; }
+.opcaoEnquete > * { position: relative; z-index: 1; }
+.opcaoEnquete i { position: absolute; z-index: 0; inset: 0 auto 0 0; background: var(--cor-borda); opacity: .55; transition: width .3s ease; }
+.opcaoEnquete[data-marcada="true"] { border-color: var(--cor-primaria); }
+.opcaoEnquete[data-marcada="true"] i { background: var(--cor-primaria); opacity: .22; }
+.textoOpcao { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.marcaEnquete { flex: none; display: grid; place-items: center; width: 1.1rem; height: 1.1rem; border: 1.5px solid var(--cor-borda-controle); border-radius: var(--raio-pill); color: var(--cor-sobre-primaria); }
+.opcaoEnquete[data-marcada="true"] .marcaEnquete { border-color: var(--cor-primaria); background: var(--cor-primaria); }
+.raiz .encerrarEnquete { justify-self: start; padding: 0; border: 0; background: transparent; color: var(--cor-primaria); font: inherit; font-size: var(--fonte-sm); cursor: pointer; }
