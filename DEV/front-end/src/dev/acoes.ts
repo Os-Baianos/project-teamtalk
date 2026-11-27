@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { criarClienteServidor } from "../supabase/servidor";
 import { regrasSenha, todasOk } from "../design/validacoes";
 
-export type UsuarioDev = { id: string; nome: string; arroba: string; email: string; papel: string; criado_em: string; foto_url: string | null };
+export type UsuarioDev = { id: string; nome: string; arroba: string; email: string; papel: string; criado_em: string; foto_url: string | null; arroba_alterado_em: string | null };
 
 /** A pessoa logada tem conta dev? (A permissão real é conferida de novo no banco em cada ação.) */
 export async function souDevAction(): Promise<boolean> {
@@ -66,4 +66,14 @@ export async function trocarSenhaAction(id: string, senha: string): Promise<{ ok
   if (data === "senha_fraca") return { ok: false, mensagem: "Senha fraca. Use maiúscula, minúscula, número e símbolo." };
   if (data === "inexistente") return { ok: false, mensagem: "Esse usuário já não existe." };
   return { ok: false, mensagem: "Sem permissão para trocar a senha." };
+}
+
+/** Admin: zera a contagem dos 30 dias para a pessoa poder trocar o @ de novo. */
+export async function liberarTrocaArrobaAction(id: string): Promise<{ ok: boolean; mensagem?: string }> {
+  const supabase = await criarClienteServidor();
+  const { data, error } = await supabase.rpc("dev_liberar_troca_arroba", { alvo: id });
+  if (error) return { ok: false, mensagem: "Não foi possível liberar agora. Tente novamente." };
+  if (data === "ok") { revalidatePath("/dev"); return { ok: true }; }
+  if (data === "inexistente") return { ok: false, mensagem: "Esse usuário já não existe." };
+  return { ok: false, mensagem: "Sem permissão." };
 }
