@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { FormEvent, KeyboardEvent } from "react";
+import type { ClipboardEvent, FormEvent, KeyboardEvent } from "react";
 import { Aviso } from "@design/componentes/aviso";
 import { Carregando } from "@design/componentes/carregando";
 import { Icone } from "@design/icones/icone";
 import { Avatar } from "../../contatos/avatar";
+import { ehImagem, formatarTamanho, resumoMensagem, TIPOS_ANEXO, validarArquivo } from "../../mensagens/anexos";
 import estilos from "./conversas.module.css";
 
 export type Pessoa = { id: string; nome: string; arroba: string; fotoUrl?: string | null };
@@ -30,6 +31,8 @@ export type BalaoDado = {
   editadaEm: string | null;
   apagada: boolean;
   status: StatusEnvio;
+  /** Arquivo anexado (url só existe para imagens, depois de carregar). */
+  anexo: { nome: string; tipo: string; tamanho: number; url: string | null } | null;
 };
 
 type Props = {
@@ -48,13 +51,14 @@ type Props = {
   aoAbrir: (pessoa: Pessoa) => void;
   aoVoltar: () => void;
   /** Devolve um texto de erro ou null quando enviou. */
-  aoEnviar: (texto: string, respondeA?: string | null) => Promise<string | null>;
+  aoEnviar: (texto: string, respondeA?: string | null, arquivo?: File | null) => Promise<string | null>;
   /** A outra pessoa está digitando para mim. */
   digitando: boolean;
   /** Aviso de que eu estou digitando (true) ou parei (false). */
   aoDigitar: (ativo?: boolean) => void;
   aoEditar: (id: string, texto: string) => Promise<boolean>;
   aoApagar: (id: string) => Promise<boolean>;
+  aoBaixar: (id: string, visualizar?: boolean) => Promise<boolean>;
 };
 
 const FUSO = "America/Sao_Paulo";
@@ -92,7 +96,7 @@ function Tiques({ status }: { status: StatusEnvio | "enviada" | "recebida" | "li
 
 export function TelaConversas({
   carregandoLista, carregandoMensagens, erroLista, aoTentarLista, erroHistorico, aoTentarHistorico, aoReenviar, conversas, novos, ativa, mensagens,
-  aoAbrir, aoVoltar, aoEnviar, aoEditar, aoApagar, digitando, aoDigitar,
+  aoAbrir, aoVoltar, aoEnviar, aoEditar, aoApagar, aoBaixar, digitando, aoDigitar,
 }: Props) {
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
@@ -118,6 +122,24 @@ export function TelaConversas({
   const [aviso, setAviso] = useState("");
   const historico = useRef<HTMLDivElement>(null);
   const campo = useRef<HTMLTextAreaElement>(null);
+  const seletor = useRef<HTMLInputElement>(null);
+  const [arquivo, setArquivo] = useState<File | null>(null);
+  const previa = useMemo(() => (arquivo && ehImagem(arquivo.type) ? URL.createObjectURL(arquivo) : null), [arquivo]);
+  useEffect(() => () => { if (previa) URL.revokeObjectURL(previa); }, [previa]);
+
+  function escolher(f: File | null | undefined) {
+    if (!f) return;
+    const motivo = validarArquivo(f);
+    if (motivo) { setErro(motivo); return; }
+    setErro("");
+    setEditando(null);
+    setArquivo(f);
+    campo.current?.focus();
+  }
+  function colar(e: ClipboardEvent<HTMLTextAreaElement>) {
+    const f = Array.from(e.clipboardData.files).find((x) => ehImagem(x.type));
+    if (f) { e.preventDefault(); escolher(f); }
+  }
 
   // Acompanha as mensagens novas só quando a pessoa está no fim; se subiu para ler, não puxa de volta.
   const noFim = useRef(true);
@@ -127,7 +149,7 @@ export function TelaConversas({
     const el = historico.current;
     if (el && noFim.current) el.scrollTop = el.scrollHeight;
   }, [mensagens.length, carregandoMensagens, ativa?.id]);
-  useEffect(() => { setTexto(""); setErro(""); setMenu(null); setDados(null); setEditando(null); setRespondendo(null); }, [ativa?.id]);
+  useEffect(() => { setTexto(""); setErro(""); setMenu(null); setDados(null); setEditando(null); setRespondendo(null); setArquivo(null); }, [ativa?.id]);
   useEffect(() => {
     const el = campo.current;
     if (!el) return;
@@ -159,7 +181,7 @@ export function TelaConversas({
   async function enviar(evento?: FormEvent) {
     evento?.preventDefault();
     const limpo = texto.trim();
-    if (!limpo || enviando) return;
+    if ((!limpo && !arquivo && !editando?.anexo) || enviando) return;
     setEnviando(true);
     setErro("");
     noFim.current = true; // ao enviar, acompanha a própria mensagem
@@ -172,16 +194,17 @@ export function TelaConversas({
       return;
     }
     aoDigitar(false);
-    const falha = await aoEnviar(limpo, respondendo?.id ?? null);
+    const falha = await aoEnviar(limpo, respondendo?.id ?? null, arquivo);
     setEnviando(false);
     if (falha) setErro(falha);
-    else { setTexto(""); setRespondendo(null); }
+    else { setTexto(""); setRespondendo(null); setArquivo(null); }
     campo.current?.focus();
   }
 
   function teclas(e: KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); void enviar(); }
     if (e.key === "Escape" && editando) { setEditando(null); setTexto(""); }
+    else if (e.key === "Escape" && arquivo) setArquivo(null);
     else if (e.key === "Escape" && respondendo) setRespondendo(null);
   }
 
@@ -375,7 +398,8 @@ export function TelaConversas({
                               <ul ref={mostrarMenu} className={`${estilos.menu} ${it.m.minha ? "" : estilos.menuEsq}`} role="menu">
                                 <li><button type="button" role="menuitem" onClick={() => comecarResposta(it.m)}>Responder</button></li>
                                 <li><button type="button" role="menuitem" onClick={() => { setMenu(null); setDados(it.m); }}>Dados da mensagem</button></li>
-                                <li><button type="button" role="menuitem" onClick={() => copiar(it.m)}>Copiar</button></li>
+                                {it.m.texto.trim() && <li><button type="button" role="menuitem" onClick={() => copiar(it.m)}>Copiar</button></li>}
+                                {it.m.anexo && <li><button type="button" role="menuitem" onClick={() => { setMenu(null); void aoBaixar(it.m.id).then((ok) => { if (!ok) setAviso("Não foi possível baixar"); }); }}>Baixar</button></li>}
                                 {it.m.minha && <li><button type="button" role="menuitem" onClick={() => comecarEdicao(it.m)}>Editar</button></li>}
                                 {it.m.minha && <li><button type="button" role="menuitem" className={estilos.perigo} onClick={() => apagar(it.m)}>Apagar</button></li>}
                               </ul>
@@ -388,6 +412,16 @@ export function TelaConversas({
                             <span>{it.m.resposta.texto}</span>
                           </button>
                         )}
+                        {it.m.anexo && (it.m.anexo.tipo && ehImagem(it.m.anexo.tipo) ? (
+                          <button type="button" className={estilos.anexoImagem} onClick={() => void aoBaixar(it.m.id, true)} aria-label={`Abrir imagem ${it.m.anexo.nome}`} title="Abrir imagem" disabled={it.m.status === "enviando"}>
+                            {it.m.anexo.url ? <img src={it.m.anexo.url} alt={it.m.anexo.nome} loading="lazy" /> : <span className={estilos.anexoCarregando} />}
+                          </button>
+                        ) : (
+                          <button type="button" className={estilos.anexoArquivo} onClick={() => void aoBaixar(it.m.id).then((ok) => { if (!ok) setAviso("Não foi possível baixar"); })} aria-label={`Baixar ${it.m.anexo.nome}`} title="Baixar" disabled={it.m.status === "enviando"}>
+                            <Icone nome="arquivo-pdf" width={28} height={28} />
+                            <span><strong>{it.m.anexo.nome}</strong><em>{formatarTamanho(it.m.anexo.tamanho)}</em></span>
+                          </button>
+                        ))}
                         <p>
                           {it.m.apagada ? (it.m.minha ? "Você apagou esta mensagem" : "Esta mensagem foi apagada") : it.m.texto}
                           {/* Hora e tiques entram na última linha do texto quando cabem (como no WhatsApp). */}
@@ -418,6 +452,18 @@ export function TelaConversas({
                   </button>
                 </div>
               )}
+              {arquivo && !editando && (
+                <div className={estilos.respondendo}>
+                  {previa ? <img className={estilos.miniatura} src={previa} alt="" /> : <Icone nome="arquivo-pdf" width={28} height={28} />}
+                  <div className={estilos.citacaoBarra}>
+                    <strong>{arquivo.name}</strong>
+                    <span>{formatarTamanho(arquivo.size)}</span>
+                  </div>
+                  <button type="button" className={estilos.icone} onClick={() => setArquivo(null)} aria-label="Remover arquivo" title="Remover arquivo">
+                    <Icone nome="fechar" width={18} height={18} />
+                  </button>
+                </div>
+              )}
               {(editando || aviso) && (
                 <div className={estilos.avisos}>
                   {editando && <Aviso key={editando.id} rotuloFechar="Cancelar edição" aoFechar={() => { setEditando(null); setTexto(""); }}>Editando mensagem</Aviso>}
@@ -425,8 +471,14 @@ export function TelaConversas({
                 </div>
               )}
               <div className={estilos.entrada}>
-                <textarea ref={campo} rows={1} value={texto} onChange={(e) => { setTexto(e.target.value); aoDigitar(e.target.value.trim() !== ""); }} onKeyDown={teclas} placeholder="Digite uma mensagem" aria-label="Mensagem" maxLength={2000} autoComplete="off" />
-                <button type="submit" className={estilos.enviar} disabled={!texto.trim() || enviando} aria-label={editando ? "Salvar edição" : "Enviar"}>
+                <input ref={seletor} type="file" hidden accept={TIPOS_ANEXO.join(",")} onChange={(e) => { escolher(e.target.files?.[0]); e.target.value = ""; }} />
+                {!editando && (
+                  <button type="button" className={estilos.icone} onClick={() => seletor.current?.click()} aria-label="Anexar arquivo" title="Anexar imagem, PDF ou arquivo">
+                    <Icone nome="anexar-pdf" width={22} height={22} />
+                  </button>
+                )}
+                <textarea ref={campo} rows={1} value={texto} onChange={(e) => { setTexto(e.target.value); aoDigitar(e.target.value.trim() !== ""); }} onKeyDown={teclas} onPaste={colar} placeholder={arquivo ? "Adicione uma legenda (opcional)" : "Digite uma mensagem"} aria-label="Mensagem" maxLength={2000} autoComplete="off" />
+                <button type="submit" className={estilos.enviar} disabled={(!texto.trim() && !arquivo && !editando?.anexo) || enviando} aria-label={editando ? "Salvar edição" : "Enviar"}>
                   {enviando ? <Carregando tamanho="1.1rem" texto="" cor="herdar" /> : <Icone nome={editando ? "enviada" : "enviar"} width={20} height={20} />}
                 </button>
               </div>
@@ -443,7 +495,7 @@ export function TelaConversas({
               <h2>Dados da mensagem</h2>
               <button type="button" className={estilos.icone} onClick={() => setDados(null)} aria-label="Fechar"><Icone nome="fechar" width={18} height={18} /></button>
             </header>
-            <p className={estilos.previaDialogo}>{dados.texto}</p>
+            <p className={estilos.previaDialogo}>{resumoMensagem(dados.texto, dados.anexo?.nome, dados.anexo?.tipo)}</p>
             <dl>
               <dt><Tiques status="enviada" /> Enviada</dt>
               <dd>{completo(dados.criadoEm)}</dd>

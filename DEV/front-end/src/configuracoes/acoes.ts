@@ -39,6 +39,8 @@ export async function excluirMinhaContaAction(senha: string): Promise<Resultado>
   if (dev === true) return { ok: false, mensagem: "Contas Admin não podem ser excluídas por aqui." };
   const { data: arquivos } = await supabase.storage.from("avatares").list(conferida.id);
   if (arquivos?.length) await supabase.storage.from("avatares").remove(arquivos.map((a) => `${conferida.id}/${a.name}`));
+  const { data: anexos } = await supabase.storage.from("anexos").list(conferida.id);
+  if (anexos?.length) await supabase.storage.from("anexos").remove(anexos.map((a) => `${conferida.id}/${a.name}`));
   const { data, error } = await supabase.rpc("excluir_minha_conta");
   if (error || data !== "ok") return { ok: false, mensagem: "Não foi possível excluir agora. Tente novamente." };
   try { await supabase.auth.signOut({ scope: "local" }); } catch { /* a conta já não existe */ }
