@@ -10,6 +10,7 @@ import {
   editarMensagemAction,
   enviarMensagemAction,
 } from "../../mensagens/acoes";
+import { useDigitando } from "../../mensagens/use-digitando";
 import { lerInicio, lerMensagens, marcarLidas, marcarRecebidas } from "../../dados/leituras";
 import type { Mensagem } from "../../mensagens/acoes";
 import { useMensagensAoVivo } from "../../mensagens/use-mensagens-ao-vivo";
@@ -69,14 +70,17 @@ export default function PaginaConversas() {
     if (pessoa) abrir(pessoa);
   }, [carregando]);
 
+  const { digitando, avisar: avisarDigitando, parar: pararDigitando } = useDigitando(meuId, ativa?.id ?? null);
+
   const aoReceber = useCallback((m: Mensagem) => {
     marcarRecebidas();
     if (ativaRef.current?.id === m.remetente_id) {
+      pararDigitando();
       setMensagens((atual) => (atual.some((x) => x.id === m.id) ? atual : [...atual, m]));
       marcarLidas(m.remetente_id);
     }
     carregarLista();
-  }, [carregarLista]);
+  }, [carregarLista, pararDigitando]);
 
   // Recebida/lida/editada/apagada: troca a mensagem na tela sem recarregar tudo.
   const aoAtualizar = useCallback((m: Mensagem) => {
@@ -116,14 +120,14 @@ export default function PaginaConversas() {
     carregarLista();
   }
 
-  async function enviar(texto: string) {
+  async function enviar(texto: string, respondeA: string | null = null) {
     if (!ativa || !meuId) return "Escolha uma conversa.";
     const provisoria: Local = {
       id: `tmp-${Date.now()}`, remetente_id: meuId, destinatario_id: ativa.id, texto,
-      criado_em: new Date().toISOString(), lida_em: null, recebida_em: null, editada_em: null, apagada_em: null,
+      criado_em: new Date().toISOString(), lida_em: null, recebida_em: null, editada_em: null, apagada_em: null, responde_a: respondeA,
     };
     setMensagens((atual) => [...atual, provisoria]);
-    const r = await enviarMensagemAction(ativa.id, texto);
+    const r = await enviarMensagemAction(ativa.id, texto, respondeA);
     if (!r.ok) {
       // A mensagem fica na conversa marcada como falha, com "Tentar novamente".
       setMensagens((atual) => atual.map((x) => (x.id === provisoria.id ? { ...x, falhou: true } : x)));
@@ -141,7 +145,7 @@ export default function PaginaConversas() {
     const falha = mensagens.find((m) => m.id === id);
     if (!falha || !ativa) return;
     setMensagens((atual) => atual.map((x) => (x.id === id ? { ...x, falhou: false } : x)));
-    const r = await enviarMensagemAction(ativa.id, falha.texto);
+    const r = await enviarMensagemAction(ativa.id, falha.texto, falha.responde_a ?? null);
     if (!r.ok) {
       setMensagens((atual) => atual.map((x) => (x.id === id ? { ...x, falhou: true } : x)));
       return;
@@ -171,8 +175,16 @@ export default function PaginaConversas() {
   const baloes: BalaoDado[] = mensagens.map((m) => {
     const minha = m.remetente_id === meuId;
     const status: StatusEnvio = m.falhou ? "falha" : m.id.startsWith("tmp-") ? "enviando" : m.lida_em ? "lida" : m.recebida_em ? "recebida" : "enviada";
+    const original = m.responde_a ? mensagens.find((x) => x.id === m.responde_a) : undefined;
+    const resposta = m.responde_a
+      ? {
+          id: m.responde_a,
+          autor: original ? (original.remetente_id === meuId ? "Você" : ativa?.nome ?? "") : "",
+          texto: original ? original.texto : "Mensagem indisponível",
+        }
+      : null;
     return {
-      id: m.id, minha, texto: m.texto, criadoEm: m.criado_em,
+      id: m.id, minha, texto: m.texto, criadoEm: m.criado_em, resposta,
       recebidaEm: m.recebida_em, lidaEm: m.lida_em, editadaEm: m.editada_em,
       apagada: !!m.apagada_em, status,
     };
@@ -196,6 +208,8 @@ export default function PaginaConversas() {
       aoAbrir={abrir}
       aoVoltar={voltar}
       aoEnviar={enviar}
+      digitando={digitando}
+      aoDigitar={avisarDigitando}
       aoEditar={editar}
       aoApagar={apagar}
     />
