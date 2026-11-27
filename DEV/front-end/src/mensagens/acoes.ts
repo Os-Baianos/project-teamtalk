@@ -12,6 +12,8 @@ export type Mensagem = {
   recebida_em: string | null;
   editada_em: string | null;
   apagada_em: string | null;
+  /** Id da mensagem a que esta responde (ou null). */
+  responde_a?: string | null;
 };
 
 export type Conversa = {
@@ -29,6 +31,7 @@ export type Conversa = {
 export async function enviarMensagemAction(
   contatoId: string,
   texto: string,
+  respondeA: string | null = null,
 ): Promise<{ ok: true; mensagem: Mensagem } | { ok: false; mensagem: string }> {
   const limpo = texto.trim();
   if (!limpo) return { ok: false, mensagem: "Digite uma mensagem." };
@@ -39,7 +42,7 @@ export async function enviarMensagemAction(
   if (!meuId) return { ok: false, mensagem: "Entre para enviar mensagens." };
   const { data, error } = await supabase
     .from("mensagens")
-    .insert({ remetente_id: meuId, destinatario_id: contatoId, texto: limpo })
+    .insert({ remetente_id: meuId, destinatario_id: contatoId, texto: limpo, responde_a: respondeA })
     .select()
     .single();
   if (error || !data) return { ok: false, mensagem: "Não foi possível enviar agora. Tente novamente." };

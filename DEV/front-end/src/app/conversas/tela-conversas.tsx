@@ -23,6 +23,8 @@ export type BalaoDado = {
   minha: boolean;
   texto: string;
   criadoEm: string;
+  /** Mensagem a que esta responde (autor vazio = original indisponível). */
+  resposta: { id: string; autor: string; texto: string } | null;
   recebidaEm: string | null;
   lidaEm: string | null;
   editadaEm: string | null;
@@ -46,7 +48,11 @@ type Props = {
   aoAbrir: (pessoa: Pessoa) => void;
   aoVoltar: () => void;
   /** Devolve um texto de erro ou null quando enviou. */
-  aoEnviar: (texto: string) => Promise<string | null>;
+  aoEnviar: (texto: string, respondeA?: string | null) => Promise<string | null>;
+  /** A outra pessoa está digitando para mim. */
+  digitando: boolean;
+  /** Aviso de que eu estou digitando (true) ou parei (false). */
+  aoDigitar: (ativo?: boolean) => void;
   aoEditar: (id: string, texto: string) => Promise<boolean>;
   aoApagar: (id: string) => Promise<boolean>;
 };
@@ -86,7 +92,7 @@ function Tiques({ status }: { status: StatusEnvio | "enviada" | "recebida" | "li
 
 export function TelaConversas({
   carregandoLista, carregandoMensagens, erroLista, aoTentarLista, erroHistorico, aoTentarHistorico, aoReenviar, conversas, novos, ativa, mensagens,
-  aoAbrir, aoVoltar, aoEnviar, aoEditar, aoApagar,
+  aoAbrir, aoVoltar, aoEnviar, aoEditar, aoApagar, digitando, aoDigitar,
 }: Props) {
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
@@ -107,6 +113,8 @@ export function TelaConversas({
   const soltarToque = () => { if (toque.current) { clearTimeout(toque.current); toque.current = null; } };
   const [dados, setDados] = useState<BalaoDado | null>(null);
   const [editando, setEditando] = useState<BalaoDado | null>(null);
+  const [respondendo, setRespondendo] = useState<BalaoDado | null>(null);
+  const [destaque, setDestaque] = useState<string | null>(null);
   const [aviso, setAviso] = useState("");
   const historico = useRef<HTMLDivElement>(null);
   const campo = useRef<HTMLTextAreaElement>(null);
@@ -124,7 +132,7 @@ export function TelaConversas({
     document.body.classList.add("pagina-cheia");
     return () => document.body.classList.remove("pagina-cheia");
   }, []);
-  useEffect(() => { setTexto(""); setErro(""); setMenu(null); setDados(null); setEditando(null); }, [ativa?.id]);
+  useEffect(() => { setTexto(""); setErro(""); setMenu(null); setDados(null); setEditando(null); setRespondendo(null); }, [ativa?.id]);
   useEffect(() => {
     const el = campo.current;
     if (!el) return;
@@ -168,16 +176,18 @@ export function TelaConversas({
       setTexto("");
       return;
     }
-    const falha = await aoEnviar(limpo);
+    aoDigitar(false);
+    const falha = await aoEnviar(limpo, respondendo?.id ?? null);
     setEnviando(false);
     if (falha) setErro(falha);
-    else setTexto("");
+    else { setTexto(""); setRespondendo(null); }
     campo.current?.focus();
   }
 
   function teclas(e: KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); void enviar(); }
     if (e.key === "Escape" && editando) { setEditando(null); setTexto(""); }
+    else if (e.key === "Escape" && respondendo) setRespondendo(null);
   }
 
   async function copiar(m: BalaoDado) {
@@ -186,8 +196,26 @@ export function TelaConversas({
     catch { setAviso("Não foi possível copiar"); }
   }
 
+  function comecarResposta(m: BalaoDado) {
+    setMenu(null);
+    setEditando(null);
+    setRespondendo(m);
+    setErro("");
+    setTimeout(() => campo.current?.focus(), 0);
+  }
+
+  /** Clicou na citação: rola até a mensagem original e a destaca por um instante. */
+  function irParaOriginal(id: string) {
+    const el = document.getElementById(`msg-${id}`);
+    if (!el) { setAviso("A mensagem original não está mais na conversa"); return; }
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    setDestaque(id);
+    setTimeout(() => setDestaque((atual) => (atual === id ? null : atual)), 1400);
+  }
+
   function comecarEdicao(m: BalaoDado) {
     setMenu(null);
+    setRespondendo(null);
     setEditando(m);
     setTexto(m.texto);
     setErro("");
@@ -255,7 +283,7 @@ export function TelaConversas({
                           <time dateTime={c.ultimaEm} className={c.naoLidas > 0 ? estilos.horaNova : ""}>{horarioLista(c.ultimaEm)}</time>
                         </span>
                         <span className={estilos.linha}>
-                          <span className={estilos.previa}>{statusLista(c)}{c.ultimaTexto}</span>
+                          <span className={estilos.previa}>{digitando && ativa?.id === c.id ? <span className={estilos.digitando}>digitando…</span> : <>{statusLista(c)}{c.ultimaTexto}</>}</span>
                           {c.naoLidas > 0 && <span className={estilos.naoLidas} aria-label={`${c.naoLidas} não lidas`}>{c.naoLidas > 99 ? "99+" : c.naoLidas}</span>}
                         </span>
                       </span>
@@ -312,7 +340,7 @@ export function TelaConversas({
                 <Avatar nome={ativa.nome} fotoUrl={ativa.fotoUrl} />
                 <span className={estilos.chatNome}>
                   <strong>{ativa.nome}</strong>
-                  <span>@{ativa.arroba}</span>
+                  {digitando ? <span className={estilos.digitando} role="status">digitando…</span> : <span>@{ativa.arroba}</span>}
                 </span>
               </Link>
             </header>
@@ -336,7 +364,7 @@ export function TelaConversas({
                   it.tipo === "dia" ? (
                     <div key={`d-${it.chave}`} className={estilos.dia}><span>{it.rotulo}</span></div>
                   ) : (
-                    <div key={it.m.id} className={`${estilos.linhaMsg} ${it.m.minha ? estilos.linhaMinha : ""}`}>
+                    <div key={it.m.id} id={`msg-${it.m.id}`} className={`${estilos.linhaMsg} ${it.m.minha ? estilos.linhaMinha : ""} ${destaque === it.m.id ? estilos.destaque : ""}`}>
                       <div
                         className={`${estilos.balao} ${it.m.minha ? estilos.minha : ""} ${it.m.apagada ? estilos.apagada : ""} ${it.m.status === "falha" ? estilos.falhou : ""}`}
                         onContextMenu={(e) => { if (it.m.apagada || it.m.status === "enviando" || it.m.status === "falha") return; e.preventDefault(); abrirMenu(it.m.id); }}
@@ -350,6 +378,7 @@ export function TelaConversas({
                             </button>
                             {menu === it.m.id && (
                               <ul ref={mostrarMenu} className={`${estilos.menu} ${it.m.minha ? "" : estilos.menuEsq}`} role="menu">
+                                <li><button type="button" role="menuitem" onClick={() => comecarResposta(it.m)}>Responder</button></li>
                                 <li><button type="button" role="menuitem" onClick={() => { setMenu(null); setDados(it.m); }}>Dados da mensagem</button></li>
                                 <li><button type="button" role="menuitem" onClick={() => copiar(it.m)}>Copiar</button></li>
                                 {it.m.minha && <li><button type="button" role="menuitem" onClick={() => comecarEdicao(it.m)}>Editar</button></li>}
@@ -357,6 +386,12 @@ export function TelaConversas({
                               </ul>
                             )}
                           </span>
+                        )}
+                        {it.m.resposta && !it.m.apagada && (
+                          <button type="button" className={estilos.citacao} onClick={() => irParaOriginal(it.m.resposta!.id)} aria-label="Ir para a mensagem respondida">
+                            {it.m.resposta.autor && <strong>{it.m.resposta.autor}</strong>}
+                            <span>{it.m.resposta.texto}</span>
+                          </button>
                         )}
                         <p>
                           {it.m.apagada ? (it.m.minha ? "Você apagou esta mensagem" : "Esta mensagem foi apagada") : it.m.texto}
@@ -377,6 +412,17 @@ export function TelaConversas({
 
 
             <form className={estilos.envio} onSubmit={enviar}>
+              {respondendo && !editando && (
+                <div className={estilos.respondendo}>
+                  <div className={estilos.citacaoBarra}>
+                    <strong>{respondendo.minha ? "Você" : ativa.nome}</strong>
+                    <span>{respondendo.texto}</span>
+                  </div>
+                  <button type="button" className={estilos.icone} onClick={() => setRespondendo(null)} aria-label="Cancelar resposta" title="Cancelar resposta">
+                    <Icone nome="fechar" width={18} height={18} />
+                  </button>
+                </div>
+              )}
               {(editando || aviso) && (
                 <div className={estilos.avisos}>
                   {editando && <Aviso key={editando.id} rotuloFechar="Cancelar edição" aoFechar={() => { setEditando(null); setTexto(""); }}>Editando mensagem</Aviso>}
@@ -384,7 +430,7 @@ export function TelaConversas({
                 </div>
               )}
               <div className={estilos.entrada}>
-                <textarea ref={campo} rows={1} value={texto} onChange={(e) => setTexto(e.target.value)} onKeyDown={teclas} placeholder="Digite uma mensagem" aria-label="Mensagem" maxLength={2000} autoComplete="off" />
+                <textarea ref={campo} rows={1} value={texto} onChange={(e) => { setTexto(e.target.value); aoDigitar(e.target.value.trim() !== ""); }} onKeyDown={teclas} placeholder="Digite uma mensagem" aria-label="Mensagem" maxLength={2000} autoComplete="off" />
                 <button type="submit" className={estilos.enviar} disabled={!texto.trim() || enviando} aria-label={editando ? "Salvar edição" : "Enviar"}>
                   {enviando ? <Carregando tamanho="1.1rem" texto="" cor="herdar" /> : <Icone nome={editando ? "enviada" : "enviar"} width={20} height={20} />}
                 </button>

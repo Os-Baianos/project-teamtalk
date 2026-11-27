@@ -61,6 +61,17 @@
 .chatNome strong, .chatNome span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .chatNome span { font-size: var(--fonte-xs); color: var(--cor-secundaria); }
 .raiz .icone { flex: none; display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: var(--raio-pill); color: var(--cor-secundaria); }
+.digitando { color: var(--cor-primaria); font-style: italic; }
+.raiz .citacao { display: grid; gap: 1px; width: 100%; min-height: 0; margin: 0 0 4px; padding: 4px 8px; border: 0; border-left: 3px solid var(--cor-primaria); border-radius: 6px; background: rgb(0 0 0 / 6%); color: var(--cor-secundaria); font: inherit; font-size: var(--fonte-sm); line-height: 1.3; text-align: left; cursor: pointer; transform: none; box-shadow: none; }
+.raiz .citacao:hover, .raiz .citacao:active { background: rgb(0 0 0 / 9%); transform: none; box-shadow: none; }
+.raiz .citacao strong { color: var(--cor-primaria); font-size: var(--fonte-xs); }
+.raiz .citacao span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; white-space: pre-wrap; text-align: left; }
+.respondendo { display: flex; align-items: center; gap: var(--espaco-2); margin-bottom: var(--espaco-2); padding: var(--espaco-2) var(--espaco-3); border: var(--borda-fina) solid var(--cor-borda); border-radius: var(--raio-md); background: var(--cor-superficie); }
+.balao:has(.citacao) { min-width: min(14rem, 78%); }
+.citacaoBarra { flex: 1; min-width: 0; display: grid; gap: 1px; padding: 2px 8px; border-left: 3px solid var(--cor-primaria); font-size: var(--fonte-sm); }
+.citacaoBarra strong { color: var(--cor-primaria); font-size: var(--fonte-xs); }
+.citacaoBarra span { color: var(--cor-secundaria); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.destaque .balao { box-shadow: 0 0 0 2px var(--cor-primaria), 0 1px 1px rgb(0 0 0 / 12%); transition: box-shadow .2s ease; }
 .raiz .icone:hover { background: var(--cor-fundo); color: var(--cor-texto); }
 
 .historico { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; padding: var(--espaco-4) clamp(var(--espaco-3), 6%, 4rem); }
