@@ -68,7 +68,6 @@ export function PainelDev({ inicial, meuId }: { inicial: UsuarioDev[]; meuId: st
     setOcupado(false);
     if (!r.ok) { setMensagem(r.mensagem ?? "Não foi possível trocar a senha."); return; }
     setTrocandoSenha(null); setNovaSenha("");
-    setFeito("Senha trocada. A pessoa foi desconectada e entra com a nova senha.");
   }
 
   async function excluir(id: string): Promise<string | null> {
