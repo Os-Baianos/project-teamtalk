@@ -25,7 +25,7 @@ Os testes verificam contraste AA (4,5:1 para texto), contraste dos controles/foc
 
 | Componente | Contrato |
 |---|---|
-| `Botao` | Props nativas de button, incluindo ref; `variante` primaria/secundaria/discreta/perigo; `ocupado` bloqueia cliques e anuncia processamento; `expandido` ocupa toda a largura. `type="button"` por padrão; submit deve ser explícito. |
+| `Botao` | Props nativas de button, incluindo ref; `variante` primaria/secundaria/discreta/perigo (todas desenhadas no laranja padrão do tema, sem botão de borda azul ou vermelha; a variante só indica o papel no código); `ocupado` bloqueia cliques e anuncia processamento; `expandido` ocupa toda a largura. `type="button"` por padrão; submit deve ser explícito. |
 | `Campo` | Props nativas de input, incluindo ref; exige `id` único e `rotulo`. `ajuda` e `erro` geram descrições associadas; erro usa `aria-invalid` e alerta. Preserva `aria-describedby` externo, autocomplete, inputMode, required, limites, leitura e desabilitação. |
 | `Badge` | Conteúdo textual e `tom` neutro/sucesso/atencao/erro/informacao. É informação estática, sem papel de botão ou anúncios automáticos. |
 | `CabecalhoMobile` | `titulo`, `subtitulo`, `acoes` e retorno opcional com `aoVoltar`/`rotuloVoltar`. Não cria ações sem callback. Renderiza o h1 da página. |
