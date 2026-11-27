@@ -53,7 +53,7 @@ export function MenuAcoes({ itens, rotulo = "Mais ações" }: PropsMenuAcoes) {
 
   return (
     <div className={estilos.raiz} ref={raiz}>
-      <Botao variante="secundaria" className={estilos.gatilho} aria-label={rotulo} aria-haspopup="menu" aria-expanded={aberto} onClick={() => (aberto ? fechar() : setAberto(true))}>
+      <Botao className={estilos.gatilho} aria-label={rotulo} aria-haspopup="menu" aria-expanded={aberto} onClick={() => (aberto ? fechar() : setAberto(true))}>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="19" cy="12" r="2" /></svg>
       </Botao>
       {aberto && (

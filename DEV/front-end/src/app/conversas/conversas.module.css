@@ -101,13 +101,15 @@
   .raiz .minha .menu { left: auto; right: 0; }
 }
 .menuBox[data-aberto="true"] { z-index: 20; }
-.menu { position: absolute; top: 100%; right: 4px; min-width: 11rem; margin: 2px 0 0; padding: var(--espaco-2) 0; list-style: none; background: var(--cor-superficie); border-radius: var(--raio-md); box-shadow: 0 4px 16px rgb(0 0 0 / 22%); }
+.menu { position: absolute; top: 100%; right: 4px; min-width: 11rem; margin: 2px 0 0; padding: 0; list-style: none; overflow: hidden; background: #161e2a; border: var(--borda-fina) solid #5f6b7a; border-radius: var(--raio-md); box-shadow: 0 8px 24px rgb(0 0 0 / 45%); }
 .menuEsq { right: auto; left: 4px; }
-.raiz .menu button { display: block; width: 100%; padding: var(--espaco-2) var(--espaco-4); background: transparent; color: var(--cor-texto); font-size: var(--fonte-sm); }
-.menu li + li { border-top: var(--borda-fina) solid var(--cor-borda); }
-.raiz .menu button:hover { background: var(--cor-fundo); }
-.raiz .menu .perigo { color: var(--cor-erro); }
-.raiz .menu .perigo:hover { background: var(--cor-erro-fundo); }
+.raiz .menu button { display: block; width: 100%; min-height: 0; margin: 0; padding: var(--espaco-2) var(--espaco-4); border: 0; border-radius: 0; background: transparent; color: var(--cor-topo-texto); font-size: var(--fonte-sm); font-weight: normal; text-align: left; }
+.raiz .menu button:hover, .raiz .menu button:active { transform: none; box-shadow: none; }
+.menu li + li { border-top: var(--borda-fina) solid #3a4656; }
+@media (hover: hover) { .raiz .menu button:hover { background: #232f3e; color: var(--cor-primaria); } }
+.raiz .menu .perigo { color: #ff8f8f; }
+@media (hover: hover) { .raiz .menu .perigo:hover { background: #232f3e; color: #ff8f8f; } }
+.linhaMsg:has(.menuBox[data-aberto="true"]) { position: relative; z-index: 20; }
 
 
 /* ---------- Envio ---------- */
