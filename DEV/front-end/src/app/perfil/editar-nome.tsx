@@ -30,7 +30,7 @@ export function EditarNome({ nome }: { nome: string }) {
       <>
         <dd>{nome}</dd>
         <div className={estilos.botaoCanto}>
-          <Botao variante="secundaria" onClick={() => { setValor(nome); setErro(""); setEditando(true); }}>Editar</Botao>
+          <Botao onClick={() => { setValor(nome); setErro(""); setEditando(true); }}>Editar</Botao>
         </div>
       </>
     );

@@ -39,7 +39,7 @@ export function EditarArroba({ arroba, liberadoEm }: Props) {
         {bloqueado && <dd className={estilos.dica}>Você poderá trocar de novo em {data(liberadoEm!)}.</dd>}
         {!bloqueado && (
           <div className={estilos.botaoCanto}>
-            <Botao variante="secundaria" onClick={() => { setValor(arroba); setErro(""); setEditando(true); }}>Editar</Botao>
+            <Botao onClick={() => { setValor(arroba); setErro(""); setEditando(true); }}>Editar</Botao>
           </div>
         )}
       </>
