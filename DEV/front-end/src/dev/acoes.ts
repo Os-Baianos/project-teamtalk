@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { criarClienteServidor } from "../supabase/servidor";
 import { regrasSenha, todasOk } from "../design/validacoes";
 
-export type UsuarioDev = { id: string; nome: string; arroba: string; email: string; papel: string; criado_em: string };
+export type UsuarioDev = { id: string; nome: string; arroba: string; email: string; papel: string; criado_em: string; foto_url: string | null };
 
 /** A pessoa logada tem conta dev? (A permissão real é conferida de novo no banco em cada ação.) */
 export async function souDevAction(): Promise<boolean> {
@@ -16,7 +16,11 @@ export async function souDevAction(): Promise<boolean> {
 export async function listarUsuariosAction(): Promise<UsuarioDev[]> {
   const supabase = await criarClienteServidor();
   const { data } = await supabase.rpc("dev_listar_usuarios");
-  return data ?? [];
+  return (data ?? []).map((u: Omit<UsuarioDev, "foto_url"> & { foto_path: string | null }) => {
+    const { foto_path, ...resto } = u;
+    const foto_url = foto_path ? supabase.storage.from("avatares").getPublicUrl(foto_path).data.publicUrl : null;
+    return { ...resto, foto_url };
+  });
 }
 
 export async function excluirUsuarioAction(id: string): Promise<{ ok: boolean; mensagem?: string }> {

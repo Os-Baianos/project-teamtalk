@@ -5,6 +5,7 @@ import type { FormEvent } from "react";
 import { Botao, Campo, CabecalhoMobile, LayoutMobile } from "@design/componentes";
 import { editarUsuarioAction, excluirUsuarioAction, listarUsuariosAction, trocarSenhaAction } from "../../dev/acoes";
 import type { UsuarioDev } from "../../dev/acoes";
+import { Avatar } from "../../contatos/avatar";
 import estilos from "./dev.module.css";
 
 const data = (iso: string) => new Date(iso).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" });
@@ -68,7 +69,7 @@ export function PainelDev({ inicial, meuId }: { inicial: UsuarioDev[]; meuId: st
   }
 
   return (
-    <LayoutMobile cabecalho={<CabecalhoMobile titulo="Painel Dev" subtitulo={`${usuarios.length} usuários cadastrados`} />}>
+    <LayoutMobile cabecalho={<CabecalhoMobile titulo="Admin" subtitulo={`${usuarios.length} usuários cadastrados`} />}>
       <Campo id="filtro-usuarios" rotulo="Filtrar por nome, @ ou e-mail" value={filtro} onChange={(e) => setFiltro(e.target.value)} autoComplete="off" />
       {mensagem && <p className={estilos.erro} role="alert">{mensagem}</p>}
       {feito && <p className={estilos.ok} role="status">{feito}</p>}
@@ -102,11 +103,14 @@ export function PainelDev({ inicial, meuId }: { inicial: UsuarioDev[]; meuId: st
               </form>
             ) : (
               <>
-                <div className={estilos.dados}>
-                  <strong>{u.nome} {u.papel === "dev" && <span className={estilos.papel}>DEV</span>}</strong>
-                  <span>@{u.arroba}</span>
-                  <span>{u.email}</span>
-                  <span>Criada em {data(u.criado_em)}</span>
+                <div className={estilos.pessoa}>
+                  <Avatar nome={u.nome} fotoUrl={u.foto_url} />
+                  <div className={estilos.dados}>
+                    <strong>{u.nome} {u.papel === "dev" && <span className={estilos.papel}>ADMIN</span>}</strong>
+                    <span>@{u.arroba}</span>
+                    <span>{u.email}</span>
+                    <span>Criada em {data(u.criado_em)}</span>
+                  </div>
                 </div>
                 {excluindo === u.id ? (
                   <div className={`${estilos.acoes} ${estilos.painelInterno}`}>

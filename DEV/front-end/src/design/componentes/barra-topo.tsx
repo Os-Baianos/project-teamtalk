@@ -29,7 +29,7 @@ export function BarraTopo() {
   const [meuId, setMeuId] = useState<string | null>(null);
   const [pendentes, setPendentes] = useState(0);
 
-  // Só contas dev veem o Painel dev (a permissão de verdade fica no banco).
+  // Só contas dev veem o Admin (a permissão de verdade fica no banco).
   useEffect(() => {
     if (publica) { setDev(false); setEmail(""); setMeuId(null); setPendentes(0); return; }
     souDevAction().then(setDev);
@@ -81,7 +81,7 @@ export function BarraTopo() {
               <Link href="/conta/contatos" className={estilos.opcao}>
                 Contatos{pendentes > 0 && <span className={estilos.contagem}>{pendentes}</span>}
               </Link>
-              {dev && <Link href="/dev" className={estilos.opcao}>Painel Dev</Link>}
+              {dev && <Link href="/dev" className={estilos.opcao}>Admin</Link>}
               <form action={sairAction} onSubmit={limparCache}>
                 <button type="submit" className={estilos.opcao}>Sair</button>
               </form>
