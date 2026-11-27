@@ -15,7 +15,7 @@ self.addEventListener("push", (e) => {
     await self.registration.showNotification(d.titulo || "TeamTalk", {
       body: d.corpo || "",
       icon: d.icone || "/icones/icone-192.png",
-      badge: "/icones/icone-192.png",
+      badge: "/icones/badge-96.png",
       tag: d.tag,
       renotify: true,
       data: { url: d.url || "/conversas" },
