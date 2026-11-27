@@ -16,6 +16,7 @@ import { Icone } from "../icones/icone";
 const itens = [
   { href: "/conversas", rotulo: "Conversas" },
   { href: "/contatos", rotulo: "Contatos" },
+  { href: "/comunidades", rotulo: "Comunidades" },
 ];
 
 const rotasPublicas = ["/login", "/cadastro"];
