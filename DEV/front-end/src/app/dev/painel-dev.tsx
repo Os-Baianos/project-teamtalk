@@ -2,7 +2,9 @@
 
 import { useMemo, useState } from "react";
 import type { FormEvent } from "react";
-import { Botao, Campo, CabecalhoMobile, LayoutMobile } from "@design/componentes";
+import Link from "next/link";
+import { Botao, Campo, CabecalhoMobile, LayoutMobile, MenuAcoes } from "@design/componentes";
+import type { ItemMenuAcoes } from "@design/componentes";
 import { editarUsuarioAction, excluirUsuarioAction, listarUsuariosAction, trocarSenhaAction } from "../../dev/acoes";
 import type { UsuarioDev } from "../../dev/acoes";
 import { Avatar } from "../../contatos/avatar";
@@ -10,11 +12,20 @@ import estilos from "./dev.module.css";
 
 const data = (iso: string) => new Date(iso).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" });
 
+function DadosUsuario({ u }: { u: UsuarioDev }) {
+  return (
+    <div className={estilos.dados}>
+      <strong>{u.nome} {u.papel === "dev" && <span className={estilos.papel}>ADMIN</span>}</strong>
+      <span>@{u.arroba} · {u.email}</span>
+      <span className={estilos.data}>Criada em {data(u.criado_em)}</span>
+    </div>
+  );
+}
+
 export function PainelDev({ inicial, meuId }: { inicial: UsuarioDev[]; meuId: string }) {
   const [usuarios, setUsuarios] = useState(inicial);
   const [filtro, setFiltro] = useState("");
   const [editando, setEditando] = useState<string | null>(null);
-  const [excluindo, setExcluindo] = useState<string | null>(null);
   const [nome, setNome] = useState("");
   const [arroba, setArroba] = useState("");
   const [trocandoSenha, setTrocandoSenha] = useState<string | null>(null);
@@ -33,7 +44,7 @@ export function PainelDev({ inicial, meuId }: { inicial: UsuarioDev[]; meuId: st
   async function recarregar() { setUsuarios(await listarUsuariosAction()); }
 
   function comecarEdicao(u: UsuarioDev) {
-    setEditando(u.id); setExcluindo(null); setTrocandoSenha(null); setNome(u.nome); setArroba(u.arroba); setMensagem(""); setFeito("");
+    setEditando(u.id); setTrocandoSenha(null); setNome(u.nome); setArroba(u.arroba); setMensagem(""); setFeito("");
   }
 
   async function salvar(e: FormEvent<HTMLFormElement>, id: string) {
@@ -56,16 +67,25 @@ export function PainelDev({ inicial, meuId }: { inicial: UsuarioDev[]; meuId: st
     setFeito("Senha trocada. A pessoa foi desconectada e entra com a nova senha.");
   }
 
-  async function excluir(id: string) {
-    setOcupado(true); setMensagem("");
+  async function excluir(id: string): Promise<string | null> {
     const r = await excluirUsuarioAction(id);
-    setOcupado(false);
-    if (!r.ok) { setMensagem(r.mensagem ?? "Não foi possível excluir."); return; }
-    setExcluindo(null);
+    if (!r.ok) return r.mensagem ?? "Não foi possível excluir.";
     setSaindo(id); // o cartão some com animação antes de sair da lista
     await new Promise((ok) => setTimeout(ok, 280));
     setSaindo(null);
     await recarregar();
+    return null;
+  }
+
+  function itensDe(u: UsuarioDev): ItemMenuAcoes[] {
+    const itens: ItemMenuAcoes[] = [
+      { id: "editar", rotulo: "Editar", aoEscolher: async () => { comecarEdicao(u); return null; } },
+      { id: "senha", rotulo: "Trocar senha", aoEscolher: async () => { setTrocandoSenha(u.id); setNovaSenha(""); setEditando(null); setMensagem(""); setFeito(""); return null; } },
+    ];
+    if (u.id !== meuId) {
+      itens.push({ id: "excluir", rotulo: "Excluir", perigo: true, confirmacao: `Excluir ${u.nome}? Apaga a conta, os contatos e as mensagens. Não dá para desfazer.`, aoEscolher: () => excluir(u.id) });
+    }
+    return itens;
   }
 
   return (
@@ -102,32 +122,20 @@ export function PainelDev({ inicial, meuId }: { inicial: UsuarioDev[]; meuId: st
                 </div>
               </form>
             ) : (
-              <>
-                <div className={estilos.pessoa}>
-                  <Avatar nome={u.nome} fotoUrl={u.foto_url} />
-                  <div className={estilos.dados}>
-                    <strong>{u.nome} {u.papel === "dev" && <span className={estilos.papel}>ADMIN</span>}</strong>
-                    <span>@{u.arroba}</span>
-                    <span>{u.email}</span>
-                    <span>Criada em {data(u.criado_em)}</span>
-                  </div>
-                </div>
-                {excluindo === u.id ? (
-                  <div className={`${estilos.acoes} ${estilos.painelInterno}`}>
-                    <span className={estilos.aviso}>Excluir {u.nome}? Apaga a conta, os contatos e as mensagens. Não dá para desfazer.</span>
-                    <Botao variante="secundaria" onClick={() => setExcluindo(null)} disabled={ocupado}>Cancelar</Botao>
-                    <Botao variante="perigo" onClick={() => excluir(u.id)} ocupado={ocupado}>Confirmar exclusão</Botao>
+              <div className={estilos.topo}>
+                {u.id === meuId ? (
+                  <div className={estilos.pessoa}>
+                    <Avatar nome={u.nome} fotoUrl={u.foto_url} />
+                    <DadosUsuario u={u} />
                   </div>
                 ) : (
-                  <div className={estilos.acoes}>
-                    <Botao variante="secundaria" onClick={() => comecarEdicao(u)}>Editar</Botao>
-                    <Botao variante="secundaria" onClick={() => { setTrocandoSenha(u.id); setNovaSenha(""); setEditando(null); setExcluindo(null); setMensagem(""); setFeito(""); }} aria-label={`Trocar a senha de ${u.nome}`}>Trocar senha</Botao>
-                    {u.id !== meuId && (
-                      <Botao variante="perigo" onClick={() => { setExcluindo(u.id); setEditando(null); setMensagem(""); }} aria-label={`Excluir ${u.nome}`}>Excluir</Botao>
-                    )}
-                  </div>
+                  <Link className={`${estilos.pessoa} ${estilos.pessoaLink}`} href={`/perfil/${u.arroba}`}>
+                    <Avatar nome={u.nome} fotoUrl={u.foto_url} />
+                    <DadosUsuario u={u} />
+                  </Link>
                 )}
-              </>
+                <MenuAcoes itens={itensDe(u)} rotulo={`Mais ações de ${u.nome}`} />
+              </div>
             )}
           </li>
         ))}
