@@ -14,6 +14,10 @@ export type Mensagem = {
   grupo_id?: string | null;
   /** Aviso automático do grupo. */
   sistema?: boolean;
+  /** Cartão de contato: id da pessoa compartilhada. */
+  contato_ref?: string | null;
+  /** Mensagem que é uma enquete. */
+  enquete?: boolean;
   texto: string;
   criado_em: string;
   lida_em: string | null;

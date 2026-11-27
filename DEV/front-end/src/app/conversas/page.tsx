@@ -11,7 +11,9 @@ import {
   enviarMensagemAction,
 } from "../../mensagens/acoes";
 import { useDigitando } from "../../mensagens/use-digitando";
-import { lerInicio, lerMensagens, marcarLidas, marcarRecebidas } from "../../dados/leituras";
+import { lerContatos, lerInicio, lerMensagens, marcarLidas, marcarRecebidas } from "../../dados/leituras";
+import { useExtras } from "../../mensagens/use-extras";
+import { criarEnqueteAction, enviarContatoAction } from "../../mensagens/extras-acoes";
 import type { Mensagem } from "../../mensagens/acoes";
 import { useMensagensAoVivo } from "../../mensagens/use-mensagens-ao-vivo";
 import { criarClienteNavegador } from "../../supabase/navegador";
@@ -246,6 +248,32 @@ export default function PaginaConversas() {
     return ok;
   }
 
+  const { pessoas, enquetes, votar, encerrar } = useExtras(meuId, mensagens);
+
+  function acrescentar(mensagem: Mensagem) {
+    setMensagens((atual) => (atual.some((x) => x.id === mensagem.id) ? atual : [...atual, mensagem]));
+    carregarLista();
+  }
+  const extras = {
+    carregarContatos: async () => (await lerContatos()).map((c) => ({ id: c.id, nome: c.nome, arroba: c.arroba, fotoUrl: c.foto_url })),
+    aoEnviarContato: async (pessoaId: string) => {
+      if (!ativa) return "Escolha uma conversa.";
+      const r = await enviarContatoAction({ contatoId: ativa.id }, pessoaId);
+      if (!r.ok) return r.mensagem;
+      acrescentar(r.mensagem);
+      return null;
+    },
+    aoCriarEnquete: async (pergunta: string, opcoes: string[], multipla: boolean) => {
+      if (!ativa) return "Escolha uma conversa.";
+      const r = await criarEnqueteAction({ contatoId: ativa.id }, pergunta, opcoes, multipla);
+      if (!r.ok) return r.mensagem;
+      acrescentar(r.mensagem);
+      return null;
+    },
+    aoVotar: votar,
+    aoEncerrar: encerrar,
+  };
+
   const baloes: BalaoDado[] = mensagens.map((m) => {
     const minha = m.remetente_id === meuId;
     const status: StatusEnvio = m.falhou ? "falha" : m.id.startsWith("tmp-") ? "enviando" : m.lida_em ? "lida" : m.recebida_em ? "recebida" : "enviada";
@@ -261,6 +289,7 @@ export default function PaginaConversas() {
       id: m.id, minha, texto: m.texto, criadoEm: m.criado_em, resposta,
       recebidaEm: m.recebida_em, lidaEm: m.lida_em, editadaEm: m.editada_em,
       apagada: !!m.apagada_em, status,
+      contato: m.contato_ref ? pessoas[m.contato_ref] ?? null : null, ehEnquete: !!m.enquete, enquete: enquetes[m.id] ?? null,
       anexo: m.anexo_nome && !m.apagada_em
         ? {
             nome: m.anexo_nome, tipo: m.anexo_tipo ?? "", tamanho: m.anexo_tamanho ?? 0,
@@ -294,6 +323,7 @@ export default function PaginaConversas() {
       aoEditar={editar}
       aoApagar={apagar}
       aoBaixar={baixar}
+      extras={extras}
     />
   );
 }
