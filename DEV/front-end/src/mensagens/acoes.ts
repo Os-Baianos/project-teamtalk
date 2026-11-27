@@ -9,7 +9,11 @@ import type { Anexo } from "./anexos";
 export type Mensagem = {
   id: string;
   remetente_id: string;
-  destinatario_id: string;
+  destinatario_id: string | null;
+  /** Mensagem de comunidade (grupo): não tem destinatário. */
+  grupo_id?: string | null;
+  /** Aviso automático do grupo. */
+  sistema?: boolean;
   texto: string;
   criado_em: string;
   lida_em: string | null;

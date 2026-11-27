@@ -34,6 +34,10 @@ export type BalaoDado = {
   status: StatusEnvio;
   /** Arquivo anexado (url só existe para imagens, depois de carregar). */
   anexo: { nome: string; tipo: string; tamanho: number; url: string | null; expirado: boolean } | null;
+  /** Só em grupos: quem escreveu (para mensagens dos outros). */
+  autor?: { nome: string; fotoUrl: string | null } | null;
+  /** Aviso centralizado do grupo ("Fulano adicionou Beltrano"). */
+  sistema?: boolean;
 };
 
 type Props = {
@@ -60,6 +64,18 @@ type Props = {
   aoEditar: (id: string, texto: string) => Promise<boolean>;
   aoApagar: (id: string) => Promise<boolean>;
   aoBaixar: (id: string, visualizar?: boolean) => Promise<boolean>;
+  /** Modo comunidades: título da lista, textos próprios e informações do grupo. */
+  grupo?: {
+    titulo: string;
+    vazio: string;
+    /** Linha abaixo do nome no topo da conversa (ex.: "12 membros"). */
+    subtitulo: string;
+    aoAbrirInfo: () => void;
+    /** Chat fechado para mim: no lugar do campo de mensagem aparece um aviso. */
+    bloqueado: boolean;
+    /** Conteúdo extra no topo da lista (ex.: botão). */
+    rodapeLista?: React.ReactNode;
+  };
 };
 
 const FUSO = "America/Sao_Paulo";
@@ -97,7 +113,7 @@ function Tiques({ status }: { status: StatusEnvio | "enviada" | "recebida" | "li
 
 export function TelaConversas({
   carregandoLista, carregandoMensagens, erroLista, aoTentarLista, erroHistorico, aoTentarHistorico, aoReenviar, conversas, novos, ativa, mensagens,
-  aoAbrir, aoVoltar, aoEnviar, aoEditar, aoApagar, aoBaixar, digitando, aoDigitar,
+  aoAbrir, aoVoltar, aoEnviar, aoEditar, aoApagar, aoBaixar, digitando, aoDigitar, grupo,
 }: Props) {
   const [texto, setTexto] = useState("");
   const [enviando, setEnviando] = useState(false);
@@ -272,7 +288,7 @@ export function TelaConversas({
     <div className={`${estilos.raiz} ${ativa ? estilos.comAtiva : ""} ${listaAberta ? "" : estilos.listaFechada}`}>
       <aside className={estilos.lista} aria-label="Conversas">
         <header className={estilos.listaTopo}>
-          <h1>Conversas</h1>
+          <h1>{grupo?.titulo ?? "Conversas"}</h1>
           <button type="button" className={`${estilos.icone} ${estilos.soDesktop}`} onClick={() => setListaAberta(false)} aria-label="Ocultar conversas" title="Ocultar conversas">
             <Icone nome="voltar" width={20} height={20} />
           </button>
@@ -292,7 +308,7 @@ export function TelaConversas({
             <div className={estilos.centro}><Carregando tamanho="2rem" texto="Carregando conversas" atraso /></div>
           ) : (
             <>
-              {conversas.length === 0 && novos.length === 0 && <p className={estilos.vazio}>Nenhuma conversa ainda.</p>}
+              {conversas.length === 0 && novos.length === 0 && <p className={estilos.vazio}>{grupo?.vazio ?? "Nenhuma conversa ainda."}</p>}
               {conversas.length > 0 && listaFiltrada.length === 0 && novosFiltrados.length === 0 && <p className={estilos.vazio}>Nada encontrado.</p>}
               <ul className={estilos.itens}>
                 {listaFiltrada.map((c, i) => (
@@ -345,7 +361,7 @@ export function TelaConversas({
               </button>
             )}
             <Icone nome="simbolo" width={72} height={72} />
-            <p>Escolha uma conversa para começar</p>
+            <p>{grupo ? "Escolha uma comunidade para ver as mensagens" : "Escolha uma conversa para começar"}</p>
           </div>
         ) : (
           <>
@@ -358,13 +374,23 @@ export function TelaConversas({
                   <Icone nome="menu" width={20} height={20} />
                 </button>
               )}
-              <Link className={estilos.chatPerfil} href={`/perfil/${ativa.arroba}`} aria-label={`Ver o perfil de ${ativa.nome}`}>
-                <Avatar nome={ativa.nome} fotoUrl={ativa.fotoUrl} />
-                <span className={estilos.chatNome}>
-                  <strong>{ativa.nome}</strong>
-                  {digitando ? <span className={estilos.digitando} role="status">digitando…</span> : <span>@{ativa.arroba}</span>}
-                </span>
-              </Link>
+              {grupo ? (
+                <button type="button" className={estilos.chatPerfil} onClick={grupo.aoAbrirInfo} aria-label={`Informações de ${ativa.nome}`}>
+                  <Avatar nome={ativa.nome} fotoUrl={ativa.fotoUrl} />
+                  <span className={estilos.chatNome}>
+                    <strong>{ativa.nome}</strong>
+                    <span>{grupo.subtitulo}</span>
+                  </span>
+                </button>
+              ) : (
+                <Link className={estilos.chatPerfil} href={`/perfil/${ativa.arroba}`} aria-label={`Ver o perfil de ${ativa.nome}`}>
+                  <Avatar nome={ativa.nome} fotoUrl={ativa.fotoUrl} />
+                  <span className={estilos.chatNome}>
+                    <strong>{ativa.nome}</strong>
+                    {digitando ? <span className={estilos.digitando} role="status">digitando…</span> : <span>@{ativa.arroba}</span>}
+                  </span>
+                </Link>
+              )}
             </header>
 
             <div data-historico className={estilos.historico} ref={historico} aria-live="polite" onScroll={(e) => {
@@ -385,8 +411,11 @@ export function TelaConversas({
                 itens.map((it) =>
                   it.tipo === "dia" ? (
                     <div key={`d-${it.chave}`} className={estilos.dia}><span>{it.rotulo}</span></div>
+                  ) : it.m.sistema ? (
+                    <div key={it.m.id} id={`msg-${it.m.id}`} className={estilos.dia}><span>{it.m.texto}</span></div>
                   ) : (
                     <div key={it.m.id} id={`msg-${it.m.id}`} className={`${estilos.linhaMsg} ${it.m.minha ? estilos.linhaMinha : ""} ${destaque === it.m.id ? estilos.destaque : ""}`}>
+                      {grupo && !it.m.minha && <span className={estilos.autorFoto}><Avatar nome={it.m.autor?.nome ?? "?"} fotoUrl={it.m.autor?.fotoUrl} /></span>}
                       <div
                         className={`${estilos.balao} ${it.m.minha ? estilos.minha : ""} ${it.m.apagada ? estilos.apagada : ""} ${it.m.status === "falha" ? estilos.falhou : ""}`}
                         onContextMenu={(e) => { if (it.m.apagada || it.m.status === "enviando" || it.m.status === "falha") return; e.preventDefault(); abrirMenu(it.m.id); }}
@@ -410,6 +439,7 @@ export function TelaConversas({
                             )}
                           </span>
                         )}
+                        {grupo && !it.m.minha && !it.m.apagada && <strong className={estilos.autorNome}>{it.m.autor?.nome ?? "Ex-membro"}</strong>}
                         {it.m.resposta && !it.m.apagada && (
                           <button type="button" className={estilos.citacao} onClick={() => irParaOriginal(it.m.resposta!.id)} aria-label="Ir para a mensagem respondida">
                             {it.m.resposta.autor && <strong>{it.m.resposta.autor}</strong>}
@@ -453,11 +483,14 @@ export function TelaConversas({
             </div>
 
 
+            {grupo?.bloqueado ? (
+              <p className={estilos.chatFechado}>Somente admins podem enviar mensagens</p>
+            ) : (
             <form className={estilos.envio} onSubmit={enviar}>
               {respondendo && !editando && (
                 <div className={estilos.respondendo}>
                   <div className={estilos.citacaoBarra}>
-                    <strong>{respondendo.minha ? "Você" : ativa.nome}</strong>
+                    <strong>{respondendo.minha ? "Você" : respondendo.autor?.nome ?? ativa.nome}</strong>
                     <span>{respondendo.texto}</span>
                   </div>
                   <button type="button" className={estilos.icone} onClick={() => setRespondendo(null)} aria-label="Cancelar resposta" title="Cancelar resposta">
@@ -507,6 +540,7 @@ export function TelaConversas({
               </div>
               {erro && <p className={estilos.erro} role="alert">{erro}</p>}
             </form>
+            )}
           </>
         )}
       </section>
@@ -524,9 +558,9 @@ export function TelaConversas({
               <dd>{completo(dados.criadoEm)}</dd>
               {dados.minha && (
                 <>
-                  <dt><Tiques status="recebida" /> Recebida</dt>
-                  <dd>{dados.recebidaEm ? completo(dados.recebidaEm) : "Ainda não"}</dd>
-                  <dt><Tiques status="lida" /> Lida</dt>
+                  {!grupo && (<><dt><Tiques status="recebida" /> Recebida</dt>
+                  <dd>{dados.recebidaEm ? completo(dados.recebidaEm) : "Ainda não"}</dd></>)}
+                  <dt><Tiques status="lida" /> {grupo ? "Lida por todos" : "Lida"}</dt>
                   <dd>{dados.lidaEm ? completo(dados.lidaEm) : "Ainda não"}</dd>
                 </>
               )}

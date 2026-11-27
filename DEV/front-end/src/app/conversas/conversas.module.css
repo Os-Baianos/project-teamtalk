@@ -194,3 +194,11 @@
   .chat { animation: aparecer .25s ease backwards; }
   .tique { transition: color .25s ease; }
 }
+
+/* Comunidades */
+.raiz button.chatPerfil { padding: 0; border: 0; background: transparent; text-align: left; cursor: pointer; font: inherit; }
+.linhaMsg { gap: var(--espaco-2); align-items: flex-end; }
+.autorFoto { flex: none; display: block; width: 2rem; height: 2rem; overflow: hidden; border-radius: var(--raio-pill); }
+.autorFoto > * { width: 100%; height: 100%; }
+.autorNome { display: block; margin-bottom: 2px; font-size: var(--fonte-xs); color: var(--cor-primaria); }
+.chatFechado { margin: 0; padding: var(--espaco-4); text-align: center; background: var(--cor-fundo); border-top: var(--borda-fina) solid var(--cor-borda); color: var(--cor-secundaria); font-size: var(--fonte-sm); }

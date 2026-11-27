@@ -8,6 +8,7 @@ import type { ItemMenuAcoes } from "@design/componentes";
 import { editarUsuarioAction, excluirUsuarioAction, liberarTrocaArrobaAction, listarUsuariosAction, trocarSenhaAction } from "../../dev/acoes";
 import type { UsuarioDev } from "../../dev/acoes";
 import { Avatar } from "../../contatos/avatar";
+import { ComunidadesDev } from "./comunidades-dev";
 import estilos from "./dev.module.css";
 
 const DIAS_30 = 30 * 24 * 60 * 60 * 1000;
@@ -102,6 +103,8 @@ export function PainelDev({ inicial, meuId }: { inicial: UsuarioDev[]; meuId: st
 
   return (
     <LayoutMobile cabecalho={<CabecalhoMobile titulo="Admin" subtitulo={`${usuarios.length} usuários cadastrados`} />}>
+      <ComunidadesDev usuarios={usuarios} meuId={meuId} />
+      <h2 style={{ margin: "var(--espaco-5, 24px) 0 var(--espaco-3)", fontSize: "var(--fonte-base)" }}>Usuários</h2>
       <Campo id="filtro-usuarios" rotulo="Filtrar por nome, @ ou e-mail" value={filtro} onChange={(e) => setFiltro(e.target.value)} autoComplete="off" />
       {mensagem && <p className={estilos.erro} role="alert">{mensagem}</p>}
       {feito && <p className={estilos.ok} role="status">{feito}</p>}
