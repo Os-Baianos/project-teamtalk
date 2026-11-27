@@ -14,6 +14,7 @@ type Estado = "carregando" | "sem-suporte" | "bloqueado" | "desligado" | "ligado
 export function Notificacoes() {
   const [estado, setEstado] = useState<Estado>("carregando");
   const [ocupado, setOcupado] = useState(false);
+  const [testando, setTestando] = useState(false);
   const [erro, setErro] = useState("");
   const [resultado, setResultado] = useState("");
 
@@ -56,17 +57,23 @@ export function Notificacoes() {
   }
 
   async function testar() {
-    setOcupado(true);
+    setTestando(true);
     setErro("");
     setResultado("");
-    const r = await enviarPushTesteAction();
-    setOcupado(false);
-    if (r.ok) setResultado(r.mensagem); else setErro(r.mensagem);
+    try {
+      const r = await enviarPushTesteAction();
+      if (r.ok) setResultado(r.mensagem); else setErro(r.mensagem);
+    } catch {
+      setErro("Não foi possível enviar o teste. Atualize a página e tente de novo.");
+    } finally {
+      setTestando(false);
+    }
   }
 
   async function desativar() {
     setOcupado(true);
     setErro("");
+    setResultado("");
     try {
       const reg = await navigator.serviceWorker.ready;
       const sub = await reg.pushManager.getSubscription();
@@ -95,9 +102,13 @@ export function Notificacoes() {
       <dd>{texto}</dd>
       {erro && <dd className={estilos.dica} role="alert">{erro}</dd>}
       {resultado && <dd className={estilos.dica} role="status">{resultado}</dd>}
-      {estado === "ligado" && <dd><Botao disabled={ocupado} onClick={testar}>Enviar teste</Botao></dd>}
       {estado === "desligado" && <div className={estilos.botaoCanto}><Botao ocupado={ocupado} onClick={ativar}>Ativar</Botao></div>}
-      {estado === "ligado" && <div className={estilos.botaoCanto}><Botao ocupado={ocupado} onClick={desativar}>Desativar</Botao></div>}
+      {estado === "ligado" && (
+        <div className={estilos.botaoCanto}>
+          <Botao ocupado={ocupado} disabled={testando} onClick={desativar}>Desativar</Botao>
+          <Botao ocupado={testando} disabled={ocupado} onClick={testar}>Teste</Botao>
+        </div>
+      )}
     </>
   );
 }

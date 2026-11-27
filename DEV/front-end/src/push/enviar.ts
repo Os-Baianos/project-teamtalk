@@ -1,4 +1,4 @@
-import webpush from "web-push";
+import { sendNotification } from "web-push";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 /**
@@ -23,10 +23,10 @@ export async function enviarPushDaMensagem(supabase: SupabaseClient, meuId: stri
       tag: `msg-${meuId}`,
       url: `/conversas?com=${encodeURIComponent(eu.arroba)}`,
     });
-    webpush.setVapidDetails(process.env.VAPID_SUBJECT ?? "mailto:contato@teamtalk.app", publica, privada);
+    const vapidDetails = { subject: process.env.VAPID_SUBJECT ?? "mailto:contato@teamtalk.app", publicKey: publica, privateKey: privada };
     await Promise.all((destinos as { endpoint: string; p256dh: string; auth: string }[]).map(async (d) => {
       try {
-        await webpush.sendNotification({ endpoint: d.endpoint, keys: { p256dh: d.p256dh, auth: d.auth } }, carga, { TTL: 60 * 60 * 24, urgency: "high" });
+        await sendNotification({ endpoint: d.endpoint, keys: { p256dh: d.p256dh, auth: d.auth } }, carga, { vapidDetails, TTL: 60 * 60 * 24, urgency: "high", timeout: 10_000 });
       } catch (e) {
         const status = (e as { statusCode?: number }).statusCode;
         console.error("push: falha ao enviar", status, (e as { body?: string }).body ?? "");
