@@ -1,6 +1,6 @@
 "use server";
 
-import webpush from "web-push";
+import webpush from "./webpush";
 import { criarClienteServidor } from "../supabase/servidor";
 
 export type AssinaturaPush = { endpoint: string; keys: { p256dh: string; auth: string } };
