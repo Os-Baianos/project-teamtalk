@@ -98,8 +98,12 @@ export function TelaConversas({
   const toque = useRef<ReturnType<typeof setTimeout> | null>(null);
   /** Abre o menu da mensagem (clique na setinha no computador, segurar a mensagem no celular). */
   const abrirMenu = (id: string) => { abertoEm.current = Date.now(); setMenu(id); };
-  /** Menu aberto perto do fim da conversa: rola o histórico só o necessário para ele aparecer inteiro. */
-  const mostrarMenu = useCallback((el: HTMLElement | null) => { el?.scrollIntoView({ block: "nearest" }); }, []);
+  /** Menu que não cabe abaixo (últimas mensagens) abre para cima, em vez de empurrar a conversa. */
+  const mostrarMenu = useCallback((el: HTMLElement | null) => {
+    if (!el) return;
+    const caixa = el.closest("[data-historico]");
+    if (caixa && el.getBoundingClientRect().bottom > caixa.getBoundingClientRect().bottom) el.dataset.cima = "true";
+  }, []);
   const soltarToque = () => { if (toque.current) { clearTimeout(toque.current); toque.current = null; } };
   const [dados, setDados] = useState<BalaoDado | null>(null);
   const [editando, setEditando] = useState<BalaoDado | null>(null);
@@ -313,7 +317,7 @@ export function TelaConversas({
               </Link>
             </header>
 
-            <div className={estilos.historico} ref={historico} aria-live="polite" onScroll={(e) => {
+            <div data-historico className={estilos.historico} ref={historico} aria-live="polite" onScroll={(e) => {
               const el = e.currentTarget;
               noFim.current = el.scrollHeight - el.scrollTop - el.clientHeight < 96;
             }}>
