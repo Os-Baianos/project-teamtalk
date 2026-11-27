@@ -1,5 +1,7 @@
 # Diagrama de máquina de estados — ciclo de vida da mensagem
 
+> Diagrama do piloto corporativo. Os [fluxos da versão atual](../07-fluxos-e-estados.md) descrevem o aplicativo em DEV/front-end. [Estado do MVP](../integracao-mvp.md).
+
 ## Objetivo
 
 Representar os estados pelos quais uma mensagem passa no TeamTalk. O fluxo mostra a tentativa de envio, a confirmação de gravação pelo servidor, a visualização pelo destinatário e o tratamento de falha.

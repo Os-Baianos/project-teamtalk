@@ -1,5 +1,7 @@
 # Diagrama de atividades — envio de mensagem
 
+> Diagrama do piloto corporativo. Os [fluxos da versão atual](../07-fluxos-e-estados.md) descrevem o aplicativo em DEV/front-end. [Estado do MVP](../integracao-mvp.md).
+
 ## Objetivo
 
 Descrever o fluxo realizado por um funcionário para enviar uma mensagem no TeamTalk. O processo contempla texto e anexo PDF opcional, validações de segurança no servidor e os caminhos de sucesso e erro.

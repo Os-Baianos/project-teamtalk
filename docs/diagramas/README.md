@@ -1,5 +1,7 @@
 # Diagramas UML do TeamTalk
 
+> Diagrama do piloto corporativo. Os [fluxos da versão atual](../07-fluxos-e-estados.md) descrevem o aplicativo em DEV/front-end. [Estado do MVP](../integracao-mvp.md).
+
 Esta pasta contém quatro diagramas que representam os principais comportamentos do Aplicativo Web de Comunicação Interna. Eles foram elaborados a partir do documento de requisitos, do contrato de autenticação e da divisão técnica do projeto.
 
 ## Diagramas

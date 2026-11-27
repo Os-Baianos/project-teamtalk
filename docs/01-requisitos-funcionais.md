@@ -1,5 +1,7 @@
 # 01 — Requisitos funcionais
 
+> Especificação do piloto corporativo original. Para comparar estes critérios com a aplicação de 27/11/2026, consulte o estado da entrega. [Estado do MVP](integracao-mvp.md).
+
 Os requisitos funcionais descrevem as funcionalidades que deverão ser disponibilizadas pelo sistema. Os identificadores originais foram mantidos para facilitar rastreabilidade, implementação e testes.
 
 ## RF01 — Acesso por dispositivos móveis

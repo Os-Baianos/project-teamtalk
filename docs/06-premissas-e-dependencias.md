@@ -1,5 +1,7 @@
 # 06 — Premissas e dependências
 
+> Especificação do piloto corporativo original. Para comparar estes critérios com a aplicação de 27/11/2026, consulte o estado da entrega. [Estado do MVP](integracao-mvp.md).
+
 - A empresa fornecerá a identidade visual oficial, incluindo logotipo, cores e orientações de uso da marca.
 - A empresa disponibilizará ou indicará o serviço de e-mail corporativo para envio de comunicações de acesso.
 - A equipe de TI será responsável por fornecer os dados necessários para criação e gestão das contas.

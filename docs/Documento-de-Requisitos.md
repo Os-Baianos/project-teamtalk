@@ -1,4 +1,6 @@
 # Documento de Especificação de Requisitos
+
+> Especificação do piloto corporativo original. Para comparar estes critérios com a aplicação de 27/11/2026, consulte o estado da entrega. [Estado do MVP](integracao-mvp.md).
 ## Aplicativo Web de Comunicação Interna
 
 **Tipo:** Especificação de Requisitos de Software  

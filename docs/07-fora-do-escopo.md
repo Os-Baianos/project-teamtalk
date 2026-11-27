@@ -1,5 +1,7 @@
 # 07 — Funcionalidades fora do escopo inicial
 
+> Especificação do piloto corporativo original. Para comparar estes critérios com a aplicação de 27/11/2026, consulte o estado da entrega. [Estado do MVP](integracao-mvp.md).
+
 Com base nas informações fornecidas pelo cliente, as funcionalidades abaixo não fazem parte do escopo inicial do produto:
 
 - Chamadas de voz.

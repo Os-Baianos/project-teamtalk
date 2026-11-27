@@ -1,5 +1,7 @@
 # PROPOSTA TÉCNICA E COMERCIAL
 
+> Estimativa comercial do escopo proposto. O aceite da entrega usa os fluxos implementados e a evidência de QA. [Estado do MVP](integracao-mvp.md).
+
 ## Análise, Precificação e Estimativa de Serviços por Pontos de Função
 
 **PROJETO:** TeamTalk  
