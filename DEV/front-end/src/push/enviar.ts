@@ -1,4 +1,4 @@
-import webpush from "web-push";
+import webpush from "./webpush";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 /**
