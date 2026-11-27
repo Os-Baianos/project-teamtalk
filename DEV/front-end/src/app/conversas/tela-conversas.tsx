@@ -473,7 +473,7 @@ export function TelaConversas({
               <div className={estilos.entrada}>
                 <input ref={seletor} type="file" hidden accept={TIPOS_ANEXO.join(",")} onChange={(e) => { escolher(e.target.files?.[0]); e.target.value = ""; }} />
                 {!editando && (
-                  <button type="button" className={estilos.icone} onClick={() => seletor.current?.click()} aria-label="Anexar arquivo" title="Anexar imagem, PDF ou arquivo">
+                  <button type="button" className={`${estilos.icone} ${estilos.anexar}`} onClick={() => seletor.current?.click()} aria-label="Anexar arquivo" title="Anexar imagem, PDF ou arquivo">
                     <Icone nome="anexar-pdf" width={22} height={22} />
                   </button>
                 )}
