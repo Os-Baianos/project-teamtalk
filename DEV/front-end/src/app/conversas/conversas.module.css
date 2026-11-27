@@ -83,6 +83,7 @@
 .citacaoBarra strong { color: var(--cor-primaria); font-size: var(--fonte-xs); }
 .citacaoBarra span { color: var(--cor-secundaria); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .destaque .balao { box-shadow: 0 0 0 2px var(--cor-primaria), 0 1px 1px rgb(0 0 0 / 12%); transition: box-shadow .2s ease; }
+.raiz .anexar { width: 2.75rem; height: 2.75rem; }
 .raiz .icone:hover { background: var(--cor-fundo); color: var(--cor-texto); }
 
 .historico { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 3px; padding: var(--espaco-4) clamp(var(--espaco-3), 6%, 4rem); }
