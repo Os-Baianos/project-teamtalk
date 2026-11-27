@@ -1,5 +1,8 @@
 .raiz { position: relative; display: inline-block; }
 .raiz .gatilho { width: 2.75rem; min-width: 0; padding: 0; display: grid; place-items: center; }
+/* Versão redonda (botão "+" do chat), no mesmo padrão do botão de enviar. */
+.raiz .gatilho.redondo { width: 2.75rem; height: 2.75rem; border-radius: var(--raio-pill); background: var(--cor-primaria); color: var(--cor-sobre-primaria); box-shadow: none; }
+.raiz .gatilho.redondo:hover, .raiz .gatilho.redondo:active { background: var(--cor-primaria-hover); transform: none; box-shadow: none; }
 /* Mesmo visual do menu Conta (caixa escura, divisórias finas, hover laranja). */
 .painel {
   position: absolute; top: 100%; right: 0; z-index: 10; min-width: 12rem; margin-top: var(--espaco-1);
