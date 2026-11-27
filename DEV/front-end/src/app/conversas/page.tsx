@@ -14,6 +14,9 @@ import { useDigitando } from "../../mensagens/use-digitando";
 import { lerInicio, lerMensagens, marcarLidas, marcarRecebidas } from "../../dados/leituras";
 import type { Mensagem } from "../../mensagens/acoes";
 import { useMensagensAoVivo } from "../../mensagens/use-mensagens-ao-vivo";
+import { criarClienteNavegador } from "../../supabase/navegador";
+import { ehImagem, nomeSeguro, resumoMensagem, validarArquivo } from "../../mensagens/anexos";
+import type { Anexo } from "../../mensagens/anexos";
 
 type Local = Mensagem & { falhou?: boolean };
 
@@ -29,6 +32,27 @@ export default function PaginaConversas() {
   const [erroHistorico, setErroHistorico] = useState(false);
   const ativaRef = useRef<Pessoa | null>(null);
   ativaRef.current = ativa;
+  /** Endereços (temporários) das imagens, por caminho no armazenamento. */
+  const [urls, setUrls] = useState<Record<string, string>>({});
+  const pedidas = useRef(new Set<string>());
+  /** Arquivos de mensagens que ainda não foram enviadas (para "Tentar novamente"). */
+  const pendentes = useRef(new Map<string, { arquivo: File; anexo?: Anexo }>());
+
+  useEffect(() => {
+    const faltam = mensagens
+      .filter((m) => m.anexo_caminho && !m.apagada_em && ehImagem(m.anexo_tipo) && !m.anexo_caminho.startsWith("tmp/") && !pedidas.current.has(m.anexo_caminho))
+      .map((m) => m.anexo_caminho as string);
+    if (faltam.length === 0) return;
+    faltam.forEach((c) => pedidas.current.add(c));
+    criarClienteNavegador().storage.from("anexos").createSignedUrls(faltam, 3600).then(({ data }) => {
+      if (!data) { faltam.forEach((c) => pedidas.current.delete(c)); return; }
+      setUrls((atual) => {
+        const novo = { ...atual };
+        for (const d of data) if (d.path && d.signedUrl) novo[d.path] = d.signedUrl;
+        return novo;
+      });
+    });
+  }, [mensagens]);
 
   const aplicarInicio = useCallback((dados: Awaited<ReturnType<typeof lerInicio>>) => {
     setConversas(dados.conversas.map((c) => ({
@@ -120,24 +144,55 @@ export default function PaginaConversas() {
     carregarLista();
   }
 
-  async function enviar(texto: string, respondeA: string | null = null) {
-    if (!ativa || !meuId) return "Escolha uma conversa.";
-    const provisoria: Local = {
-      id: `tmp-${Date.now()}`, remetente_id: meuId, destinatario_id: ativa.id, texto,
-      criado_em: new Date().toISOString(), lida_em: null, recebida_em: null, editada_em: null, apagada_em: null, responde_a: respondeA,
-    };
-    setMensagens((atual) => [...atual, provisoria]);
-    const r = await enviarMensagemAction(ativa.id, texto, respondeA);
-    if (!r.ok) {
-      // A mensagem fica na conversa marcada como falha, com "Tentar novamente".
-      setMensagens((atual) => atual.map((x) => (x.id === provisoria.id ? { ...x, falhou: true } : x)));
-      return null;
+  /** Sobe o arquivo (se houver) direto para o armazenamento e depois envia a mensagem. */
+  async function subirEEnviar(tmpId: string, contatoId: string, texto: string, respondeA: string | null, arquivo: File | null, jaSubido?: Anexo) {
+    let anexo = jaSubido ?? null;
+    if (arquivo && !anexo) {
+      const caminho = `${meuId}/${crypto.randomUUID()}-${nomeSeguro(arquivo.name)}`;
+      const { error } = await criarClienteNavegador().storage.from("anexos").upload(caminho, arquivo, { contentType: arquivo.type });
+      if (error) return null;
+      anexo = { caminho, nome: arquivo.name.slice(0, 200), tipo: arquivo.type, tamanho: arquivo.size };
+      const guardado = pendentes.current.get(tmpId);
+      if (guardado) guardado.anexo = anexo;
     }
+    return enviarMensagemAction(contatoId, texto, respondeA, anexo);
+  }
+
+  function concluir(tmpId: string, mensagem: Mensagem) {
+    pendentes.current.delete(tmpId);
+    if (mensagem.anexo_caminho) pedidas.current.add(mensagem.anexo_caminho); // já temos a imagem na tela
+    setUrls((atual) => {
+      const antigo = atual[`tmp/${tmpId}`];
+      return antigo && mensagem.anexo_caminho ? { ...atual, [mensagem.anexo_caminho]: antigo } : atual;
+    });
     setMensagens((atual) => {
-      const real = atual.some((x) => x.id === r.mensagem.id);
-      return real ? atual.filter((x) => x.id !== provisoria.id) : atual.map((x) => (x.id === provisoria.id ? r.mensagem : x));
+      const real = atual.some((x) => x.id === mensagem.id);
+      return real ? atual.filter((x) => x.id !== tmpId) : atual.map((x) => (x.id === tmpId ? mensagem : x));
     });
     carregarLista();
+  }
+
+  async function enviar(texto: string, respondeA: string | null = null, arquivo: File | null = null) {
+    if (!ativa || !meuId) return "Escolha uma conversa.";
+    if (arquivo) { const motivo = validarArquivo(arquivo); if (motivo) return motivo; }
+    const tmpId = `tmp-${Date.now()}`;
+    const provisoria: Local = {
+      id: tmpId, remetente_id: meuId, destinatario_id: ativa.id, texto,
+      criado_em: new Date().toISOString(), lida_em: null, recebida_em: null, editada_em: null, apagada_em: null, responde_a: respondeA,
+      ...(arquivo ? { anexo_caminho: `tmp/${tmpId}`, anexo_nome: arquivo.name, anexo_tipo: arquivo.type, anexo_tamanho: arquivo.size } : {}),
+    };
+    if (arquivo) {
+      pendentes.current.set(tmpId, { arquivo });
+      if (ehImagem(arquivo.type)) setUrls((atual) => ({ ...atual, [`tmp/${tmpId}`]: URL.createObjectURL(arquivo) }));
+    }
+    setMensagens((atual) => [...atual, provisoria]);
+    const r = await subirEEnviar(tmpId, ativa.id, texto, respondeA, arquivo);
+    if (!r || !r.ok) {
+      // A mensagem fica na conversa marcada como falha, com "Tentar novamente".
+      setMensagens((atual) => atual.map((x) => (x.id === tmpId ? { ...x, falhou: true } : x)));
+      return null;
+    }
+    concluir(tmpId, r.mensagem);
     return null;
   }
 
@@ -145,13 +200,28 @@ export default function PaginaConversas() {
     const falha = mensagens.find((m) => m.id === id);
     if (!falha || !ativa) return;
     setMensagens((atual) => atual.map((x) => (x.id === id ? { ...x, falhou: false } : x)));
-    const r = await enviarMensagemAction(ativa.id, falha.texto, falha.responde_a ?? null);
-    if (!r.ok) {
+    const guardado = pendentes.current.get(id);
+    const r = await subirEEnviar(id, ativa.id, falha.texto, falha.responde_a ?? null, guardado?.arquivo ?? null, guardado?.anexo);
+    if (!r || !r.ok) {
       setMensagens((atual) => atual.map((x) => (x.id === id ? { ...x, falhou: true } : x)));
       return;
     }
-    setMensagens((atual) => atual.map((x) => (x.id === id ? r.mensagem : x)));
-    carregarLista();
+    concluir(id, r.mensagem);
+  }
+
+  /** Baixa o arquivo com o nome original (link temporário só para este clique); imagens podem só abrir. */
+  async function baixar(id: string, visualizar = false) {
+    const m = mensagens.find((x) => x.id === id);
+    if (!m?.anexo_caminho || !m.anexo_nome) return false;
+    const aberta = urls[m.anexo_caminho];
+    if (visualizar && aberta) { window.open(aberta, "_blank", "noopener"); return true; }
+    const { data } = await criarClienteNavegador().storage.from("anexos").createSignedUrl(m.anexo_caminho, 60, { download: m.anexo_nome });
+    if (!data?.signedUrl) return false;
+    const a = document.createElement("a");
+    a.href = data.signedUrl;
+    a.rel = "noopener";
+    a.click();
+    return true;
   }
 
   async function editar(id: string, texto: string) {
@@ -166,7 +236,7 @@ export default function PaginaConversas() {
   async function apagar(id: string) {
     const ok = await apagarMensagemAction(id);
     if (ok) {
-      setMensagens((atual) => atual.map((x) => (x.id === id ? { ...x, texto: "Mensagem apagada", apagada_em: new Date().toISOString() } : x)));
+      setMensagens((atual) => atual.map((x) => (x.id === id ? { ...x, texto: "Mensagem apagada", apagada_em: new Date().toISOString(), anexo_caminho: null, anexo_nome: null, anexo_tipo: null, anexo_tamanho: null } : x)));
       carregarLista();
     }
     return ok;
@@ -180,13 +250,16 @@ export default function PaginaConversas() {
       ? {
           id: m.responde_a,
           autor: original ? (original.remetente_id === meuId ? "Você" : ativa?.nome ?? "") : "",
-          texto: original ? original.texto : "Mensagem indisponível",
+          texto: original ? resumoMensagem(original.texto, original.anexo_nome, original.anexo_tipo) || "Mensagem indisponível" : "Mensagem indisponível",
         }
       : null;
     return {
       id: m.id, minha, texto: m.texto, criadoEm: m.criado_em, resposta,
       recebidaEm: m.recebida_em, lidaEm: m.lida_em, editadaEm: m.editada_em,
       apagada: !!m.apagada_em, status,
+      anexo: m.anexo_caminho && m.anexo_nome && !m.apagada_em
+        ? { nome: m.anexo_nome, tipo: m.anexo_tipo ?? "", tamanho: m.anexo_tamanho ?? 0, url: urls[m.anexo_caminho] ?? null }
+        : null,
     };
   });
   const comConversa = new Set(conversas.map((c) => c.id));
@@ -212,6 +285,7 @@ export default function PaginaConversas() {
       aoDigitar={avisarDigitando}
       aoEditar={editar}
       aoApagar={apagar}
+      aoBaixar={baixar}
     />
   );
 }
