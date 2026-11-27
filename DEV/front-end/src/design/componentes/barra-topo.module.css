@@ -1,4 +1,4 @@
-.topo { position: relative; z-index: 30; background: var(--cor-topo); color: var(--cor-topo-texto); }
+.topo { position: relative; z-index: 30; background: var(--cor-topo); color: var(--cor-topo-texto); padding-top: env(safe-area-inset-top); }
 .linha {
   display: flex;
   align-items: center;
@@ -39,6 +39,7 @@
 }
 .rodape {
   padding: var(--espaco-5);
+  padding-bottom: calc(var(--espaco-5) + env(safe-area-inset-bottom));
   background: var(--cor-topo);
   color: var(--cor-topo-texto-suave);
   font-size: var(--fonte-sm);
