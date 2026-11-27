@@ -1,6 +1,8 @@
 "use server";
 
+import { after } from "next/server";
 import { criarClienteServidor } from "../supabase/servidor";
+import { enviarPushDaMensagem } from "../push/enviar";
 
 export type Mensagem = {
   id: string;
@@ -46,6 +48,8 @@ export async function enviarMensagemAction(
     .select()
     .single();
   if (error || !data) return { ok: false, mensagem: "Não foi possível enviar agora. Tente novamente." };
+  // Notificação no celular de quem recebe, sem atrasar a resposta de quem enviou.
+  after(() => enviarPushDaMensagem(supabase, meuId, contatoId, limpo));
   return { ok: true, mensagem: data };
 }
 

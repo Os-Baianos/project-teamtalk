@@ -4,6 +4,7 @@ import { criarClienteServidor } from "../../supabase/servidor";
 import { EditarArroba } from "./editar-arroba";
 import { EditarNome } from "./editar-nome";
 import { FotoPerfil } from "./foto-perfil";
+import { Notificacoes } from "./notificacoes";
 import estilos from "./perfil.module.css";
 
 export default async function PaginaPerfil() {
@@ -40,6 +41,7 @@ export default async function PaginaPerfil() {
       <dl className={estilos.lista}>
         <div className={estilos.linha}><dt>Nome</dt><EditarNome nome={nome} /></div>
         <div className={estilos.linha}><dt>Usuário (@)</dt><EditarArroba arroba={perfil?.arroba ?? ""} liberadoEm={liberadoEm} /></div>
+        <div className={estilos.linha}><dt>Notificações</dt><Notificacoes /></div>
         <div className={estilos.linha}><dt>E-mail</dt><dd>{auth.user.email}</dd></div>
         <div className={estilos.linha}><dt>Conta criada em</dt><dd>{desde}</dd></div>
       </dl>

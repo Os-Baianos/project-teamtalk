@@ -8,6 +8,7 @@ import { souDevAction } from "../../dev/acoes";
 import { criarClienteNavegador } from "../../supabase/navegador";
 import { aquecerMensagens, lerContaContatos, lerInicio } from "../../dados/leituras";
 import { gravarCache, limparCache } from "../../cache/cache-local";
+import { CHAVE_ENDPOINT } from "../../push/cliente";
 import { useContatosAoVivo } from "../../contatos/use-contatos-ao-vivo";
 import estilos from "@design/componentes/barra-topo.module.css";
 import { Icone } from "../icones/icone";
@@ -82,7 +83,11 @@ export function BarraTopo() {
                 Contatos{pendentes > 0 && <span className={estilos.contagem}>{pendentes}</span>}
               </Link>
               {dev && <Link href="/dev" className={estilos.opcao}>Admin</Link>}
-              <form action={sairAction} onSubmit={limparCache}>
+              <form action={sairAction} onSubmit={(e) => {
+                limparCache();
+                try { (e.currentTarget.elements.namedItem("endpoint") as HTMLInputElement).value = localStorage.getItem(CHAVE_ENDPOINT) ?? ""; } catch { /* sem armazenamento */ }
+              }}>
+                <input type="hidden" name="endpoint" defaultValue="" />
                 <button type="submit" className={estilos.opcao}>Sair</button>
               </form>
             </div>
