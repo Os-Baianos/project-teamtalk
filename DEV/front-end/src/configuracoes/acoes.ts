@@ -25,8 +25,8 @@ export async function trocarMinhaSenhaAction(atual: string, nova: string): Promi
   const supabase = await criarClienteServidor();
   const conferida = await conferirSenha(supabase, atual);
   if ("erro" in conferida) return { ok: false, mensagem: conferida.erro };
-  const { error } = await supabase.auth.updateUser({ password: nova });
-  if (error) return { ok: false, mensagem: "Não foi possível trocar a senha agora. Tente novamente." };
+  const { data, error } = await supabase.rpc("trocar_minha_senha", { nova });
+  if (error || data !== "ok") return { ok: false, mensagem: "Não foi possível trocar a senha agora. Tente novamente." };
   return { ok: true };
 }
 

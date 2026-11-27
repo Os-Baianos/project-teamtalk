@@ -63,7 +63,7 @@ export async function trocarSenhaAction(id: string, senha: string): Promise<{ ok
   const { data, error } = await supabase.rpc("dev_trocar_senha", { alvo: id, nova: senha });
   if (error) return { ok: false, mensagem: "Não foi possível trocar a senha agora. Tente novamente." };
   if (data === "ok") return { ok: true };
-  if (data === "senha_fraca") return { ok: false, mensagem: "Senha fraca. Use maiúscula, minúscula, número e símbolo." };
+  if (data === "senha_fraca") return { ok: false, mensagem: "Senha inválida. Use de 4 a 72 caracteres." };
   if (data === "inexistente") return { ok: false, mensagem: "Esse usuário já não existe." };
   return { ok: false, mensagem: "Sem permissão para trocar a senha." };
 }

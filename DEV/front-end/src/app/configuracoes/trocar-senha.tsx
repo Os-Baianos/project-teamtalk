@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { Aviso, Botao, Campo, ListaRegras } from "@design/componentes";
-import { modoLista } from "@design/modo-lista";
+import { Aviso, Botao, Campo } from "@design/componentes";
 import { regrasConfirmacao, regrasSenha, todasOk } from "../../design/validacoes";
 import { trocarMinhaSenhaAction } from "../../configuracoes/acoes";
 import estilos from "./configuracoes.module.css";
@@ -14,7 +13,6 @@ export function TrocarSenha() {
   const [atual, setAtual] = useState("");
   const [nova, setNova] = useState("");
   const [confirmacao, setConfirmacao] = useState("");
-  const [focado, setFocado] = useState(false);
   const [ocupado, setOcupado] = useState(false);
   const [erro, setErro] = useState("");
   const [feito, setFeito] = useState(false);
@@ -49,11 +47,7 @@ export function TrocarSenha() {
   return (
     <form className={estilos.edicao} onSubmit={salvar} noValidate>
       <Campo id="senha-atual" rotulo="Senha atual" type="password" autoComplete="current-password" value={atual} onChange={(e) => setAtual(e.target.value)} />
-      <div>
-        <Campo id="senha-nova" rotulo="Nova senha" type="password" autoComplete="new-password" value={nova}
-          onChange={(e) => setNova(e.target.value)} onFocus={() => setFocado(true)} onBlur={() => setFocado(false)} aria-describedby="regras-senha-nova" />
-        <ListaRegras id="regras-senha-nova" regras={regras} modo={modoLista(nova, regras, false)} focado={focado} />
-      </div>
+      <Campo id="senha-nova" rotulo="Nova senha" type="password" autoComplete="new-password" value={nova} onChange={(e) => setNova(e.target.value)} />
       <Campo id="senha-confirmar" rotulo="Confirmar nova senha" type="password" autoComplete="new-password" value={confirmacao}
         onChange={(e) => setConfirmacao(e.target.value)} erro={confirmacao !== "" && !confere ? "As senhas não conferem." : undefined} />
       {erro && <p className={estilos.erro} role="alert">{erro}</p>}
