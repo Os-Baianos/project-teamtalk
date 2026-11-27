@@ -1,22 +1,26 @@
 .raiz { position: relative; display: inline-block; }
 .raiz .gatilho { width: 2.75rem; min-width: 0; padding: 0; display: grid; place-items: center; }
+/* Mesmo visual do menu Conta (caixa escura, divisórias finas, hover laranja). */
 .painel {
   position: absolute; top: 100%; right: 0; z-index: 10; min-width: 12rem; margin-top: var(--espaco-1);
-  background: var(--cor-superficie); border: var(--borda-fina) solid var(--cor-borda); border-radius: var(--raio-md);
-  box-shadow: 0 4px 16px rgb(0 0 0 / 18%); overflow: hidden;
+  background: #161e2a; border: var(--borda-fina) solid #5f6b7a; border-radius: var(--raio-md);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 45%); overflow: hidden;
 }
 /* Os botões globais do site são grandes e laranja: dentro do menu voltam ao neutro. */
 .painel button.item {
-  display: block; width: 100%; min-height: 0; margin: 0; padding: var(--espaco-3) var(--espaco-4);
-  border: 0; border-radius: 0; background: none; color: var(--cor-texto);
+  display: block; width: 100%; min-height: 0; margin: 0; padding: var(--espaco-2) var(--espaco-4);
+  border: 0; border-radius: 0; background: none; color: var(--cor-topo-texto);
   font: inherit; font-size: var(--fonte-sm); font-weight: normal; text-align: left; cursor: pointer;
 }
-.painel button.item + button.item { border-top: var(--borda-fina) solid var(--cor-borda); }
-.painel button.item:hover { background: var(--cor-fundo); }
-.painel button.perigo { color: var(--cor-erro); }
+.painel button.item:hover, .painel button.item:active { transform: none; box-shadow: none; }
+.painel button.item + button.item { border-top: var(--borda-fina) solid #3a4656; }
+@media (hover: hover) { .painel button.item:hover { background: #232f3e; color: var(--cor-primaria); } }
+.painel button.item:focus-visible { outline: 2px solid #fff; outline-offset: -3px; }
+.painel button.perigo { color: #ff8f8f; }
+@media (hover: hover) { .painel button.perigo:hover { color: #ff8f8f; } }
 .confirmar { display: grid; gap: var(--espaco-2); padding: var(--espaco-3); }
-.confirmar p { margin: 0; font-size: var(--fonte-sm); color: var(--cor-secundaria); }
-.erro { margin: 0; padding: 0 var(--espaco-3) var(--espaco-3); color: var(--cor-erro); font-size: var(--fonte-sm); }
+.confirmar p { margin: 0; font-size: var(--fonte-sm); color: var(--cor-topo-texto-suave); }
+.erro { margin: 0; padding: 0 var(--espaco-3) var(--espaco-3); color: #ff8f8f; font-size: var(--fonte-sm); }
 
 @media (prefers-reduced-motion: no-preference) {
   @keyframes abrir { from { opacity: 0; transform: translateY(-4px) scale(.98); } to { opacity: 1; transform: none; } }

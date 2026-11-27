@@ -7,6 +7,8 @@
   border: var(--borda-fina) solid var(--cor-borda);
   border-radius: var(--raio-md);
 }
+/* Cartão com o menu aberto fica acima dos cartões de baixo (as animações criam camadas próprias). */
+.cartao:has([role="menu"]) { position: relative; z-index: 5; }
 .topo { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--espaco-3); }
 .pessoa { display: flex; align-items: flex-start; gap: var(--espaco-3); min-width: 0; }
 .pessoaLink { color: inherit; text-decoration: none; }
