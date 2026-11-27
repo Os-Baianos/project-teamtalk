@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent, KeyboardEvent } from "react";
 import { Aviso } from "@design/componentes/aviso";
 import { Carregando } from "@design/componentes/carregando";
@@ -98,6 +98,8 @@ export function TelaConversas({
   const toque = useRef<ReturnType<typeof setTimeout> | null>(null);
   /** Abre o menu da mensagem (clique na setinha no computador, segurar a mensagem no celular). */
   const abrirMenu = (id: string) => { abertoEm.current = Date.now(); setMenu(id); };
+  /** Menu aberto perto do fim da conversa: rola o histórico só o necessário para ele aparecer inteiro. */
+  const mostrarMenu = useCallback((el: HTMLElement | null) => { el?.scrollIntoView({ block: "nearest" }); }, []);
   const soltarToque = () => { if (toque.current) { clearTimeout(toque.current); toque.current = null; } };
   const [dados, setDados] = useState<BalaoDado | null>(null);
   const [editando, setEditando] = useState<BalaoDado | null>(null);
@@ -343,7 +345,7 @@ export function TelaConversas({
                               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
                             </button>
                             {menu === it.m.id && (
-                              <ul className={`${estilos.menu} ${it.m.minha ? "" : estilos.menuEsq}`} role="menu">
+                              <ul ref={mostrarMenu} className={`${estilos.menu} ${it.m.minha ? "" : estilos.menuEsq}`} role="menu">
                                 <li><button type="button" role="menuitem" onClick={() => { setMenu(null); setDados(it.m); }}>Dados da mensagem</button></li>
                                 <li><button type="button" role="menuitem" onClick={() => copiar(it.m)}>Copiar</button></li>
                                 {it.m.minha && <li><button type="button" role="menuitem" onClick={() => comecarEdicao(it.m)}>Editar</button></li>}
