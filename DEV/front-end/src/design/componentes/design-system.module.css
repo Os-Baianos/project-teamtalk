@@ -23,17 +23,12 @@
 }
 
 .botao[data-expandido="true"] { width: 100%; }
-.botao[data-variante="primaria"] { background: var(--cor-primaria); }
-.botao[data-variante="secundaria"] { border-color: var(--cor-link); background: transparent; color: var(--cor-link); }
-.botao[data-variante="discreta"] { background: transparent; color: var(--cor-link); }
-.botao[data-variante="perigo"] { border-color: var(--cor-erro); background: transparent; color: var(--cor-erro); }
+/* Padrão do tema: todo botão é o laranja. As variantes continuam no código só para dar sentido ao uso. */
+.botao[data-variante] { background: var(--cor-primaria); }
 .botao:disabled, .destino:disabled { opacity: .6; cursor: not-allowed; }
 
 @media (hover: hover) {
   .botao:not(:disabled):hover { background: var(--cor-primaria-hover); }
-  .botao[data-variante="secundaria"]:not(:disabled):hover,
-  .botao[data-variante="discreta"]:not(:disabled):hover { background: var(--cor-selecionada); }
-  .botao[data-variante="perigo"]:not(:disabled):hover { background: var(--cor-erro); color: #fff; }
 }
 
 .botao:focus-visible, .entrada:focus-visible, .destino:focus-visible, .pular:focus-visible {
