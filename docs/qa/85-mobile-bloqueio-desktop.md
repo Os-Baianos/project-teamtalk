@@ -1,5 +1,7 @@
 # QA #85 — Compatibilidade mobile e bloqueio desktop
 
+> Roteiro de QA do piloto corporativo. Use o [roteiro da versão atual](../08-testes-e-rastreabilidade.md) para testar o aplicativo da entrega A3. [Estado do MVP](../integracao-mvp.md).
+
 Responsáveis: **Ícaro (PO) e Mariana (SQA)**. [Issue #85](https://github.com/Acebmoon/project-teamtalk/issues/85). Requisitos: **RF01, RF02, RNF01, RNF02, RNF03, RNF04, RNF14**. Entregas: #73/#74/#75/#76, PRs #91/#107/#93/#94 e integração #110.
 
 ## Evidências já disponíveis na base integrada

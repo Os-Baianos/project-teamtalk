@@ -1,5 +1,7 @@
 # QA #88 — Upload PDF, README e rastreabilidade
 
+> Roteiro de QA do piloto corporativo. Use o [roteiro da versão atual](../08-testes-e-rastreabilidade.md) para testar o aplicativo da entrega A3. [Estado do MVP](../integracao-mvp.md).
+
 Responsáveis: **Ícaro (PO) e Mariana (SQA)**. [Issue #88](https://github.com/Acebmoon/project-teamtalk/issues/88). Requisitos: **RF11, RF12, RN06, RN07, RNF11, RNF12, RNF13, SEG05**. Entregas: #77/#84/#92, PRs #104/#102/#108 e integração #110; esta documentação complementa #88 e entrega o backlog #96.
 
 ## Evidências já disponíveis na base integrada

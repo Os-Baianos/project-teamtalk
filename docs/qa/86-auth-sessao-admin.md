@@ -1,5 +1,7 @@
 # QA #86 — Autenticação, sessão e administração
 
+> Roteiro de QA do piloto corporativo. Use o [roteiro da versão atual](../08-testes-e-rastreabilidade.md) para testar o aplicativo da entrega A3. [Estado do MVP](../integracao-mvp.md).
+
 Responsáveis: **Ícaro (PO) e Mariana (SQA)**. [Issue #86](https://github.com/Acebmoon/project-teamtalk/issues/86). Requisitos: **RF03–RF07, RF13–RF15; RN01–RN05, RN09, RN10; RNF05–RNF07; SEG01–SEG04, SEG06, SEG07**. Entregas: #71–#73/#75/#81–#83, PRs #89–#91/#93/#100/#103/#106.
 
 ## Evidências já disponíveis na base integrada

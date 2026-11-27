@@ -1,5 +1,7 @@
 # 04 — Requisitos de interface
 
+> Especificação do piloto corporativo original. Para comparar estes critérios com a aplicação de 27/11/2026, consulte o estado da entrega. [Estado do MVP](integracao-mvp.md).
+
 ## 6.1 Interface do usuário
 
 A interface deverá ser desenvolvida prioritariamente para smartphones, com organização visual inspirada em aplicativos de mensagens. A navegação deverá facilitar o acesso às conversas, à leitura e ao envio de mensagens e ao compartilhamento de PDFs.

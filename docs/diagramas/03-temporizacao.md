@@ -1,5 +1,7 @@
 # Diagrama de temporização — TeamTalk
 
+> Diagrama do piloto corporativo. Os [fluxos da versão atual](../07-fluxos-e-estados.md) descrevem o aplicativo em DEV/front-end. [Estado do MVP](../integracao-mvp.md).
+
 A imagem abaixo é o diagrama de temporização em formato SVG. **Ela aparece diretamente nesta página do GitHub**, no navegador, sem precisar instalar ou abrir outro aplicativo.
 
 ![Diagrama de temporização do TeamTalk](03-temporizacao.svg)

@@ -1,5 +1,7 @@
 # QA #87 — Chat, privacidade e status de leitura
 
+> Roteiro de QA do piloto corporativo. Use o [roteiro da versão atual](../08-testes-e-rastreabilidade.md) para testar o aplicativo da entrega A3. [Estado do MVP](../integracao-mvp.md).
+
 Responsáveis: **Ícaro (PO) e Mariana (SQA)**. [Issue #87](https://github.com/Acebmoon/project-teamtalk/issues/87). Requisitos: **RF08, RF09, RF10, RN08, RNF08, RNF09, RNF10, RNF12, SEG04**. Entregas: #76/#78–#80/#98, PRs #94/#97/#99/#101/#105/#109 e integração #110.
 
 ## Evidências já disponíveis na base integrada

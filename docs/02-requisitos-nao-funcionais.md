@@ -1,5 +1,7 @@
 # 02 — Requisitos não funcionais
 
+> Especificação do piloto corporativo original. Para comparar estes critérios com a aplicação de 27/11/2026, consulte o estado da entrega. [Estado do MVP](integracao-mvp.md).
+
 Os requisitos não funcionais definem atributos de qualidade, critérios técnicos e restrições que deverão orientar a implementação e a operação do sistema.
 
 ## RNF01 — Responsividade e compatibilidade mobile

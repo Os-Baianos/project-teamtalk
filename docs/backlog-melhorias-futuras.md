@@ -1,10 +1,12 @@
 # Backlog de melhorias futuras — Issue #96
 
+> Backlog elaborado em 20/11. Respostas a mensagens e Web Push já têm implementação na main. A situação dos demais itens requer conferência individual. [Estado do MVP](integracao-mvp.md).
+
 Consolidação de 20/11/2026 para avaliação de **Ícaro (PO)** e **Elliot (Tech Lead)**, com **Gilson (UI/UX)** como responsável pela origem das propostas visuais. [Issue #96](https://github.com/Acebmoon/project-teamtalk/issues/96). Este documento entrega a organização das ideias; implementar, abrir novas issues ou alterar o escopo depende de decisão posterior do produto.
 
 ## Fontes e fronteira de escopo
 
-- Base entregue: [MVP integrado pelo #110](integracao-mvp.md), [requisitos](Documento-de-Requisitos.md), [matriz](08-testes-e-rastreabilidade.md) e [Inbox #97/#109](../controle-base-main/inbox/README.md).
+- Base entregue: [MVP integrado pelo #110](integracao-mvp.md), [requisitos](Documento-de-Requisitos.md), [matriz](08-testes-e-rastreabilidade.md) e [Inbox #97/#109](09-workspace-inbox-linear.md).
 - Sugestões de Gilson: branch [`feature/teamtalk-design-system`](https://github.com/Acebmoon/project-teamtalk/tree/feature/teamtalk-design-system), commit consultado **`80ac4fcf701ac54bc6f9259047ca7e2ee5a5a16e`**.
 - Referências imutáveis: [guia UI/UX](https://github.com/Acebmoon/project-teamtalk/blob/80ac4fcf701ac54bc6f9259047ca7e2ee5a5a16e/design-system/handoff/GUIA_IMPLEMENTACAO_UIUX.md), [decisões](https://github.com/Acebmoon/project-teamtalk/blob/80ac4fcf701ac54bc6f9259047ca7e2ee5a5a16e/design-system/handoff/REGISTRO_DE_DECISOES.md), [Lista de Conversas](https://github.com/Acebmoon/project-teamtalk/blob/80ac4fcf701ac54bc6f9259047ca7e2ee5a5a16e/design-system/documentation/lista-de-conversas/TeamTalk_Lista_de_Conversas.docx) e [Conversa](https://github.com/Acebmoon/project-teamtalk/blob/80ac4fcf701ac54bc6f9259047ca7e2ee5a5a16e/design-system/documentation/tela-conversa/TeamTalk_Conversa.docx).
 

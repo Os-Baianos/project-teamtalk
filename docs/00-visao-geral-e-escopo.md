@@ -1,5 +1,7 @@
 # 00 — Visão geral e escopo
 
+> Especificação do piloto corporativo original. Para comparar estes critérios com a aplicação de 27/11/2026, consulte o estado da entrega. [Estado do MVP](integracao-mvp.md).
+
 ## Identificação do documento
 
 - **Tipo:** Especificação de Requisitos de Software

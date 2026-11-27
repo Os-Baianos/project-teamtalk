@@ -1,5 +1,7 @@
 # 05 — Requisitos de segurança
 
+> Especificação do piloto corporativo original. Para comparar estes critérios com a aplicação de 27/11/2026, consulte o estado da entrega. [Estado do MVP](integracao-mvp.md).
+
 ## SEG01 — Autenticação individual
 
 Cada funcionário deverá utilizar uma conta individual, não compartilhada.

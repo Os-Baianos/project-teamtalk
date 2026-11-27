@@ -1,5 +1,7 @@
 # Diagrama de caso de uso — TeamTalk
 
+> Diagrama do piloto corporativo. Os [fluxos da versão atual](../07-fluxos-e-estados.md) descrevem o aplicativo em DEV/front-end. [Estado do MVP](../integracao-mvp.md).
+
 ## Objetivo
 
 Apresentar, de forma geral, o que cada perfil pode realizar no TeamTalk. O sistema possui dois atores principais: **Funcionário** e **Administrador da TI**. O serviço de e-mail é representado como ator externo porque participa do envio das credenciais iniciais.
