@@ -43,8 +43,11 @@ export async function cadastrarAction(dados: {
   return { ok: true };
 }
 
-export async function sairAction(): Promise<void> {
+export async function sairAction(dados?: FormData): Promise<void> {
   const supabase = await criarClienteServidor();
+  // Este aparelho deixa de receber notificações da conta que está saindo.
+  const endpoint = dados?.get("endpoint");
+  if (typeof endpoint === "string" && endpoint) await supabase.from("push_assinaturas").delete().eq("endpoint", endpoint);
   await supabase.auth.signOut();
   redirect("/login");
 }
