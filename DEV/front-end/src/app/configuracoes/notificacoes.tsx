@@ -20,7 +20,6 @@ export function Notificacoes() {
   const [estado, setEstado] = useState<Estado>("carregando");
   const [ocupado, setOcupado] = useState(false);
   const [erro, setErro] = useState("");
-  const [resultado, setResultado] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -63,10 +62,9 @@ export function Notificacoes() {
   async function testar() {
     setOcupado(true);
     setErro("");
-    setResultado("");
     try {
       const r = await comLimite(enviarPushTesteAction(), 15000);
-      if (r.ok) setResultado(r.mensagem); else setErro(r.mensagem);
+      if (!r.ok) setErro(r.mensagem);
     } catch {
       setErro("O teste demorou demais ou falhou. Tente de novo; se repetir, desative e ative as notificações.");
     } finally {
@@ -104,7 +102,6 @@ export function Notificacoes() {
     <>
       <dd>{texto}</dd>
       {erro && <dd className={estilos.dica} role="alert">{erro}</dd>}
-      {resultado && <dd className={estilos.dica} role="status">{resultado}</dd>}
       {(estado === "desligado" || estado === "ligado") && (
         <div className={estilos.botaoCanto}>
           {estado === "desligado" && <Botao ocupado={ocupado} onClick={ativar}>Ativar</Botao>}
