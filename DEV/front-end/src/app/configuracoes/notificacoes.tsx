@@ -6,7 +6,7 @@ import { criarClienteNavegador } from "../../supabase/navegador";
 import { chaveParaBytes, guardarEndpoint, suportaPush } from "../../push/cliente";
 import { obterChavePublicaAction, removerAssinaturaAction, salvarAssinaturaAction } from "../../push/acoes";
 import type { AssinaturaPush } from "../../push/acoes";
-import estilos from "./perfil.module.css";
+import estilos from "./configuracoes.module.css";
 
 type Estado = "carregando" | "sem-suporte" | "bloqueado" | "desligado" | "ligado";
 

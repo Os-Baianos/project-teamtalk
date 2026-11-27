@@ -82,6 +82,7 @@ export function BarraTopo() {
               <Link href="/conta/contatos" className={estilos.opcao}>
                 Contatos{pendentes > 0 && <span className={estilos.contagem}>{pendentes}</span>}
               </Link>
+              <Link href="/configuracoes" className={estilos.opcao}>Configurações</Link>
               {dev && <Link href="/dev" className={estilos.opcao}>Admin</Link>}
               <form action={sairAction} onSubmit={(e) => {
                 limparCache();
