@@ -5,11 +5,14 @@ import type { FormEvent } from "react";
 import Link from "next/link";
 import { Botao, Campo, CabecalhoMobile, LayoutMobile, MenuAcoes } from "@design/componentes";
 import type { ItemMenuAcoes } from "@design/componentes";
-import { editarUsuarioAction, excluirUsuarioAction, listarUsuariosAction, trocarSenhaAction } from "../../dev/acoes";
+import { editarUsuarioAction, excluirUsuarioAction, liberarTrocaArrobaAction, listarUsuariosAction, trocarSenhaAction } from "../../dev/acoes";
 import type { UsuarioDev } from "../../dev/acoes";
 import { Avatar } from "../../contatos/avatar";
 import estilos from "./dev.module.css";
 
+const DIAS_30 = 30 * 24 * 60 * 60 * 1000;
+/** A pessoa trocou o @ há menos de 30 dias e ainda está esperando. */
+const esperando = (u: UsuarioDev) => !!u.arroba_alterado_em && new Date(u.arroba_alterado_em).getTime() + DIAS_30 > Date.now();
 const data = (iso: string) => new Date(iso).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" });
 
 function DadosUsuario({ u }: { u: UsuarioDev }) {
@@ -18,6 +21,7 @@ function DadosUsuario({ u }: { u: UsuarioDev }) {
       <strong>{u.nome} {u.papel === "dev" && <span className={estilos.papel}>ADMIN</span>}</strong>
       <span>@{u.arroba} · {u.email}</span>
       <span className={estilos.data}>Criada em {data(u.criado_em)}</span>
+      {esperando(u) && <span className={estilos.data}>Trocou o @ em {data(u.arroba_alterado_em!)} · pode trocar de novo em {data(new Date(new Date(u.arroba_alterado_em!).getTime() + DIAS_30).toISOString())}</span>}
     </div>
   );
 }
@@ -82,6 +86,15 @@ export function PainelDev({ inicial, meuId }: { inicial: UsuarioDev[]; meuId: st
       { id: "editar", rotulo: "Editar", aoEscolher: async () => { comecarEdicao(u); return null; } },
       { id: "senha", rotulo: "Trocar senha", aoEscolher: async () => { setTrocandoSenha(u.id); setNovaSenha(""); setEditando(null); setMensagem(""); setFeito(""); return null; } },
     ];
+    if (esperando(u)) {
+      itens.push({ id: "liberar", rotulo: "Liberar troca de @", aoEscolher: async () => {
+        const r = await liberarTrocaArrobaAction(u.id);
+        if (!r.ok) return r.mensagem ?? "Não foi possível liberar.";
+        setFeito(`Troca de @ liberada para ${u.nome}.`); setMensagem("");
+        await recarregar();
+        return null;
+      } });
+    }
     if (u.id !== meuId) {
       itens.push({ id: "excluir", rotulo: "Excluir", perigo: true, confirmacao: `Excluir ${u.nome}? Apaga a conta, os contatos e as mensagens. Não dá para desfazer.`, aoEscolher: () => excluir(u.id) });
     }
