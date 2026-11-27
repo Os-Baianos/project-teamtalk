@@ -15,11 +15,7 @@ export const regrasEmail = (email: string): Regra[] => [
 ];
 
 export const regrasSenha = (senha: string): Regra[] => [
-  { texto: "Pelo menos 6 caracteres", ok: senha.length >= 6 },
-  { texto: "Uma letra maiúscula", ok: /[A-Z]/.test(senha) },
-  { texto: "Uma letra minúscula", ok: /[a-z]/.test(senha) },
-  { texto: "Um número", ok: /\d/.test(senha) },
-  { texto: "Um símbolo (ex.: ! @ # $)", ok: /[^A-Za-z0-9]/.test(senha) },
+  { texto: "Pelo menos 4 caracteres", ok: senha.length >= 4 },
   { texto: "No máximo 72 caracteres", ok: senha.length <= 72 },
 ];
 

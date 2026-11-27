@@ -43,6 +43,7 @@ export function TelaCadastro() {
     evento.preventDefault();
     if (!todasOk(...Object.values(regras))) {
       setValidados({ nome: true, arroba: true, email: true, senha: true, confirmacao: true });
+      if (!todasOk(regras.senha)) setMensagem("A senha precisa ter de 4 a 72 caracteres.");
       return;
     }
     setEnviando(true);
@@ -76,11 +77,11 @@ export function TelaCadastro() {
         onFocus={() => setFocado(id)}
         onBlur={() => aoSair(id)}
         aria-invalid={invalido(id)}
-        aria-describedby={`regras-${id}`}
+        aria-describedby={id === "senha" ? undefined : `regras-${id}`}
         required
         {...props}
       />
-      <ListaRegras id={`regras-${id}`} regras={regras[id]} modo={modo(id)} focado={focado === id} />
+      {id !== "senha" && <ListaRegras id={`regras-${id}`} regras={regras[id]} modo={modo(id)} focado={focado === id} />}
     </>
   );
 

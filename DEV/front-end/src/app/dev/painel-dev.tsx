@@ -125,7 +125,6 @@ export function PainelDev({ inicial, meuId }: { inicial: UsuarioDev[]; meuId: st
                   rotulo={`Nova senha de ${u.nome}`}
                   type="password"
                   autoComplete="new-password"
-                  ajuda="Mínimo 6 caracteres, com maiúscula, minúscula, número e símbolo."
                   value={novaSenha}
                   onChange={(e) => setNovaSenha(e.target.value)}
                 />
