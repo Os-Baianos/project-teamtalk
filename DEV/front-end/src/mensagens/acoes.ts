@@ -52,7 +52,8 @@ export async function enviarMensagemAction(
 ): Promise<{ ok: true; mensagem: Mensagem } | { ok: false; mensagem: string }> {
   const limpo = texto.trim();
   if (!limpo && !anexo) return { ok: false, mensagem: "Digite uma mensagem." };
-  if (anexo && (anexo.tamanho <= 0 || anexo.tamanho > LIMITE_ANEXO || !TIPOS_ANEXO.includes(anexo.tipo))) return { ok: false, mensagem: "Arquivo não aceito." };
+  if (anexo && anexo.tipo === "application/pdf") return { ok: false, mensagem: "Envie PDFs pelo seletor de documentos." };
+  if (anexo && (anexo.tamanho <= 0 || anexo.tamanho > LIMITE_ANEXO || !TIPOS_ANEXO.includes(anexo.tipo) || anexo.nome.toLocaleLowerCase("en-US").endsWith(".pdf"))) return { ok: false, mensagem: "Envie um PDF válido ou uma imagem/vídeo aceito." };
   if (limpo.length > 2000) return { ok: false, mensagem: "Mensagem muito longa (máximo 2000 caracteres)." };
   const supabase = await criarClienteServidor();
   const { data: auth } = await supabase.auth.getClaims();

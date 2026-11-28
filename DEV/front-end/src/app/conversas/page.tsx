@@ -20,6 +20,7 @@ import { criarClienteNavegador } from "../../supabase/navegador";
 import { anexoExpirado, ehImagem, ehVideo, nomeSeguro, resumoMensagem, validarArquivo } from "../../mensagens/anexos";
 import { limparAnexosVencidos } from "../../mensagens/limpar-anexos";
 import type { Anexo } from "../../mensagens/anexos";
+import { ehArquivoPdf, enviarPdf, abrirOuBaixarPdf } from "../../mensagens/pdf-cliente";
 
 type Local = Mensagem & { falhou?: boolean };
 
@@ -39,7 +40,7 @@ export default function PaginaConversas() {
   const [urls, setUrls] = useState<Record<string, string>>({});
   const pedidas = useRef(new Set<string>());
   /** Arquivos de mensagens que ainda não foram enviadas (para "Tentar novamente"). */
-  const pendentes = useRef(new Map<string, { arquivo: File; anexo?: Anexo }>());
+  const pendentes = useRef(new Map<string, { arquivo: File; requestId: string; anexo?: Anexo }>());
 
   useEffect(() => {
     const faltam = mensagens
@@ -152,6 +153,10 @@ export default function PaginaConversas() {
 
   /** Sobe o arquivo (se houver) direto para o armazenamento e depois envia a mensagem. */
   async function subirEEnviar(tmpId: string, contatoId: string, texto: string, respondeA: string | null, arquivo: File | null, jaSubido?: Anexo) {
+    if (arquivo && ehArquivoPdf(arquivo)) {
+      const pendente = pendentes.current.get(tmpId);
+      return enviarPdf(arquivo, pendente?.requestId ?? crypto.randomUUID(), { destinatarioId: contatoId }, texto, respondeA);
+    }
     let anexo = jaSubido ?? null;
     if (arquivo && !anexo) {
       const caminho = `${meuId}/${crypto.randomUUID()}-${nomeSeguro(arquivo.name)}`;
@@ -180,15 +185,20 @@ export default function PaginaConversas() {
 
   async function enviar(texto: string, respondeA: string | null = null, arquivo: File | null = null) {
     if (!ativa || !meuId) return "Escolha uma conversa.";
-    if (arquivo) { const motivo = validarArquivo(arquivo); if (motivo) return motivo; }
-    const tmpId = `tmp-${Date.now()}`;
+    if (arquivo) { const motivo = await validarArquivo(arquivo); if (motivo) return motivo; }
+    if (arquivo && ehArquivoPdf(arquivo)) {
+      const anterior = [...pendentes.current.entries()].find(([id, p]) =>
+        p.arquivo === arquivo && mensagens.some((m) => m.id === id && m.falhou && m.destinatario_id === ativa.id));
+      if (anterior) return reenviar(anterior[0]);
+    }
+    const tmpId = `tmp-${crypto.randomUUID()}`;
     const provisoria: Local = {
       id: tmpId, remetente_id: meuId, destinatario_id: ativa.id, texto,
       criado_em: new Date().toISOString(), lida_em: null, recebida_em: null, editada_em: null, apagada_em: null, responde_a: respondeA,
       ...(arquivo ? { anexo_caminho: `tmp/${tmpId}`, anexo_nome: arquivo.name, anexo_tipo: arquivo.type, anexo_tamanho: arquivo.size } : {}),
     };
     if (arquivo) {
-      pendentes.current.set(tmpId, { arquivo });
+      pendentes.current.set(tmpId, { arquivo, requestId: crypto.randomUUID() });
       if (ehImagem(arquivo.type) || ehVideo(arquivo.type)) setUrls((atual) => ({ ...atual, [`tmp/${tmpId}`]: URL.createObjectURL(arquivo) }));
     }
     setMensagens((atual) => [...atual, provisoria]);
@@ -196,7 +206,7 @@ export default function PaginaConversas() {
     if (!r || !r.ok) {
       // A mensagem fica na conversa marcada como falha, com "Tentar novamente".
       setMensagens((atual) => atual.map((x) => (x.id === tmpId ? { ...x, falhou: true } : x)));
-      return null;
+      return r && !r.ok ? r.mensagem : "Não foi possível enviar. Tente novamente.";
     }
     concluir(tmpId, r.mensagem);
     return null;
@@ -204,21 +214,23 @@ export default function PaginaConversas() {
 
   async function reenviar(id: string) {
     const falha = mensagens.find((m) => m.id === id);
-    if (!falha || !ativa) return;
+    if (!falha || !ativa) return "Escolha uma conversa.";
     setMensagens((atual) => atual.map((x) => (x.id === id ? { ...x, falhou: false } : x)));
     const guardado = pendentes.current.get(id);
     const r = await subirEEnviar(id, ativa.id, falha.texto, falha.responde_a ?? null, guardado?.arquivo ?? null, guardado?.anexo);
     if (!r || !r.ok) {
       setMensagens((atual) => atual.map((x) => (x.id === id ? { ...x, falhou: true } : x)));
-      return;
+      return r && !r.ok ? r.mensagem : "Não foi possível enviar. Tente novamente.";
     }
     concluir(id, r.mensagem);
+    return null;
   }
 
   /** Baixa o arquivo com o nome original (link temporário só para este clique); imagens podem só abrir. */
   async function baixar(id: string, visualizar = false) {
     const m = mensagens.find((x) => x.id === id);
-    if (!m?.anexo_caminho || !m.anexo_nome || anexoExpirado(m.criado_em, m.anexo_caminho)) return false;
+    if (!m?.anexo_caminho || !m.anexo_nome || anexoExpirado(m.criado_em, m.anexo_caminho, m.anexo_tipo)) return false;
+    if (m.anexo_tipo === "application/pdf") return ativa ? abrirOuBaixarPdf(m, { destinatarioId: ativa.id }, visualizar) : false;
     const aberta = urls[m.anexo_caminho];
     if (visualizar && aberta) { window.open(aberta, "_blank", "noopener"); return true; }
     const { data } = await criarClienteNavegador().storage.from("anexos").createSignedUrl(m.anexo_caminho, 60, { download: m.anexo_nome });
@@ -293,7 +305,7 @@ export default function PaginaConversas() {
       anexo: m.anexo_nome && !m.apagada_em
         ? {
             nome: m.anexo_nome, tipo: m.anexo_tipo ?? "", tamanho: m.anexo_tamanho ?? 0,
-            expirado: anexoExpirado(m.criado_em, m.anexo_caminho),
+            expirado: anexoExpirado(m.criado_em, m.anexo_caminho, m.anexo_tipo),
             url: m.anexo_caminho ? urls[m.anexo_caminho] ?? null : null,
           }
         : null,

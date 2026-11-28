@@ -9,6 +9,7 @@ import { Carregando } from "@design/componentes/carregando";
 import { Icone } from "@design/icones/icone";
 import { Avatar } from "../../contatos/avatar";
 import { ehImagem, ehVideo, formatarTamanho, resumoMensagem, TIPOS_DOCUMENTO, TIPOS_MIDIA, validarArquivo } from "../../mensagens/anexos";
+import { ehArquivoPdf } from "../../mensagens/pdf-cliente";
 import { DialogoContato, DialogoEnquete } from "../../mensagens/dialogos-extras";
 import type { PessoaEscolhivel } from "../../mensagens/dialogos-extras";
 import type { DadosEnquete } from "../../mensagens/extras";
@@ -64,7 +65,7 @@ type Props = {
   aoTentarLista: () => void;
   erroHistorico: boolean;
   aoTentarHistorico: () => void;
-  aoReenviar: (id: string) => void;
+  aoReenviar: (id: string) => Promise<string | null>;
   conversas: ResumoConversa[];
   /** Contatos que ainda não têm conversa (para começar uma). */
   novos: Pessoa[];
@@ -166,9 +167,9 @@ export function TelaConversas({
   const abrirEntrada = (ref: React.RefObject<HTMLInputElement | null>) => async () => { ref.current?.click(); return null; };
   useEffect(() => () => { if (previa) URL.revokeObjectURL(previa); }, [previa]);
 
-  function escolher(f: File | null | undefined) {
+  async function escolher(f: File | null | undefined) {
     if (!f) return;
-    const motivo = validarArquivo(f);
+    const motivo = await validarArquivo(f);
     if (motivo) { setErro(motivo); return; }
     setErro("");
     setEditando(null);
@@ -177,7 +178,7 @@ export function TelaConversas({
   }
   function colar(e: ClipboardEvent<HTMLTextAreaElement>) {
     const f = Array.from(e.clipboardData.files).find((x) => ehImagem(x.type));
-    if (f) { e.preventDefault(); escolher(f); }
+    if (f) { e.preventDefault(); void escolher(f); }
   }
 
   // Acompanha as mensagens novas só quando a pessoa está no fim; se subiu para ler, não puxa de volta.
@@ -478,6 +479,14 @@ export function TelaConversas({
                           <div className={estilos.anexoImagem}>
                             {it.m.anexo.url ? <video src={it.m.anexo.url} controls playsInline preload="metadata" aria-label={it.m.anexo.nome} /> : <span className={estilos.anexoCarregando} />}
                           </div>
+                        ) : it.m.anexo.tipo === "application/pdf" ? (
+                          <button type="button" className={estilos.anexoPdf} onClick={() => void aoBaixar(it.m.id, true).then((ok) => { if (!ok) setAviso("Não foi possível abrir o PDF"); })} aria-label={`Abrir PDF ${it.m.anexo.nome}`} disabled={it.m.status === "enviando" || it.m.status === "falha"}>
+                            <Icone nome="arquivo-pdf" width={36} height={36} />
+                            <span className={estilos.anexoPdfDados}>
+                              <strong title={it.m.anexo.nome}>{it.m.anexo.nome}</strong>
+                              <em>PDF · {formatarTamanho(it.m.anexo.tamanho)}</em>
+                            </span>
+                          </button>
                         ) : (
                           <button type="button" className={estilos.anexoArquivo} onClick={() => void aoBaixar(it.m.id).then((ok) => { if (!ok) setAviso("Não foi possível baixar"); })} aria-label={`Baixar ${it.m.anexo.nome}`} title="Baixar" disabled={it.m.status === "enviando"}>
                             <Icone nome="documento" width={28} height={28} />
@@ -523,7 +532,7 @@ export function TelaConversas({
                             {it.m.minha && !it.m.apagada && <Tiques status={it.m.status} />}
                           </span>
                         </p>
-                        {it.m.status === "falha" && <button type="button" className={estilos.tentar} onClick={() => aoReenviar(it.m.id)}>Falha ao enviar. Tentar novamente</button>}
+                        {it.m.status === "falha" && <button type="button" className={estilos.tentar} disabled={enviando} onClick={() => { setEnviando(true); setErro(""); void aoReenviar(it.m.id).then((falha) => { if (falha) setErro(falha); }).catch(() => setErro("Não foi possível enviar. Tente novamente.")).finally(() => setEnviando(false)); }}>Falha ao enviar. Tentar novamente</button>}
                       </div>
                     </div>
                   ),
@@ -549,7 +558,7 @@ export function TelaConversas({
               )}
               {arquivo && !editando && (
                 <div className={estilos.respondendo}>
-                  {previa ? <img className={estilos.miniatura} src={previa} alt="" /> : <Icone nome={ehVideo(arquivo.type) ? "foto-video" : "documento"} width={28} height={28} />}
+                  {previa ? <img className={estilos.miniatura} src={previa} alt="" /> : <Icone nome={ehArquivoPdf(arquivo) ? "arquivo-pdf" : ehVideo(arquivo.type) ? "foto-video" : "documento"} width={28} height={28} />}
                   <div className={estilos.citacaoBarra}>
                     <strong>{arquivo.name}</strong>
                     <span>{formatarTamanho(arquivo.size)}</span>
@@ -566,9 +575,9 @@ export function TelaConversas({
                 </div>
               )}
               <div className={estilos.entrada}>
-                <input ref={entradaDocumento} type="file" hidden accept={TIPOS_DOCUMENTO.join(",")} onChange={(e) => { escolher(e.target.files?.[0]); e.target.value = ""; }} />
-                <input ref={entradaMidia} type="file" hidden accept={TIPOS_MIDIA.join(",")} onChange={(e) => { escolher(e.target.files?.[0]); e.target.value = ""; }} />
-                <input ref={entradaCamera} type="file" hidden accept="image/*" capture="environment" onChange={(e) => { escolher(e.target.files?.[0]); e.target.value = ""; }} />
+                <input ref={entradaDocumento} type="file" hidden accept={TIPOS_DOCUMENTO.join(",")} onChange={(e) => { void escolher(e.target.files?.[0]); e.target.value = ""; }} />
+                <input ref={entradaMidia} type="file" hidden accept={TIPOS_MIDIA.join(",")} onChange={(e) => { void escolher(e.target.files?.[0]); e.target.value = ""; }} />
+                <input ref={entradaCamera} type="file" hidden accept="image/*" capture="environment" onChange={(e) => { void escolher(e.target.files?.[0]); e.target.value = ""; }} />
                 {!editando && (
                   <MenuAcoes
                     rotulo="Anexar"
