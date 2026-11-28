@@ -18,6 +18,7 @@ import { lerAutores, lerGrupos, lerMembros, lerMensagensGrupo, marcarLidoGrupo }
 import { useGruposAoVivo } from "../../grupos/use-grupos-ao-vivo";
 import { InfoGrupo } from "../../grupos/info-grupo";
 import type { GrupoResumo, MembroGrupo } from "../../grupos/tipos";
+import { ehArquivoPdf, enviarPdf, abrirOuBaixarPdf } from "../../mensagens/pdf-cliente";
 
 type Local = Mensagem & { falhou?: boolean };
 type Autores = Record<string, { nome: string; foto_url: string | null }>;
@@ -39,7 +40,7 @@ export default function PaginaComunidades() {
   ativaRef.current = ativaId;
   const [urls, setUrls] = useState<Record<string, string>>({});
   const pedidas = useRef(new Set<string>());
-  const pendentes = useRef(new Map<string, { arquivo: File; anexo?: Anexo }>());
+  const pendentes = useRef(new Map<string, { arquivo: File; requestId: string; anexo?: Anexo }>());
 
   const ativa = grupos.find((g) => g.id === ativaId) ?? null;
 
@@ -135,6 +136,10 @@ export default function PaginaComunidades() {
   useGruposAoVivo(meuId, aoNova, aoMudar, aoGrupo);
 
   async function subirEEnviar(tmpId: string, grupoId: string, texto: string, respondeA: string | null, arquivo: File | null, jaSubido?: Anexo) {
+    if (arquivo && ehArquivoPdf(arquivo)) {
+      const pendente = pendentes.current.get(tmpId);
+      return enviarPdf(arquivo, pendente?.requestId ?? crypto.randomUUID(), { grupoId }, texto, respondeA);
+    }
     let anexo = jaSubido ?? null;
     if (arquivo && !anexo) {
       const caminho = `${meuId}/${crypto.randomUUID()}-${nomeSeguro(arquivo.name)}`;
@@ -163,22 +168,27 @@ export default function PaginaComunidades() {
 
   async function enviar(texto: string, respondeA: string | null = null, arquivo: File | null = null) {
     if (!ativa || !meuId) return "Escolha uma comunidade.";
-    if (arquivo) { const motivo = validarArquivo(arquivo); if (motivo) return motivo; }
-    const tmpId = `tmp-${Date.now()}`;
+    if (arquivo) { const motivo = await validarArquivo(arquivo); if (motivo) return motivo; }
+    if (arquivo && ehArquivoPdf(arquivo)) {
+      const anterior = [...pendentes.current.entries()].find(([id, p]) =>
+        p.arquivo === arquivo && mensagens.some((m) => m.id === id && m.falhou && m.grupo_id === ativa.id));
+      if (anterior) return reenviar(anterior[0]);
+    }
+    const tmpId = `tmp-${crypto.randomUUID()}`;
     const provisoria: Local = {
       id: tmpId, remetente_id: meuId, destinatario_id: null, grupo_id: ativa.id, texto,
       criado_em: new Date().toISOString(), lida_em: null, recebida_em: null, editada_em: null, apagada_em: null, responde_a: respondeA,
       ...(arquivo ? { anexo_caminho: `tmp/${tmpId}`, anexo_nome: arquivo.name, anexo_tipo: arquivo.type, anexo_tamanho: arquivo.size } : {}),
     };
     if (arquivo) {
-      pendentes.current.set(tmpId, { arquivo });
+      pendentes.current.set(tmpId, { arquivo, requestId: crypto.randomUUID() });
       if (ehImagem(arquivo.type) || ehVideo(arquivo.type)) setUrls((atual) => ({ ...atual, [`tmp/${tmpId}`]: URL.createObjectURL(arquivo) }));
     }
     setMensagens((atual) => [...atual, provisoria]);
     const r = await subirEEnviar(tmpId, ativa.id, texto, respondeA, arquivo);
     if (!r || !r.ok) {
       setMensagens((atual) => atual.map((x) => (x.id === tmpId ? { ...x, falhou: true } : x)));
-      return null;
+      return r && !r.ok ? r.mensagem : "Não foi possível enviar. Tente novamente.";
     }
     concluir(tmpId, r.mensagem);
     return null;
@@ -186,17 +196,19 @@ export default function PaginaComunidades() {
 
   async function reenviar(id: string) {
     const falha = mensagens.find((m) => m.id === id);
-    if (!falha || !ativa) return;
+    if (!falha || !ativa) return "Escolha uma comunidade.";
     setMensagens((atual) => atual.map((x) => (x.id === id ? { ...x, falhou: false } : x)));
     const guardado = pendentes.current.get(id);
     const r = await subirEEnviar(id, ativa.id, falha.texto, falha.responde_a ?? null, guardado?.arquivo ?? null, guardado?.anexo);
-    if (!r || !r.ok) { setMensagens((atual) => atual.map((x) => (x.id === id ? { ...x, falhou: true } : x))); return; }
+    if (!r || !r.ok) { setMensagens((atual) => atual.map((x) => (x.id === id ? { ...x, falhou: true } : x))); return r && !r.ok ? r.mensagem : "Não foi possível enviar. Tente novamente."; }
     concluir(id, r.mensagem);
+    return null;
   }
 
   async function baixar(id: string, visualizar = false) {
     const m = mensagens.find((x) => x.id === id);
-    if (!m?.anexo_caminho || !m.anexo_nome || anexoExpirado(m.criado_em, m.anexo_caminho)) return false;
+    if (!m?.anexo_caminho || !m.anexo_nome || anexoExpirado(m.criado_em, m.anexo_caminho, m.anexo_tipo)) return false;
+    if (m.anexo_tipo === "application/pdf") return ativa ? abrirOuBaixarPdf(m, { grupoId: ativa.id }, visualizar) : false;
     const aberta = urls[m.anexo_caminho];
     if (visualizar && aberta) { window.open(aberta, "_blank", "noopener"); return true; }
     const { data } = await criarClienteNavegador().storage.from("anexos").createSignedUrl(m.anexo_caminho, 60, { download: m.anexo_nome });
@@ -275,7 +287,7 @@ export default function PaginaComunidades() {
       contato: m.contato_ref ? pessoas[m.contato_ref] ?? null : null, ehEnquete: !!m.enquete, enquete: enquetes[m.id] ?? null,
       autor: autor ? { nome: autor.nome, fotoUrl: autor.foto_url } : null,
       anexo: m.anexo_nome && !m.apagada_em
-        ? { nome: m.anexo_nome, tipo: m.anexo_tipo ?? "", tamanho: m.anexo_tamanho ?? 0, expirado: anexoExpirado(m.criado_em, m.anexo_caminho), url: m.anexo_caminho ? urls[m.anexo_caminho] ?? null : null }
+        ? { nome: m.anexo_nome, tipo: m.anexo_tipo ?? "", tamanho: m.anexo_tamanho ?? 0, expirado: anexoExpirado(m.criado_em, m.anexo_caminho, m.anexo_tipo), url: m.anexo_caminho ? urls[m.anexo_caminho] ?? null : null }
         : null,
     };
   });

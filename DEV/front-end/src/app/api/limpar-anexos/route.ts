@@ -18,7 +18,7 @@ export async function GET(requisicao: Request) {
   const supabase = createClient(url, chave, { auth: { persistSession: false } });
   const limite = new Date(Date.now() - DIAS_ANEXO * 864e5).toISOString();
   const { data, error } = await supabase.from("mensagens").select("id, anexo_caminho")
-    .not("anexo_caminho", "is", null).lt("criado_em", limite).limit(500);
+    .not("anexo_caminho", "is", null).or("anexo_tipo.is.null,anexo_tipo.neq.application/pdf").lt("criado_em", limite).limit(500);
   if (error) return NextResponse.json({ erro: error.message }, { status: 500 });
   const linhas = data ?? [];
   if (linhas.length === 0) return NextResponse.json({ apagados: 0 });
