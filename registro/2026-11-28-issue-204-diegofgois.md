@@ -2,7 +2,7 @@
 
 Quem: Diego (diegofgois)
 Data: 2026-11-28
-PR: não aberto (conforme instrução)
+PR: https://github.com/Os-Baianos/project-teamtalk/pull/246
 
 ## O que foi feito
 - A policy do Storage impede que o atalho de leitura da pasta do remetente exponha PDFs; o objeto PDF só é legível quando sua mensagem está visível pela RLS aos participantes.
